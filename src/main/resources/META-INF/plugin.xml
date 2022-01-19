@@ -1,0 +1,22 @@
+<idea-plugin>
+    <id>com.bamboo.bamboo-tool</id>
+    <name>bamboo-tool</name>
+    <vendor email="760560079@qq.com" url="http://www.yourcompany.com">bamboo</vendor>
+
+    <description> <![CDATA[
+        1111111 ]]>
+    </description>
+    <!-- 插件版本号 -->
+    <version>1.0</version>
+    <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+</idea-plugin>
