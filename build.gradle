@@ -7,18 +7,30 @@ group 'com.bamboo'
 version '1.0-SNAPSHOT'
 
 repositories {
+    maven { name "Alibaba"; url "https://maven.aliyun.com/repository/public" }
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+
+    implementation 'com.alibaba:fastjson:1.2.47'
+    implementation group: 'cn.hutool', name: 'hutool-all', version: '5.7.19'
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version = '2021.3.1'
-    localPath ="E:\\install\\tool\\idea\\IntelliJ IDEA 2021.3.1"
+    localPath = "D:\\install\\tools\\Idea\\IntelliJ IDEA 2021.3"
+    plugins = ['java']
+
 }
 patchPluginXml {
     changeNotes = """

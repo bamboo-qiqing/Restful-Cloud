@@ -1,21 +1,24 @@
 <idea-plugin>
     <id>com.bamboo.bamboo-tool</id>
     <name>bamboo-tool</name>
-    <vendor email="760560079@qq.com" url="http://www.yourcompany.com">bamboo</vendor>
+    <vendor email="760560079@qq.com" url="http://baidu.com">bamboo</vendor>
 
-    <description> <![CDATA[
-        1111111 ]]>
-    </description>
+    <description>111</description>
     <!-- 插件版本号 -->
     <version>1.0</version>
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
          on how to target different products -->
-    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
+    <depends>com.intellij.spring</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
     </extensions>
 
+ <projectListeners>
+     <listener class="com.bamboo.tool.listeners.BambooProjectManagerListener" topic="com.intellij.openapi.project.ProjectManagerListener"/>
+ </projectListeners>
     <actions>
         <!-- Add your actions here -->
     </actions>
