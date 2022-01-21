@@ -1,9 +1,10 @@
 package com.bamboo.tool.config.model;
 
+import cn.hutool.core.io.FileUtil;
+import com.bamboo.tool.components.api.entity.ApiMethod;
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Create by GuoQing
@@ -13,5 +14,9 @@ import java.util.Map;
 @Data
 public class BambooToolConfig {
 
-    private String projectSavePath =  System.getProperty("user.home")+"\\bambooTool\\";
+    private String projectSavePath = FileUtil.getUserHomePath() + "\\bambooTool\\";
+
+    private ProjectInfo projectInfo;
+
+    private List<ApiMethod> apiMethods;
 }

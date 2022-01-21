@@ -1,6 +1,7 @@
 package com.bamboo.tool.config;
 
 import com.bamboo.tool.config.model.BambooToolConfig;
+import com.bamboo.tool.config.model.ProjectInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -9,6 +10,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -27,6 +29,8 @@ public class BambooToolComponent implements PersistentStateComponent<BambooToolC
     BambooToolConfig getState() {
         if (Objects.isNull(toolConfig)) {
             toolConfig = new BambooToolConfig();
+            toolConfig.setProjectInfo(new ProjectInfo());
+            toolConfig.setApiMethods(new ArrayList<>());
         }
         return toolConfig;
     }
