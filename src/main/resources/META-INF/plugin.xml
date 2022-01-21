@@ -14,11 +14,15 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
+        <projectService  serviceImplementation="com.bamboo.tool.components.api.frameworkType.impl.SpringFrameworkImpl"/>
+        <projectService serviceImplementation="com.bamboo.tool.components.api.frameworkType.impl.JaxFrameworkImpl"/>
+
     </extensions>
 
- <projectListeners>
-     <listener class="com.bamboo.tool.listeners.BambooProjectManagerListener" topic="com.intellij.openapi.project.ProjectManagerListener"/>
- </projectListeners>
+    <projectListeners>
+        <listener class="com.bamboo.tool.listeners.ToolProjectManagerListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </projectListeners>
     <actions>
         <!-- Add your actions here -->
     </actions>

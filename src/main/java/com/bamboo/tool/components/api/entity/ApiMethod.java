@@ -9,9 +9,32 @@ import lombok.Data;
  */
 @Data
 public class ApiMethod {
+    /**
+     * url地址
+     */
     private String url;
+    /**
+     * 描述
+     */
     private String description;
-    private String name;
+    /**
+     * 方法名称
+     */
+    private String methodName;
+    /**
+     * 方法类型
+     */
     private String methodType;
+    /**
+     * 文件名
+     */
     private String className;
+    /**
+     * 模块名
+     */
+    private String moduleName;
+    /**
+     * 包名
+     */
+    private String packageName;
 }

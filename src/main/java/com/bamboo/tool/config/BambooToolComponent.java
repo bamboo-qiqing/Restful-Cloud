@@ -1,5 +1,7 @@
 package com.bamboo.tool.config;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.bamboo.tool.config.model.BambooToolConfig;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.intellij.openapi.application.ApplicationManager;
@@ -29,9 +31,17 @@ public class BambooToolComponent implements PersistentStateComponent<BambooToolC
     BambooToolConfig getState() {
         if (Objects.isNull(toolConfig)) {
             toolConfig = new BambooToolConfig();
-            toolConfig.setProjectInfo(new ProjectInfo());
+        }
+        if(toolConfig.getApiMethods()==null){
             toolConfig.setApiMethods(new ArrayList<>());
         }
+        if(toolConfig.getProjectInfo()==null){
+            toolConfig.setProjectInfo(new ProjectInfo());
+        }
+        if(StrUtil.isEmpty(toolConfig.getProjectSavePath())){
+            toolConfig.setProjectSavePath(FileUtil.getUserHomePath() + "\\bambooTool\\");
+        }
+
         return toolConfig;
     }
 

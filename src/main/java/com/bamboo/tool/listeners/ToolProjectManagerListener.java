@@ -2,15 +2,20 @@ package com.bamboo.tool.listeners;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.bamboo.tool.components.api.entity.ApiMethod;
+import com.bamboo.tool.components.api.frameworkType.FrameworkExecute;
 import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.BambooToolConfig;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.util.FileUtil;
+import com.bamboo.tool.util.PsiClassUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManagerListener;
+import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,15 +31,14 @@ public class ToolProjectManagerListener implements ProjectManagerListener {
         BambooToolConfig state = BambooToolComponent.getInstance().getState();
         String projectName = project.getName();
         String projectPath = project.getBasePath();
-        String apiUrlFileName = String.format("%sApi.json", projectName);
-        String apiUrlFilePath = String.format("%s%s%s%s", state.getProjectSavePath(), projectName + "\\", apiUrlFileName);
+        String apiUrlFileName = String.format("%s-api.json", projectName);
+        String apiUrlFilePath = String.format("%s%s%s", state.getProjectSavePath(), projectName + "\\", apiUrlFileName);
         ProjectInfo projectInfo = state.getProjectInfo();
         projectInfo.setProjectName(projectName);
         projectInfo.setProjectPath(projectPath);
         projectInfo.setProjectPath(apiUrlFilePath);
         ProjectManagerListener.super.projectOpened(project);
     }
-
 
 
     @Override
@@ -49,10 +53,12 @@ public class ToolProjectManagerListener implements ProjectManagerListener {
 
     @Override
     public void projectClosingBeforeSave(@NotNull Project project) {
+
+        FrameworkExecute.buildApiMethod(project);
         ProjectManagerListener.super.projectClosingBeforeSave(project);
     }
 
-    private ProjectInfo loadProjectInfo(@NotNull Project project,  BambooToolConfig  config) {
+    private ProjectInfo loadProjectInfo(@NotNull Project project, BambooToolConfig config) {
         String projectName = project.getName();
         String projectPath = project.getBasePath();
         String projectSavePath = config.getProjectSavePath();
@@ -65,10 +71,7 @@ public class ToolProjectManagerListener implements ProjectManagerListener {
             projectInfos = new ArrayList<>();
         }
 
-        ProjectInfo projectInfo = projectInfos.stream()
-                .filter(e -> e.getProjectPath().equals(project.getBasePath()))
-                .filter(e -> e.getProjectName().equals(project.getName()))
-                .findFirst().get();
+        ProjectInfo projectInfo = projectInfos.stream().filter(e -> e.getProjectPath().equals(project.getBasePath())).filter(e -> e.getProjectName().equals(project.getName())).findFirst().get();
         if (Objects.isNull(projectInfo)) {
             String apiUrlFileName = String.format("%sApi.json", projectName);
             String apiUrlFilePath = String.format("%s%s%s%s", projectSavePath, projectName + "\\", apiUrlFileName);

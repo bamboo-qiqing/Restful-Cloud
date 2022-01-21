@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class BambooToolConfig {
 
-    private String projectSavePath = FileUtil.getUserHomePath() + "\\bambooTool\\";
+    private String projectSavePath ;
 
     private ProjectInfo projectInfo;
 
