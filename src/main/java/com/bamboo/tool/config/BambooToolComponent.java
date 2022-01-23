@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * Create by GuoQing
  * Date 2022/1/20 10:58
- * Description url工具配置类
+ * Description
  */
 @State(name = "bambooTool", storages = {@Storage("bambooTool.xml")})
 public class BambooToolComponent implements PersistentStateComponent<BambooToolConfig> {

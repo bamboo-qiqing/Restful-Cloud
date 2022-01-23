@@ -1,6 +1,10 @@
 package com.bamboo.tool.components.api.entity;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Create by GuoQing
@@ -10,31 +14,30 @@ import lombok.Data;
 @Data
 public class ApiMethod {
     /**
-     * url地址
-     */
-    private String url;
-    /**
      * 描述
      */
-    private String description;
+    private String description = StringUtils.EMPTY;
     /**
      * 方法名称
      */
-    private String methodName;
+    private String methodName = StringUtils.EMPTY;
+
     /**
-     * 方法类型
+     * 请求类型
      */
-    private String methodType;
+    private List<String> methodTypes;
+
     /**
-     * 文件名
+     * 方法Url地址
      */
-    private String className;
+    private List<String> methodUrls = new ArrayList<>();
+
     /**
-     * 模块名
+     * url地址
      */
-    private String moduleName;
-    /**
-     * 包名
-     */
-    private String packageName;
+    private String url = StringUtils.EMPTY;
+
+    private List<String> contentTypes = new ArrayList<>();
+    private List<String> headers = new ArrayList<>();
+    private List<String> params = new ArrayList<>();
 }

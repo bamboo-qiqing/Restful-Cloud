@@ -14,8 +14,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
-        <projectService  serviceImplementation="com.bamboo.tool.components.api.frameworkType.impl.SpringFrameworkImpl"/>
-        <projectService serviceImplementation="com.bamboo.tool.components.api.frameworkType.impl.JaxFrameworkImpl"/>
 
     </extensions>
 
