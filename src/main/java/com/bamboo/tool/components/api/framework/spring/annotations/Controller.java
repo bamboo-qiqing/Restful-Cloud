@@ -14,7 +14,6 @@ import java.util.Objects;
 @Data
 public class Controller implements ClassAnnotationProcess {
 
-    private String path;
 
     @Override
     public void buildClass(ApiClass apiMethod, PsiAnnotation psiAnnotation) {

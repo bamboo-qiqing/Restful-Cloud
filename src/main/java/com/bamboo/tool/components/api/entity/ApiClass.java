@@ -1,6 +1,5 @@
 package com.bamboo.tool.components.api.entity;
 
-import com.google.protobuf.Api;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 

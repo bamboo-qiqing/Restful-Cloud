@@ -29,10 +29,10 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
         for (PsiNameValuePair pair : pairs) {
             String attributeName = pair.getName();
             // value和path 属性获取
-            if (Objects.equals(attributeName, "value") || Objects.equals(attributeName, "path")) {
+            if (Objects.equals(attributeName, "value") || Objects.equals(attributeName, "path")||StringUtil.isBlank(attributeName)||StringUtil.isBlank(attributeName)) {
                 String text = pair.getText();
                 if (StringUtil.isNotBlank(text)) {
-                    apiMethod.getClassUrls().addAll(StringUtil.getAttributes(text));
+                    apiMethod.getClassUrls().addAll(StringUtil.getAttributes(text,pair));
                 }
             }
         }
@@ -52,10 +52,10 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
         for (PsiNameValuePair pair : pairs) {
             String attributeName = pair.getName();
             // url
-            if (Objects.equals(attributeName, "value") || Objects.equals(attributeName, "path")) {
+            if (Objects.equals(attributeName, "value") || Objects.equals(attributeName, "path")||StringUtil.isBlank(attributeName)) {
                 String text = pair.getText();
                 if (StringUtil.isNotBlank(text)) {
-                    apiMethod.getMethodUrls().addAll(StringUtil.getAttributes(text));
+                    apiMethod.getMethodUrls().addAll(StringUtil.getAttributes(text,pair));
                 }
             }
             // method
@@ -69,14 +69,14 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
             if (Objects.equals(attributeName, "produces") || Objects.equals(attributeName, "consumes")) {
                 String text = pair.getText();
                 if (StringUtil.isNotBlank(text)) {
-                    apiMethod.getContentTypes().addAll(StringUtil.getAttributes(text));
+                    apiMethod.getContentTypes().addAll(StringUtil.getAttributes(text,pair));
                 }
             }
             //headers
             if (Objects.equals(attributeName, "headers")) {
                 String text = pair.getText();
                 if (StringUtil.isNotBlank(text)) {
-                    apiMethod.getHeaders().addAll(StringUtil.getAttributes(text));
+                    apiMethod.getHeaders().addAll(StringUtil.getAttributes(text,pair));
                 }
             }
         }

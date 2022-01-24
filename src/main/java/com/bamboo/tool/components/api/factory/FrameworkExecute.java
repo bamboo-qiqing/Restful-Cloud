@@ -13,6 +13,7 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMethod;
+import com.intellij.util.SlowOperations;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -83,16 +84,17 @@ public class FrameworkExecute {
         return apiClasses;
     }
 
-    private static ApiMethod
-    buildMethod(PsiAnnotation[] classAnnotations, PsiMethod method) {
+    private static ApiMethod buildMethod(PsiAnnotation[] classAnnotations, PsiMethod method) {
         ApiMethod apiMethod = new ApiMethod();
         PsiAnnotation[] methodAnnotations = method.getAnnotations();
         if (classAnnotations == null || classAnnotations.length < 1) {
             return null;
         }
+        apiMethod.setMethodName(method.getName());
         for (PsiAnnotation methodAnnotation : methodAnnotations) {
             PsiJavaCodeReferenceElement referenceElement = methodAnnotation.getNameReferenceElement();
-            MethodAnnotationProcess methodAnnotationProcess = methodAnnotationProcessMap.get(methodAnnotation.getQualifiedName());
+            String qualifiedName = methodAnnotation.getQualifiedName();
+            MethodAnnotationProcess methodAnnotationProcess = methodAnnotationProcessMap.get(qualifiedName);
             if (!Objects.isNull(methodAnnotationProcess) && methodAnnotationProcess.getClassShortName().equals(referenceElement.getReferenceName())) {
                 methodAnnotationProcess.buildMethod(apiMethod, methodAnnotation);
             }
