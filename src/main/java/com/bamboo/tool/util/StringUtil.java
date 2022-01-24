@@ -17,13 +17,13 @@ public class StringUtil extends StrUtil {
     public static List<String> getAttributes(String attributes, PsiNameValuePair pair) {
         List<String> attributesList = new ArrayList<>();
         if (attributes.contains(StrUtil.COMMA)) {
-            char[] chars = {'{', '}', '"','/' };
-            StrUtil.replaceChars(attributes, chars, "");
+            char[] chars = {'{', '}', '"',' ' };
+            attributes = StrUtil.replaceChars(attributes, chars, "");
             attributesList = StrUtil.split(attributes, StrUtil.COMMA);
         } else {
             attributes = pair.getValue().getText();
             if (attributes.contains(String.valueOf(CharPool.DOUBLE_QUOTES))) {
-                char[] chars = {'"','/' };
+                char[] chars = {'"','{', '}',' ' };
                 String attribute = StrUtil.replaceChars(attributes, chars, "");
                 attributesList.add(attribute);
             } else {

@@ -1,6 +1,7 @@
 package com.bamboo.tool.components.api.framework.spring.annotations;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
 import com.bamboo.tool.components.api.enums.ClassAnnotationType;
@@ -14,7 +15,9 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiNameValuePair;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Data
 public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationProcess {
@@ -29,12 +32,32 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
         for (PsiNameValuePair pair : pairs) {
             String attributeName = pair.getName();
             // value和path 属性获取
-            if (Objects.equals(attributeName, "value") || Objects.equals(attributeName, "path")||StringUtil.isBlank(attributeName)||StringUtil.isBlank(attributeName)) {
+            if (Objects.equals(attributeName, "value")) {
+                String text = pair.getValue().getText();
+                if (StringUtil.isNotBlank(text)) {
+                    apiMethod.getClassUrls().addAll(StringUtil.getAttributes(text,pair));
+                }
+            }
+            if (Objects.equals(attributeName, "path")) {
+                String text = pair.getValue().getText();
+                if (StringUtil.isNotBlank(text)) {
+                    apiMethod.getClassUrls().addAll(StringUtil.getAttributes(text,pair));
+                }
+            }
+            if ( StringUtil.isBlank(attributeName)) {
                 String text = pair.getText();
                 if (StringUtil.isNotBlank(text)) {
                     apiMethod.getClassUrls().addAll(StringUtil.getAttributes(text,pair));
                 }
             }
+
+        }
+        if(CollectionUtil.isNotEmpty(apiMethod.getClassUrls())){
+            List<String> classUrls = apiMethod.getClassUrls()
+                    .parallelStream()
+                    .map(e -> CharSequenceUtil.addPrefixIfNot(e, "/"))
+                    .collect(Collectors.toList());
+            apiMethod.setClassUrls(classUrls);
         }
     }
 
@@ -82,6 +105,13 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
         }
         if (CollectionUtil.isEmpty(apiMethod.getMethodTypes())) {
             apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
+        }
+        if(CollectionUtil.isNotEmpty(apiMethod.getMethodUrls())){
+            List<String> classUrls = apiMethod.getMethodUrls()
+                    .parallelStream()
+                    .map(e -> CharSequenceUtil.addPrefixIfNot(e, "/"))
+                    .collect(Collectors.toList());
+            apiMethod.setMethodUrls(classUrls);
         }
     }
 

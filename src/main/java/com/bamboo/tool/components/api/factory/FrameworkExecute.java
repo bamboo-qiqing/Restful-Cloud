@@ -1,5 +1,6 @@
 package com.bamboo.tool.components.api.factory;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
@@ -29,12 +30,8 @@ public class FrameworkExecute {
     public static Map<String, MethodAnnotationProcess> methodAnnotationProcessMap = new HashMap();
 
     static {
-        classAnnotationProcessMap = Arrays.stream(ClassAnnotationType.values())
-                .filter(e -> e.getClassAnnotationProcess() != null)
-                .collect(Collectors.toMap(e -> e.getClassPath(), e -> e.getClassAnnotationProcess()));
-        methodAnnotationProcessMap = Arrays.stream(MethodAnnotationType.values())
-                .filter(e -> e.getMethodAnnotationProcess() != null)
-                .collect(Collectors.toMap(e -> e.getCode(), e -> e.getMethodAnnotationProcess()));
+        classAnnotationProcessMap = Arrays.stream(ClassAnnotationType.values()).filter(e -> e.getClassAnnotationProcess() != null).collect(Collectors.toMap(e -> e.getClassPath(), e -> e.getClassAnnotationProcess()));
+        methodAnnotationProcessMap = Arrays.stream(MethodAnnotationType.values()).filter(e -> e.getMethodAnnotationProcess() != null).collect(Collectors.toMap(e -> e.getCode(), e -> e.getMethodAnnotationProcess()));
     }
 
     /**
@@ -98,6 +95,9 @@ public class FrameworkExecute {
             if (!Objects.isNull(methodAnnotationProcess) && methodAnnotationProcess.getClassShortName().equals(referenceElement.getReferenceName())) {
                 methodAnnotationProcess.buildMethod(apiMethod, methodAnnotation);
             }
+        }
+        if (CollectionUtil.isEmpty(apiMethod.getMethodUrls())) {
+            return null;
         }
         return apiMethod;
     }

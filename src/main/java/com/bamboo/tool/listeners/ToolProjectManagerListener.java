@@ -2,20 +2,12 @@ package com.bamboo.tool.listeners;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
-import cn.hutool.core.thread.ThreadUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.bamboo.tool.components.api.entity.ApiClass;
-import com.bamboo.tool.components.api.factory.FrameworkExecute;
 import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.BambooToolConfig;
 import com.bamboo.tool.config.model.ProjectInfo;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManagerListener;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +17,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Create by GuoQing
@@ -41,7 +32,7 @@ public class ToolProjectManagerListener implements ProjectManagerListener {
         String projectName = project.getName();
         String projectPath = project.getBasePath();
         String apiUrlFileName = String.format("%s-api.json", projectName);
-        String apiUrlFilePath = String.format("%s%s%s",projectPath,"\\.idea\\bamboo-api\\", apiUrlFileName);
+        String apiUrlFilePath = String.format("%s%s%s",projectPath,"/.idea/bamboo-api/", apiUrlFileName);
 
         boolean exist = FileUtil.exist(projectsPath);
         List<ProjectInfo> bambooToolConfigs;
