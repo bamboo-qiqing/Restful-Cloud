@@ -1,0 +1,13 @@
+{
+	"main": "index.html",
+	"logo": "logo.png",
+	"preload": "preload.js",
+	"cmds": [ "api", "bamboo" ],
+	"features": [
+		{
+		  "code": "bamboo",
+		  "explain": "bamboo",
+			"cmds":["bamboo", "bamboo"]
+		}
+	]
+}

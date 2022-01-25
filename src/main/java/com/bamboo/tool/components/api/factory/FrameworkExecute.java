@@ -65,14 +65,8 @@ public class FrameworkExecute {
 
                 // 构建ApiMethod
                 PsiMethod[] methods = psiClass.getMethods();
-                List<ApiMethod> apiMethods = new ArrayList<>();
-                for (PsiMethod method : methods) {
-                    ApiMethod apiMethod = buildMethod(classAnnotations, method);
-                    if (apiMethod != null) {
-                        apiMethods.add(apiMethod);
-                    }
-                }
-
+                List<ApiMethod> apiMethods = Arrays.stream(methods).parallel().map(e -> buildMethod(e))
+                        .filter(e -> e != null).collect(Collectors.toList());
                 apiClass.setMethods(apiMethods);
                 apiClasses.add(apiClass);
             }
@@ -81,16 +75,16 @@ public class FrameworkExecute {
         return apiClasses;
     }
 
-    private static ApiMethod buildMethod(PsiAnnotation[] classAnnotations, PsiMethod method) {
+    private static ApiMethod buildMethod( PsiMethod method) {
         ApiMethod apiMethod = new ApiMethod();
         PsiAnnotation[] methodAnnotations = method.getAnnotations();
-        if (classAnnotations == null || classAnnotations.length < 1) {
+        if (methodAnnotations == null || methodAnnotations.length < 1) {
             return null;
         }
         apiMethod.setMethodName(method.getName());
         for (PsiAnnotation methodAnnotation : methodAnnotations) {
             PsiJavaCodeReferenceElement referenceElement = methodAnnotation.getNameReferenceElement();
-            String qualifiedName = methodAnnotation.getQualifiedName();
+            String qualifiedName = referenceElement.getCanonicalText();
             MethodAnnotationProcess methodAnnotationProcess = methodAnnotationProcessMap.get(qualifiedName);
             if (!Objects.isNull(methodAnnotationProcess) && methodAnnotationProcess.getClassShortName().equals(referenceElement.getReferenceName())) {
                 methodAnnotationProcess.buildMethod(apiMethod, methodAnnotation);
