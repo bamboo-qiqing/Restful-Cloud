@@ -5,9 +5,15 @@ import cn.hutool.core.io.file.FileReader;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.bamboo.tool.components.api.entity.ApiClass;
+import com.bamboo.tool.components.api.factory.FrameworkExecute;
 import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.BambooToolConfig;
 import com.bamboo.tool.config.model.ProjectInfo;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManagerListener;
 import org.jetbrains.annotations.NotNull;
@@ -67,5 +73,10 @@ public class ToolProjectManagerListener implements ProjectManagerListener {
             e.printStackTrace();
         }
         ProjectManagerListener.super.projectOpened(project);
+    }
+
+    @Override
+    public void projectClosing(@NotNull Project project) {
+
     }
 }

@@ -5,7 +5,7 @@ let projectsPath = os.homedir() + "\\bambooTool\\bamboo-projects.json"
 let projects = loadJson(projectsPath);
 
 window.readConfig = function () {
-   return  getAllApi();
+    return getAllApi();
 }
 
 function getAllApi() {
@@ -22,6 +22,7 @@ function loadJson(filepath) {
     try {
         data = fs.readFileSync(filepath, 'utf8');
         data = JSON.parse(data);
+        console.log(data)
     } catch (err) {
         console.log(err);
     }

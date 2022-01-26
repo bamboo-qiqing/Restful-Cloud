@@ -11,6 +11,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Create by GuoQing
@@ -29,21 +31,22 @@ public class ToolPostStartupActivity implements StartupActivity {
 
     @Override
     public void runActivity(@NotNull Project project) {
+        BambooToolConfig state = BambooToolComponent.getInstance().getState();
+        List<ApiClass> apiClasses=FrameworkExecute.buildApiMethod(project);
 
-        ApplicationManager.getApplication().runReadAction(()->{
-            BambooToolConfig state = BambooToolComponent.getInstance().getState();
-            List<ApiClass> apiClasses = FrameworkExecute.buildApiMethod(project);
-            FileWriter writer = null;
-            try {
-                String formatStr = JSON.toJSONString(apiClasses, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
-                        SerializerFeature.WriteDateUseDateFormat);
-                File touch = FileUtil.touch(state.getProjectInfo().getApiUrlFilePath());
-                writer = new FileWriter(touch);
-                writer.write(formatStr);
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        FileWriter writer = null;
+        try {
+            String formatStr = JSON.toJSONString(apiClasses, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
+                    SerializerFeature.WriteDateUseDateFormat);
+            File touch = FileUtil.touch(state.getProjectInfo().getApiUrlFilePath());
+            writer = new FileWriter(touch);
+            writer.write(formatStr);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+
+
 }

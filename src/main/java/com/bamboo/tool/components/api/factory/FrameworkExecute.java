@@ -14,6 +14,9 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.search.ProjectScope;
+import com.intellij.psi.search.searches.AllClassesSearch;
+import com.intellij.util.Query;
 import com.intellij.util.SlowOperations;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +33,7 @@ public class FrameworkExecute {
     public static Map<String, MethodAnnotationProcess> methodAnnotationProcessMap = new HashMap();
 
     static {
-        classAnnotationProcessMap = Arrays.stream(ClassAnnotationType.values()).filter(e -> e.getClassAnnotationProcess() != null).collect(Collectors.toMap(e -> e.getClassPath(), e -> e.getClassAnnotationProcess()));
+        classAnnotationProcessMap = Arrays.stream(ClassAnnotationType.values()).filter(e -> e.getClassAnnotationProcess() != null).collect(Collectors.toMap(e -> e.getClassAnnotationProcess().getClassShortName(), e -> e.getClassAnnotationProcess()));
         methodAnnotationProcessMap = Arrays.stream(MethodAnnotationType.values()).filter(e -> e.getMethodAnnotationProcess() != null).collect(Collectors.toMap(e -> e.getCode(), e -> e.getMethodAnnotationProcess()));
     }
 
@@ -43,33 +46,30 @@ public class FrameworkExecute {
     public static List<ApiClass> buildApiMethod(Project project) {
         List<ApiClass> apiClasses = new ArrayList<>();
         Collection<PsiClass> allPsiClass = PsiUtil.getALLPsiClass(project);
-        allPsiClass.stream().forEach(psiClass -> {
-            Module module = ModuleUtil.findModuleForPsiElement(psiClass);
-            if (module != null) {
+        allPsiClass.forEach(psiClass->{
                 // 构建apiclass
-                ApiClass apiClass = new ApiClass();
-                apiClass.setModuleName(module.getName());
-                apiClass.setClassName(psiClass.getName());
-
-                String packageName = getPackageName(psiClass);
-                apiClass.setPackageName(packageName);
-
                 PsiAnnotation[] classAnnotations = psiClass.getAnnotations();
-                for (PsiAnnotation classAnnotation : classAnnotations) {
-                    PsiJavaCodeReferenceElement referenceElement = classAnnotation.getNameReferenceElement();
-                    ClassAnnotationProcess classAnnotationProcess = classAnnotationProcessMap.get(classAnnotation.getQualifiedName());
-                    if (!Objects.isNull(classAnnotationProcess) && classAnnotationProcess.getClassShortName().equals(referenceElement.getReferenceName())) {
-                        classAnnotationProcess.buildClass(apiClass, classAnnotation);
-                    }
-                }
+                if(classAnnotations.length>0){
+                    ApiClass apiClass = new ApiClass();
+                    apiClass.setClassName(psiClass.getName());
+                    String packageName = getPackageName(psiClass);
+                    apiClass.setPackageName(packageName);
+                    for (PsiAnnotation classAnnotation : classAnnotations) {
+                        PsiJavaCodeReferenceElement referenceElement = classAnnotation.getNameReferenceElement();
+                        String referenceName = referenceElement.getReferenceName();
+                        ClassAnnotationProcess classAnnotationProcess = classAnnotationProcessMap.get(referenceName);
+                        if (!Objects.isNull(classAnnotationProcess) ) {
+                            classAnnotationProcess.buildClass(apiClass, classAnnotation);
 
-                // 构建ApiMethod
-                PsiMethod[] methods = psiClass.getMethods();
-                List<ApiMethod> apiMethods = Arrays.stream(methods).parallel().map(e -> buildMethod(e))
-                        .filter(e -> e != null).collect(Collectors.toList());
-                apiClass.setMethods(apiMethods);
-                apiClasses.add(apiClass);
-            }
+                        }
+                    }
+                    // 构建ApiMethod
+                    PsiMethod[] methods = psiClass.getMethods();
+                    List<ApiMethod> apiMethods = Arrays.stream(methods).parallel().map(e -> buildMethod(e))
+                            .filter(e -> e != null).collect(Collectors.toList());
+                    apiClass.setMethods(apiMethods);
+                    apiClasses.add(apiClass);
+                }
 
         });
         return apiClasses;
@@ -84,7 +84,7 @@ public class FrameworkExecute {
         apiMethod.setMethodName(method.getName());
         for (PsiAnnotation methodAnnotation : methodAnnotations) {
             PsiJavaCodeReferenceElement referenceElement = methodAnnotation.getNameReferenceElement();
-            String qualifiedName = referenceElement.getCanonicalText();
+            String qualifiedName = referenceElement.getQualifiedName();
             MethodAnnotationProcess methodAnnotationProcess = methodAnnotationProcessMap.get(qualifiedName);
             if (!Objects.isNull(methodAnnotationProcess) && methodAnnotationProcess.getClassShortName().equals(referenceElement.getReferenceName())) {
                 methodAnnotationProcess.buildMethod(apiMethod, methodAnnotation);

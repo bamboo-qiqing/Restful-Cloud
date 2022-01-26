@@ -10,6 +10,7 @@ import com.intellij.util.Query;
 import java.util.*;
 
 public class PsiUtil {
+    static List<ClassAnnotationType> classAnnotationTypes = Arrays.asList(ClassAnnotationType.values());
 
     public static final Collection<PsiClass> getALLPsiClass(Project project) {
         Query<PsiClass> query = AllClassesSearch.search(ProjectScope.getContentScope(project), project);
@@ -18,6 +19,6 @@ public class PsiUtil {
     }
 
     private static boolean isContainsAnnotation(PsiClass psiClass) {
-        return Arrays.asList(ClassAnnotationType.values()).stream().filter(a -> psiClass.getAnnotation(a.getClassPath()) != null).count() > 1;
+        return classAnnotationTypes.parallelStream().filter(a -> psiClass.getAnnotation(a.getClassPath()) != null).count() > 1;
     }
 }
