@@ -15,10 +15,10 @@ import java.util.List;
 public class ApiMethod {
     private String description = StringUtils.EMPTY;
     private String methodName = StringUtils.EMPTY;
-    private List<String> methodTypes= new ArrayList<>();
+    private List<String> methodTypes = new ArrayList<>();
     private List<String> methodUrls = new ArrayList<>();
-    private String url = StringUtils.EMPTY;
     private List<String> contentTypes = new ArrayList<>();
     private List<String> headers = new ArrayList<>();
     private List<String> params = new ArrayList<>();
+    private List<String> urls = new ArrayList<>();
 }

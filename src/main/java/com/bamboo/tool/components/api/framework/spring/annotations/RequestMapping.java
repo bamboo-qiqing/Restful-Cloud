@@ -67,7 +67,7 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
     }
 
     @Override
-    public void buildMethod(ApiMethod apiMethod, PsiAnnotation annotation) {
+    public void buildMethod(ApiMethod apiMethod, PsiAnnotation annotation, ApiClass apiClass) {
         PsiNameValuePair[] pairs = annotation.getParameterList().getAttributes();
         if (pairs == null && pairs.length < 1) {
             return;
@@ -112,6 +112,11 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
                     .map(e -> CharSequenceUtil.addPrefixIfNot(e, "/"))
                     .collect(Collectors.toList());
             apiMethod.setMethodUrls(classUrls);
+
+            apiClass.getClassUrls().parallelStream().forEach(e->{
+                List<String> urls = apiMethod.getMethodUrls().parallelStream().map(a -> e + a).collect(Collectors.toList());
+                apiMethod.getUrls().addAll(urls);
+            });
         }
     }
 

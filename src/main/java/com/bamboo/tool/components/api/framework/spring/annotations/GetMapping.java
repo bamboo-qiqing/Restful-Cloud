@@ -2,6 +2,7 @@ package com.bamboo.tool.components.api.framework.spring.annotations;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
 import com.bamboo.tool.components.api.enums.FrameworkType;
 import com.bamboo.tool.components.api.enums.MethodAnnotationType;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 public class GetMapping implements MethodAnnotationProcess {
 
     @Override
-    public void buildMethod(ApiMethod apiMethod, PsiAnnotation annotation) {
+    public void buildMethod(ApiMethod apiMethod, PsiAnnotation annotation, ApiClass apiClass) {
         apiMethod.getMethodTypes().add(RequestMethod.GET.getCode());
 
         PsiNameValuePair[] pairs = annotation.getParameterList().getAttributes();
@@ -64,6 +65,10 @@ public class GetMapping implements MethodAnnotationProcess {
                     .collect(Collectors.toList());
             apiMethod.setMethodUrls(classUrls);
         }
+        apiClass.getClassUrls().parallelStream().forEach(e->{
+            List<String> urls = apiMethod.getMethodUrls().parallelStream().map(a -> e + a).collect(Collectors.toList());
+            apiMethod.getUrls().addAll(urls);
+        });
     }
 
     @Override

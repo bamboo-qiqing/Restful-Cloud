@@ -21,20 +21,7 @@ public class Controller implements ClassAnnotationProcess {
 
     @Override
     public void buildClass(ApiClass apiMethod, PsiAnnotation psiAnnotation) {
-        PsiAnnotationMemberValue value = psiAnnotation.findDeclaredAttributeValue("value");
-        if (Objects.isNull(value)) {
-            return ;
-        }
-        if (StrUtil.isNotBlank(value.getText())) {
-            apiMethod.getClassUrls().add(value.getText());
-        }
-        if(CollectionUtil.isNotEmpty(apiMethod.getClassUrls())){
-            List<String> classUrls = apiMethod.getClassUrls()
-                    .parallelStream()
-                    .map(e -> CharSequenceUtil.addPrefixIfNot(e, "/"))
-                    .collect(Collectors.toList());
-            apiMethod.setClassUrls(classUrls);
-        }
+
     }
 
     @Override
