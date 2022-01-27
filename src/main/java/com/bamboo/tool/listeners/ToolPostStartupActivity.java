@@ -31,20 +31,20 @@ public class ToolPostStartupActivity implements StartupActivity {
 
     @Override
     public void runActivity(@NotNull Project project) {
-        BambooToolConfig state = BambooToolComponent.getInstance().getState();
-        List<ApiClass> apiClasses=FrameworkExecute.buildApiMethod(project);
-
-        FileWriter writer = null;
-        try {
-            String formatStr = JSON.toJSONString(apiClasses, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
-                    SerializerFeature.WriteDateUseDateFormat);
-            File touch = FileUtil.touch(state.getProjectInfo().getApiUrlFilePath());
-            writer = new FileWriter(touch);
-            writer.write(formatStr);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        BambooToolConfig state = BambooToolComponent.getInstance().getState();
+//        List<ApiClass> apiClasses=FrameworkExecute.buildApiMethod(project);
+//
+//        FileWriter writer = null;
+//        try {
+//            String formatStr = JSON.toJSONString(apiClasses, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
+//                    SerializerFeature.WriteDateUseDateFormat);
+//            File touch = FileUtil.touch(state.getProjectInfo().getApiUrlFilePath());
+//            writer = new FileWriter(touch);
+//            writer.write(formatStr);
+//            writer.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
 
