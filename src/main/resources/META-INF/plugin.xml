@@ -3,7 +3,11 @@
     <name>bamboo-tool</name>
     <vendor email="760560079@qq.com" url="http://baidu.com">bamboo</vendor>
 
-    <description>111</description>
+    <description><![CDATA[
+    Restful Fast Request is a powerful restful api toolkit plugin(http client)
+    ]]>
+    </description>
+
     <!-- 插件版本号 -->
     <version>1.0</version>
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
@@ -14,6 +18,8 @@
         <!-- Add your extensions here -->
         <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
         <postStartupActivity implementation="com.bamboo.tool.listeners.ToolPostStartupActivity"/>
+        <toolWindow id="tool api" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
+                    secondary="false"/>
     </extensions>
 
     <projectListeners>
