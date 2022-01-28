@@ -1,5 +1,6 @@
 package com.bamboo.tool.components.api.entity;
 
+import com.intellij.psi.PsiMethod;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -21,4 +22,5 @@ public class ApiMethod {
     private List<String> headers = new ArrayList<>();
     private List<String> params = new ArrayList<>();
     private List<String> urls = new ArrayList<>();
+    private PsiMethod psiMethod;
 }
