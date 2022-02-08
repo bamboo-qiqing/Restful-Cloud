@@ -1,34 +1,29 @@
-package com.bamboo.tool.components.api.framework.spring.annotations;
+﻿package com.bamboo.tool.components.api.framework.odianyun.annotations;
 
 import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.enums.ClassAnnotationType;
 import com.bamboo.tool.components.api.enums.FrameworkType;
 import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
 import com.intellij.psi.PsiAnnotation;
-import lombok.Data;
 
-@Data
-public class Controller implements ClassAnnotationProcess {
-
-
+public class SoaServiceRegister implements ClassAnnotationProcess {
     @Override
-    public void buildClass(ApiClass apiMethod, PsiAnnotation psiAnnotation) {
-
+    public void buildClass(ApiClass apiClass, PsiAnnotation psiAnnotation) {
+        System.out.printf("1");
     }
 
     @Override
     public ClassAnnotationType getClassAnnotationType() {
-        return ClassAnnotationType.CONTROLLER;
+        return ClassAnnotationType.SOA_SERVICE_REGISTER;
     }
 
     @Override
     public String getClassShortName() {
-        return "Controller";
+        return "SoaServiceRegister";
     }
 
     @Override
     public FrameworkType getFrameworkType() {
-        return FrameworkType.SPRING;
+        return FrameworkType.O_DIAN_YUN;
     }
-
 }

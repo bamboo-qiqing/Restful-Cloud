@@ -1,6 +1,5 @@
 package com.bamboo.tool.components.api.entity;
 
-import b.C.S;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.intellij.psi.PsiMethod;
 import lombok.Data;

@@ -6,7 +6,7 @@ package com.bamboo.tool.components.api.enums;
  * Description
  */
 public enum FrameworkType {
-    SPRING, JAX_RS;
+    SPRING, JAX_RS, O_DIAN_YUN;
 
 
 }

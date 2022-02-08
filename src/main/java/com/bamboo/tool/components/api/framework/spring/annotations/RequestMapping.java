@@ -32,7 +32,6 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
 
         for (PsiNameValuePair pair : pairs) {
             String attributeName = pair.getName();
-            // value和path 属性获取
             if (Objects.equals(attributeName, "value")) {
                 String text = pair.getValue().getText();
                 if (StringUtil.isNotBlank(text)) {

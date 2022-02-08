@@ -40,8 +40,6 @@ public class ApiTree extends Tree implements TreeExpander {
                 expandAll(path, expand);
             }
         }
-
-        // 展开或收起必须自下而上进行
         if (expand) {
             expandPath(parent);
         } else {

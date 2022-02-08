@@ -7,7 +7,7 @@ import com.intellij.psi.PsiAnnotation;
 
 public interface ClassAnnotationProcess {
 
-    void buildClass(ApiClass apiMethod, PsiAnnotation psiAnnotation);
+    void buildClass(ApiClass apiClass, PsiAnnotation psiAnnotation);
 
     ClassAnnotationType getClassAnnotationType();
 

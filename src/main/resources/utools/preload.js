@@ -14,13 +14,13 @@ window.getAllProject = function () {
             }
         }
     });
+    console.log(projects)
     return projects;
 }
 
 window.getMethod = function (input) {
-    console.log(input)
     let methods = []
-    db.all("select *  from bamboo_api_method where url like ? ", [("%" + input + "%")], function (err, row) {
+    db.all("select bam.*,bap.project_name,bap.project_path from bamboo_api_method bam inner join bamboo_api_project bap on bam.project_id = bap.id where url  like ? ", [("%" + input + "%")], function (err, row) {
         if (row) {
             for (let i = 0; i < row.length; i++) {
                 methods.push(row[i])

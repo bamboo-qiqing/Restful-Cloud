@@ -9,35 +9,35 @@ import com.bamboo.tool.util.StringUtil;
  */
 public class SqlConstant {
     /**
-     * åˆ›å»ºapié¡¹ç›®è¡¨
+     * ´´½¨apiÏîÄ¿±í
      */
     public static final String CREAT_PROJECT_SQL = "create table bamboo_api_project ( id integer not null constraint bamboo_api_project_pk primary key autoincrement, project_name text, project_path text, api_file_path text, api_file_name text );";
 
     /**
-     * åˆ›å»ºapiæ–¹æ³•è¡¨
+     * ´´½¨api·½·¨±í
      */
     public static final String CREAT_METHOD_SQL = "create table bamboo_api_method ( id integer not null constraint bamboo_api_method_pk primary key autoincrement, project_id integer not null, description text, method_name text, method_type text, content_type text, header text, params text, url text, model_name text, class_name text, class_desc text );";
 
     /**
-     * sqlite_master æŸ¥è¯¢è¡¨
+     * sqlite_master ²éÑ¯±í
      */
     public static final String SQLITE_MASTER_QUERY = "SELECT  * FROM sqlite_master WHERE type='table' AND name = '{}'";
 
     /**
-     * api é¡¹ç›®è¡¨å
+     * api ÏîÄ¿±íÃû
      */
     public static final String PROJECT_TABLE_NAME = "bamboo_api_project";
     /**
-     * api æ–¹æ³•è¡¨å
+     * api ·½·¨±íÃû
      */
     public static final String METHOD_TABLE_NAME = "bamboo_api_method";
 
     /**
-     * æŸ¥è¯¢apié¡¹ç›®è¡¨ä¿¡æ¯
+     * ²éÑ¯apiÏîÄ¿±íĞÅÏ¢
      */
     public static final String QUERY_PROJECT_TABLE = StringUtil.format(SQLITE_MASTER_QUERY, PROJECT_TABLE_NAME);
     /**
-     * æŸ¥è¯¢apiæ–¹æ³•è¡¨ä¿¡æ¯
+     * ²éÑ¯api·½·¨±íĞÅÏ¢
      */
     public static final String QUERY_METHOD_TABLE = StringUtil.format(SQLITE_MASTER_QUERY, METHOD_TABLE_NAME);
 }

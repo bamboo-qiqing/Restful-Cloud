@@ -1,6 +1,7 @@
 package com.bamboo.tool.components.api.enums;
 
 import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
+import com.bamboo.tool.components.api.framework.odianyun.annotations.SoaServiceRegister;
 import com.bamboo.tool.components.api.framework.spring.annotations.Controller;
 import com.bamboo.tool.components.api.framework.spring.annotations.RequestMapping;
 import com.bamboo.tool.components.api.framework.spring.annotations.RestController;
@@ -16,8 +17,10 @@ public enum ClassAnnotationType {
     REST_CONTROLLER("org.springframework.web.bind.annotation.RestController", new RestController()),
     CONTROLLER("org.springframework.stereotype.Controller", new Controller()),
     REQUEST_MAPPING("org.springframework.web.bind.annotation.RequestMapping", new RequestMapping()),
-    JAVAX_PATH("javax.ws.rs.Path", null);
+    JAVAX_PATH("javax.ws.rs.Path", null),
 
+
+    SOA_SERVICE_REGISTER("com.odianyun.soa.annotation.SoaServiceRegister", new SoaServiceRegister());
     private String classPath;
     private ClassAnnotationProcess classAnnotationProcess;
 
