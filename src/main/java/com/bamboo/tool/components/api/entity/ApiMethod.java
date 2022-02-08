@@ -1,5 +1,7 @@
 package com.bamboo.tool.components.api.entity;
 
+import b.C.S;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.intellij.psi.PsiMethod;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -22,5 +24,8 @@ public class ApiMethod {
     private List<String> headers = new ArrayList<>();
     private List<String> params = new ArrayList<>();
     private List<String> urls = new ArrayList<>();
+    @JSONField(serialize = false)
+    private String urlStr;
+    @JSONField(serialize = false)
     private PsiMethod psiMethod;
 }

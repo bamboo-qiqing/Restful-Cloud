@@ -48,18 +48,22 @@ public class FrameworkExecute {
         List<ApiClass> apiClasses = new ArrayList<>();
         List<PsiClassCache> allPsiClass = PsiUtil.getALLPsiClass(project);
         allPsiClass.forEach(cache -> {
-            PsiClass psiClass = cache.getPsiClass();
-            ApiClass apiClass = new ApiClass();
-            apiClass.setClassName(psiClass.getName());
-            String packageName = getPackageName(psiClass);
-            apiClass.setPackageName(packageName);
-            List<PsiClassCache.ClassAnnotationProcessCache> classAnnotationProcesses = cache.getProcessCaches();
-            classAnnotationProcesses.parallelStream().forEach(e-> e.getClassAnnotationProcesses().buildClass(apiClass, e.getPsiAnnotation()));
-            // 构建ApiMethod
-            PsiMethod[] methods = psiClass.getMethods();
-            List<ApiMethod> apiMethods = Arrays.stream(methods).parallel().map(e -> buildMethod(e,apiClass)).filter(e -> e != null).collect(Collectors.toList());
-            apiClass.setMethods(apiMethods);
-            apiClasses.add(apiClass);
+            Module module = ModuleUtil.findModuleForPsiElement(cache.getPsiClass());
+            if (module != null) {
+                PsiClass psiClass = cache.getPsiClass();
+                ApiClass apiClass = new ApiClass();
+                apiClass.setClassName(psiClass.getName());
+                String packageName = getPackageName(psiClass);
+                apiClass.setPackageName(packageName);
+                apiClass.setModuleName(module.getName());
+                List<PsiClassCache.ClassAnnotationProcessCache> classAnnotationProcesses = cache.getProcessCaches();
+                classAnnotationProcesses.parallelStream().forEach(e-> e.getClassAnnotationProcesses().buildClass(apiClass, e.getPsiAnnotation()));
+                // 构建ApiMethod
+                PsiMethod[] methods = psiClass.getMethods();
+                List<ApiMethod> apiMethods = Arrays.stream(methods).parallel().map(e -> buildMethod(e,apiClass)).filter(e -> e != null).collect(Collectors.toList());
+                apiClass.setMethods(apiMethods);
+                apiClasses.add(apiClass);
+            }
         });
         return apiClasses;
     }
@@ -71,6 +75,7 @@ public class FrameworkExecute {
             return null;
         }
         apiMethod.setMethodName(method.getName());
+        apiMethod.setPsiMethod(method);
         for (PsiAnnotation methodAnnotation : methodAnnotations) {
             PsiJavaCodeReferenceElement referenceElement = methodAnnotation.getNameReferenceElement();
             String qualifiedName = referenceElement.getQualifiedName();

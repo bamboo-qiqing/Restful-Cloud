@@ -9,6 +9,8 @@ import lombok.Data;
  */
 @Data
 public class ProjectInfo {
+
+    private Integer id;
     /**
      * 项目Api url信息File地址
      */

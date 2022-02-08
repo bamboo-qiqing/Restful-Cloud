@@ -1,4 +1,4 @@
-﻿package com.bamboo.tool.components.api.view.component.tree;
+package com.bamboo.tool.components.api.view.component.tree;
 
 import com.intellij.ide.TreeExpander;
 import com.intellij.ui.treeStructure.Tree;

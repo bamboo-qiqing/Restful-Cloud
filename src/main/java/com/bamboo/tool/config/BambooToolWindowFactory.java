@@ -25,61 +25,17 @@ public class BambooToolWindowFactory implements ToolWindowFactory, DumbAware {
     private AllApisNavToolWindow allApisNavToolWindow;
 
     private final Map<String, AllApisNavToolWindow> allApisNavToolWindowMap = new ConcurrentHashMap<>();
+
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
 
         allApisNavToolWindow = new AllApisNavToolWindow(project);
         allApisNavToolWindowMap.put(project.getName(), allApisNavToolWindow);
-
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        
-
         allApisNavToolWindow.getComponent().add(allApisNavToolWindow.getContent());
-        Content allApis = contentFactory.createContent(allApisNavToolWindow, "API Navigate", true);
-        allApis.setIcon(AllIcons.Ide.LocalScopeAction);
-        allApis.putUserData(ToolWindow.SHOW_CONTENT_ICON, Boolean.TRUE);
+        Content allApis = contentFactory.createContent(allApisNavToolWindow, "apis", true);
         toolWindow.getContentManager().addContent(allApis);
 
-        //change data
-        MessageBus messageBus = project.getMessageBus();
-        MessageBusConnection connect = messageBus.connect();
-        connect.subscribe(ConfigChangeNotifier.PARAM_CHANGE_TOPIC, new ConfigChangeNotifier() {
-            @Override
-            public void configChanged(boolean active, String projectName) {
-                windowMap.get(projectName).refresh(false);
-            }
-        });
 
-        connect.subscribe(ConfigChangeNotifier.ENV_PROJECT_CHANGE_TOPIC,
-                new ConfigChangeNotifier() {
-                    @Override
-                    public void configChanged(boolean active, String projectName) {
-                        //有可能在全局配置下点击,
-                        FastRequestToolWindow window = windowMap.get(projectName);
-                        if (window != null) {
-                            window.changeEnvAndProject();
-                        }
-                    }
-                });
-
-        connect.subscribe(ConfigChangeNotifier.ADD_REQUEST_TOPIC,
-                new ConfigChangeNotifier() {
-                    @Override
-                    public void configChanged(boolean active, String projectName) {
-                        apiWindowMap.get(projectName).refresh();
-//                        collectionToolWindow.refresh();
-                    }
-                });
-
-        connect.subscribe(ConfigChangeNotifier.LOAD_REQUEST,
-                new ConfigChangeNotifier() {
-                    @Override
-                    public void loadRequest(CollectionConfiguration.CollectionDetail detail, String projectName) {
-                        windowMap.get(projectName).refreshByCollection(detail);
-//                    window.refreshByCollection(detail);
-                    }
-                });
-
-    }
     }
 }

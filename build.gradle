@@ -1,11 +1,13 @@
 plugins {
     id 'org.jetbrains.intellij' version '1.3.1'
     id 'java'
+    id 'groovy'
 }
 
 group 'com.bamboo'
 version '1.0-SNAPSHOT'
-
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 repositories {
     maven { name "Alibaba"; url "https://maven.aliyun.com/repository/public" }
     mavenCentral()
@@ -15,6 +17,7 @@ dependencies {
 
 
     implementation 'com.alibaba:fastjson:1.2.47'
+    implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.36.0.3'
     implementation group: 'cn.hutool', name: 'hutool-all', version: '5.7.19'
     compileOnly 'org.projectlombok:lombok:1.18.22'
 

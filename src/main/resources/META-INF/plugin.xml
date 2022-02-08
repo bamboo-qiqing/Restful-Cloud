@@ -17,9 +17,13 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
-        <postStartupActivity implementation="com.bamboo.tool.listeners.ToolPostStartupActivity"/>
+        <applicationService serviceImplementation="com.bamboo.tool.db.service.ApiProjectService"/>
+        <applicationService serviceImplementation="com.bamboo.tool.db.service.ApiMethodService"/>
+
         <toolWindow id="tool api" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
                     secondary="false"/>
+        <!--兼容性处理code-->
+        <notificationGroup id="toolWindowNotificationGroup" displayType="TOOL_WINDOW"/>
     </extensions>
 
     <projectListeners>
