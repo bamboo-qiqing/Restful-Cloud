@@ -1,6 +1,7 @@
 package com.bamboo.tool.components.api.enums;
 
 import com.bamboo.tool.components.api.factory.MethodAnnotationProcess;
+import com.bamboo.tool.components.api.framework.odianyun.annotations.SoaMethodRegister;
 import com.bamboo.tool.components.api.framework.spring.annotations.*;
 import lombok.Getter;
 
@@ -12,8 +13,8 @@ public enum MethodAnnotationType {
     REQUEST_MAPPING("org.springframework.web.bind.annotation.RequestMapping", new RequestMapping()),
     DELETE_MAPPING("org.springframework.web.bind.annotation.DeleteMapping", new DeleteMapping()),
     PUT_MAPPING("org.springframework.web.bind.annotation.PutMapping", new PutMapping()),
-    PATCH_MAPPING("org.springframework.web.bind.annotation.PatchMapping", new PatchMapping());
-
+    PATCH_MAPPING("org.springframework.web.bind.annotation.PatchMapping", new PatchMapping()),
+    SOA_METHOD_REGISTER("com.odianyun.soa.annotation.SoaMethodRegister", new SoaMethodRegister());
     private String code;
     private MethodAnnotationProcess methodAnnotationProcess;
 
