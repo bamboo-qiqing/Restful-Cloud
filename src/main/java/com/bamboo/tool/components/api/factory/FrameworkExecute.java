@@ -57,11 +57,8 @@ public class FrameworkExecute {
                 apiClass.setPackageName(packageName);
                 apiClass.setModuleName(module.getName());
                 List<PsiClassCache.ClassAnnotationProcessCache> classAnnotationProcesses = cache.getProcessCaches();
-                ArrayList<ClassAnnotationType> classAnnotationTypes = new ArrayList<>();
                 classAnnotationProcesses.parallelStream().forEach(e -> {
                     e.getClassAnnotationProcesses().buildClass(apiClass, e.getPsiAnnotation());
-                    ClassAnnotationProcess classAnnotationProcesses1 = e.getClassAnnotationProcesses();
-                    classAnnotationTypes.add(classAnnotationProcesses1.getClassAnnotationType());
                 });
 
                 // 构建ApiMethod
