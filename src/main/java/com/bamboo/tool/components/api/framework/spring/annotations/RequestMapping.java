@@ -4,10 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
-import com.bamboo.tool.components.api.enums.ClassAnnotationType;
-import com.bamboo.tool.components.api.enums.FrameworkType;
-import com.bamboo.tool.components.api.enums.MethodAnnotationType;
-import com.bamboo.tool.components.api.enums.RequestMethod;
+import com.bamboo.tool.components.api.enums.*;
 import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
 import com.bamboo.tool.components.api.factory.MethodAnnotationProcess;
 import com.bamboo.tool.util.PsiUtil;
@@ -25,6 +22,8 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
 
     @Override
     public void buildClass(ApiClass apiMethod, PsiAnnotation annotation) {
+        apiMethod.getTypes().add(getFrameworkType().getCode());
+        apiMethod.getTypes().add(InterfaceType.SERVICE.getCode());
         PsiNameValuePair[] pairs = annotation.getParameterList().getAttributes();
         if (pairs == null && pairs.length < 1) {
             return;
@@ -68,6 +67,8 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
 
     @Override
     public void buildMethod(ApiMethod apiMethod, PsiAnnotation annotation, ApiClass apiClass) {
+        apiMethod.getTypes().add(getFrameworkType().getCode());
+        apiMethod.getTypes().add(InterfaceType.SERVICE.getCode());
         PsiUtil.buildValuePair(apiMethod, annotation, apiClass,null);
     }
 

@@ -11,7 +11,10 @@ public class ApiClass {
     private String className = StringUtils.EMPTY;
     private String moduleName = StringUtils.EMPTY;
     private String packageName = StringUtils.EMPTY;
+    private String serviceName = StringUtils.EMPTY;
     private List<String> classUrls = new ArrayList<>();
     private String description = StringUtils.EMPTY;
+    private List<String> types = new ArrayList<>();
     private List<ApiMethod> methods;
+
 }

@@ -1,11 +1,11 @@
 package com.bamboo.tool.components.api.factory;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
 import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
-import com.bamboo.tool.components.api.enums.ClassAnnotationType;
-import com.bamboo.tool.components.api.enums.MethodAnnotationType;
+import com.bamboo.tool.components.api.enums.*;
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.util.PsiUtil;
 import com.intellij.openapi.module.Module;
@@ -57,10 +57,16 @@ public class FrameworkExecute {
                 apiClass.setPackageName(packageName);
                 apiClass.setModuleName(module.getName());
                 List<PsiClassCache.ClassAnnotationProcessCache> classAnnotationProcesses = cache.getProcessCaches();
-                classAnnotationProcesses.parallelStream().forEach(e-> e.getClassAnnotationProcesses().buildClass(apiClass, e.getPsiAnnotation()));
+                ArrayList<ClassAnnotationType> classAnnotationTypes = new ArrayList<>();
+                classAnnotationProcesses.parallelStream().forEach(e -> {
+                    e.getClassAnnotationProcesses().buildClass(apiClass, e.getPsiAnnotation());
+                    ClassAnnotationProcess classAnnotationProcesses1 = e.getClassAnnotationProcesses();
+                    classAnnotationTypes.add(classAnnotationProcesses1.getClassAnnotationType());
+                });
+
                 // 构建ApiMethod
                 PsiMethod[] methods = psiClass.getMethods();
-                List<ApiMethod> apiMethods = Arrays.stream(methods).parallel().map(e -> buildMethod(e,apiClass)).filter(e -> e != null).collect(Collectors.toList());
+                List<ApiMethod> apiMethods = Arrays.stream(methods).parallel().map(e -> buildMethod(e, apiClass)).filter(e -> e != null).collect(Collectors.toList());
                 apiClass.setMethods(apiMethods);
                 apiClasses.add(apiClass);
             }
@@ -68,25 +74,52 @@ public class FrameworkExecute {
         return apiClasses;
     }
 
-    private static ApiMethod buildMethod(PsiMethod method,ApiClass psiClass) {
+    private static ApiMethod buildMethod(PsiMethod method, ApiClass psiClass) {
         ApiMethod apiMethod = new ApiMethod();
-        PsiAnnotation[] methodAnnotations = method.getAnnotations();
-        if (methodAnnotations == null || methodAnnotations.length < 1) {
-            return null;
-        }
         apiMethod.setMethodName(method.getName());
         apiMethod.setPsiMethod(method);
-        for (PsiAnnotation methodAnnotation : methodAnnotations) {
-            PsiJavaCodeReferenceElement referenceElement = methodAnnotation.getNameReferenceElement();
-            String qualifiedName = referenceElement.getQualifiedName();
-            MethodAnnotationProcess methodAnnotationProcess = methodAnnotationProcessMap.get(qualifiedName);
-            if (!Objects.isNull(methodAnnotationProcess) && methodAnnotationProcess.getClassShortName().equals(referenceElement.getReferenceName())) {
-                methodAnnotationProcess.buildMethod(apiMethod, methodAnnotation,psiClass);
+
+        boolean isSoa = true;
+        PsiAnnotation[] methodAnnotations = method.getAnnotations();
+        if (methodAnnotations != null || methodAnnotations.length > 0) {
+            for (PsiAnnotation methodAnnotation : methodAnnotations) {
+                PsiJavaCodeReferenceElement referenceElement = methodAnnotation.getNameReferenceElement();
+                String qualifiedName = referenceElement.getQualifiedName();
+                MethodAnnotationProcess methodAnnotationProcess = methodAnnotationProcessMap.get(qualifiedName);
+                if (!Objects.isNull(methodAnnotationProcess) && methodAnnotationProcess.getClassShortName().equals(referenceElement.getReferenceName())) {
+                    methodAnnotationProcess.buildMethod(apiMethod, methodAnnotation, psiClass);
+                    isSoa = false;
+                }
+            }
+        }
+        if (isSoa) {
+            String odianyun = FrameworkType.O_DIAN_YUN.getCode();
+            String serviceCode = InterfaceType.SERVICE.getCode();
+            String clientCode = InterfaceType.CLIENT.getCode();
+            if (psiClass.getTypes().contains(odianyun)) {
+                if (psiClass.getTypes().contains(clientCode)) {
+                    apiMethod.getMethodUrls().add(method.getName());
+                    apiMethod.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
+                    apiMethod.getTypes().add(InterfaceType.CLIENT.getCode());
+                    apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
+                }
+                if (psiClass.getTypes().contains(serviceCode)) {
+                    apiMethod.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
+                    apiMethod.getTypes().add(InterfaceType.SERVICE.getCode());
+                    apiMethod.getMethodUrls().add(method.getName());
+                    apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
+                }
             }
         }
         if (CollectionUtil.isEmpty(apiMethod.getMethodUrls())) {
             return null;
         }
+        List<String> classUrls = apiMethod.getMethodUrls().parallelStream().map(e -> CharSequenceUtil.addPrefixIfNot(e, "/")).collect(Collectors.toList());
+        apiMethod.setMethodUrls(classUrls);
+        psiClass.getClassUrls().parallelStream().forEach(e -> {
+            List<String> urls = apiMethod.getMethodUrls().parallelStream().map(a -> e + a).collect(Collectors.toList());
+            apiMethod.getUrls().addAll(urls);
+        });
         return apiMethod;
     }
 

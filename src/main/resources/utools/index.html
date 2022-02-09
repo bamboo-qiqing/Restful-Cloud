@@ -35,6 +35,10 @@
                                 {{method.url}}
                                 <span class="class-name">
                                  <el-tag size="small"> {{method.project_name}}</el-tag>
+                                 <el-tag size="small" type="success"  effect="dark"
+                                         v-if="method.types.includes('O_DIAN_YUN')&&method.types.includes('CLIENT')">消费</el-tag>
+                                     <el-tag size="small" type="danger"  effect="dark"
+                                             v-if="method.types.includes('O_DIAN_YUN')&&method.types.includes('SERVICE')">服务</el-tag>
                                </span>
                             </div>
                         </el-col>

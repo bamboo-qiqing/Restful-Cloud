@@ -1,6 +1,8 @@
 package com.bamboo.tool.components.api.enums;
 
 import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
+import com.bamboo.tool.components.api.framework.odianyun.annotations.SoaMethodClient;
+import com.bamboo.tool.components.api.framework.odianyun.annotations.SoaServiceClient;
 import com.bamboo.tool.components.api.framework.odianyun.annotations.SoaServiceRegister;
 import com.bamboo.tool.components.api.framework.spring.annotations.Controller;
 import com.bamboo.tool.components.api.framework.spring.annotations.RequestMapping;
@@ -20,7 +22,8 @@ public enum ClassAnnotationType {
     JAVAX_PATH("javax.ws.rs.Path", null),
 
 
-    SOA_SERVICE_REGISTER("com.odianyun.soa.annotation.SoaServiceRegister", new SoaServiceRegister());
+    SOA_SERVICE_REGISTER("com.odianyun.soa.annotation.SoaServiceRegister", new SoaServiceRegister()),
+    SOA_SERVICE_CLIENT("com.odianyun.soa.client.annotation.SoaServiceClient", new SoaServiceClient());
     private String classPath;
     private ClassAnnotationProcess classAnnotationProcess;
 

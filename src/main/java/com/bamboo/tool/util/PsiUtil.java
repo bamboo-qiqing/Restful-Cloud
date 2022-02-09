@@ -118,15 +118,6 @@ public class PsiUtil {
         if (CollectionUtil.isEmpty(apiMethod.getMethodTypes())) {
             apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
         }
-        if (CollectionUtil.isNotEmpty(apiMethod.getMethodUrls())) {
-            List<String> classUrls = apiMethod.getMethodUrls().parallelStream().map(e -> CharSequenceUtil.addPrefixIfNot(e, "/")).collect(Collectors.toList());
-            apiMethod.setMethodUrls(classUrls);
-
-            apiClass.getClassUrls().parallelStream().forEach(e -> {
-                List<String> urls = apiMethod.getMethodUrls().parallelStream().map(a -> e + a).collect(Collectors.toList());
-                apiMethod.getUrls().addAll(urls);
-            });
-        }
 
     }
 

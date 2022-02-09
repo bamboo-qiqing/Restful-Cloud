@@ -23,6 +23,7 @@ public class ApiMethod {
     private List<String> headers = new ArrayList<>();
     private List<String> params = new ArrayList<>();
     private List<String> urls = new ArrayList<>();
+    private List<String> types = new ArrayList<>();
     @JSONField(serialize = false)
     private String urlStr;
     @JSONField(serialize = false)
