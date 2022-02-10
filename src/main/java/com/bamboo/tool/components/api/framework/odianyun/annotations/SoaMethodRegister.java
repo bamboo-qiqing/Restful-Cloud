@@ -1,7 +1,5 @@
 package com.bamboo.tool.components.api.framework.odianyun.annotations;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
 import com.bamboo.tool.components.api.enums.FrameworkType;
@@ -12,9 +10,7 @@ import com.bamboo.tool.components.api.factory.MethodAnnotationProcess;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiNameValuePair;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class SoaMethodRegister implements MethodAnnotationProcess {
     @Override
