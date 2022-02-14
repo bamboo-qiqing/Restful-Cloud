@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class RequestMappingModel extends FilteringGotoByModel<FileType> {
-
     protected RequestMappingModel(@NotNull Project project, @NotNull List<ChooseByNameContributor> contributors) {
         super(project, contributors);
     }
@@ -85,7 +84,7 @@ public class RequestMappingModel extends FilteringGotoByModel<FileType> {
 
 
     @Override
-    public String @NotNull [] getSeparators() {
+    public String[] getSeparators() {
         return new String[0];
     }
 

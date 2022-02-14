@@ -1,6 +1,8 @@
 package com.bamboo.tool.components.api.view.action;
 
 import com.intellij.ide.actions.searcheverywhere.AbstractGotoSEContributor;
+import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributor;
+import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributorFactory;
 import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
 import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -44,5 +46,12 @@ public class FastRequestGotoContributor extends AbstractGotoSEContributor {
     @Nls String getAdvertisement() {
         return "type [/url] or [post /url] to search";
     }
+    static class Factory implements SearchEverywhereContributorFactory<Object> {
 
+        @Override
+        public @NotNull
+        SearchEverywhereContributor<Object> createContributor(@NotNull AnActionEvent initEvent) {
+            return new FastRequestGotoContributor(initEvent);
+        }
+    }
 }

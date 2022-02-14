@@ -31,12 +31,12 @@ public class GotoRequestAction extends SearchEverywhereBaseAction implements Dum
         if (project == null) return;
 
         boolean dumb = DumbService.isDumb(project);
-        if (!dumb || new SymbolSearchEverywhereContributor(anActionEvent).isDumbAware()) {
-            String tabID = Registry.is("search.everywhere.group.contributors.by.type")
-                    ? "SearchEverywhere.Project"
-                    : FastRequestGotoContributor.class.getSimpleName();
-            showInSearchEverywherePopup(tabID, anActionEvent, true, true);
-        }
+//        if (!dumb || new SymbolSearchEverywhereContributor(anActionEvent).isDumbAware()) {
+//            String tabID = Registry.is("search.everywhere.group.contributors.by.type")
+//                    ? "SearchEverywhere.Project"
+//                    : FastRequestGotoContributor.class.getSimpleName();
+//            showInSearchEverywherePopup(tabID, anActionEvent, true, true);
+//        }
     }
 
     @Override

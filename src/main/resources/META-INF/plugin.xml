@@ -24,8 +24,17 @@
                     secondary="false"/>
         <!--兼容性处理code-->
         <notificationGroup id="toolWindowNotificationGroup" displayType="TOOL_WINDOW"/>
-    </extensions>
 
+<!--        <searchEverywhereContributor-->
+<!--                implementation="com.bamboo.tool.components.api.view.action.FastRequestGotoContributor$Factory"/>-->
+
+    </extensions>
+   <actions>
+       <action id="bambooApi.goToBambooApiRequest"
+               class="com.bamboo.tool.components.api.view.action.GotoRequestAction">
+           <keyboard-shortcut first-keystroke="alt F" keymap="$default"/>
+       </action>
+   </actions>
     <projectListeners>
         <listener class="com.bamboo.tool.listeners.ToolProjectManagerListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>

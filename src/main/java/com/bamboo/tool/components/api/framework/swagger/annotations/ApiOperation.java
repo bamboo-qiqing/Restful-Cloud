@@ -20,7 +20,8 @@ public class ApiOperation implements MethodAnnotationProcess {
 
     @Override
     public MethodAnnotationType getMethodAnnotationType() {
-        return MethodAnnotationType.API_OPERATION;
+//        return MethodAnnotationType.API_OPERATION;
+        return null;
     }
 
     @Override
