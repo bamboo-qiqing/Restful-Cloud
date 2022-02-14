@@ -39,7 +39,6 @@ public class SoaServiceClient implements ClassAnnotationProcess {
         }
         String url = "";
         if (StringUtil.isNotEmpty(poolName)) {
-            url = url + CharSequenceUtil.addPrefixIfNot(poolName, "/")+"/cloud";
             apiClass.setServiceName(poolName);
         }
         if (StringUtil.isNotEmpty(interfaceName)) {

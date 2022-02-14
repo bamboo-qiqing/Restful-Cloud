@@ -7,7 +7,7 @@ import com.bamboo.tool.components.api.enums.InterfaceType;
 import com.bamboo.tool.components.api.enums.MethodAnnotationType;
 import com.bamboo.tool.components.api.enums.RequestMethod;
 import com.bamboo.tool.components.api.factory.MethodAnnotationProcess;
-import com.bamboo.tool.util.PsiUtil;
+import com.bamboo.tool.util.PsiUtils;
 import com.intellij.psi.PsiAnnotation;
 
 public class DeleteMapping implements MethodAnnotationProcess {
@@ -16,7 +16,7 @@ public class DeleteMapping implements MethodAnnotationProcess {
     public void buildMethod(ApiMethod apiMethod, PsiAnnotation annotation, ApiClass apiClass) {
         apiMethod.getTypes().add(getFrameworkType().getCode());
         apiMethod.getTypes().add(InterfaceType.SERVICE.getCode());
-        PsiUtil.buildValuePair(apiMethod, annotation, apiClass,RequestMethod.DELETE.getCode());
+        PsiUtils.buildValuePair(apiMethod, annotation, apiClass,RequestMethod.DELETE.getCode());
     }
 
     @Override

@@ -1,21 +1,22 @@
 package com.bamboo.tool.util;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
-import com.bamboo.tool.components.api.enums.ClassAnnotationType;
 import com.bamboo.tool.components.api.enums.RequestMethod;
 import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
 import com.bamboo.tool.components.api.factory.FrameworkExecute;
+import com.bamboo.tool.components.api.view.component.entity.MethodModel;
 import com.bamboo.tool.components.api.view.component.tree.*;
 import com.bamboo.tool.config.model.PsiClassCache;
+import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
 import com.intellij.util.Query;
 import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -23,7 +24,7 @@ import javax.swing.tree.TreeNode;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PsiUtil {
+public class PsiUtils {
 
 
     public static final List<PsiClassCache> getALLPsiClass(Project project) {
@@ -82,7 +83,9 @@ public class PsiUtil {
 
     @NotNull
     public static void buildValuePair(ApiMethod apiMethod, PsiAnnotation annotation, ApiClass apiClass, String method) {
-
+      if(StringUtil.isNotEmpty(method)){
+          apiMethod.getMethodTypes().add(method);
+      }
         PsiNameValuePair[] pairs = annotation.getParameterList().getAttributes();
         if (pairs == null && pairs.length < 1) {
             return;
@@ -91,27 +94,25 @@ public class PsiUtil {
             String attributeName = pair.getName();
             // url
             if (Objects.equals(attributeName, "value") || Objects.equals(attributeName, "path") || StringUtil.isBlank(attributeName)) {
-                List<String> values = PsiUtil.getAnnotationAttributeValues(pair.getValue());
+                List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
                 apiMethod.getMethodUrls().addAll(values);
             }
             // method
             if (Objects.equals(attributeName, "method")) {
                 if (StringUtil.isBlank(method)) {
-                    List<String> values = PsiUtil.getAnnotationAttributeValues(pair.getValue());
+                    List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
                     apiMethod.getMethodTypes().addAll(values);
-                } else {
-                    apiMethod.getMethodTypes().add(method);
                 }
             }
 
             //ContentType
             if (Objects.equals(attributeName, "produces") || Objects.equals(attributeName, "consumes")) {
-                List<String> values = PsiUtil.getAnnotationAttributeValues(pair.getValue());
+                List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
                 apiMethod.getContentTypes().addAll(values);
             }
             //headers
             if (Objects.equals(attributeName, "headers")) {
-                List<String> values = PsiUtil.getAnnotationAttributeValues(pair.getValue());
+                List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
                 apiMethod.getHeaders().addAll(values);
             }
         }
@@ -133,7 +134,12 @@ public class PsiUtil {
                 apiMethodList.forEach(apiMethod -> {
                     apiMethod.getUrls().forEach(e -> {
                         apiMethod.setUrlStr(e);
-                        moduleNode.add(new MethodNode(apiMethod));
+                        MethodModel methodModel = new MethodModel();
+                        methodModel.setUrl(apiMethod.getUrlStr());
+                        methodModel.setDesc( apiMethod.getDescription());
+                        methodModel.setMethodType(StringUtils.join(apiMethod.getMethodTypes(), ','));
+                        methodModel.setPsiMethod(apiMethod.getPsiMethod());
+                        moduleNode.add(new MethodNode(methodModel));
                     });
                 });
             }
@@ -141,6 +147,34 @@ public class PsiUtil {
         }
         moduleNodeList.sort(Comparator.comparing(ModuleNode::toString));
         moduleNodeList.forEach(root::add);
+    }
+
+    public static void convertToOtherApi(DefaultMutableTreeNode root, Map<String, Map<String, List<BambooApiMethod>>> otherApis) {
+        List<ProjectModel> projectModels = new ArrayList<>();
+
+        for (Map.Entry<String, Map<String, List<BambooApiMethod>>> moduleEntry : otherApis.entrySet()) {
+            String projectName = moduleEntry.getKey().split("_")[0];
+            Map<String, List<BambooApiMethod>> modes = moduleEntry.getValue();
+            ProjectModel projectModel = new ProjectModel(projectName);
+            for (Map.Entry<String, List<BambooApiMethod>> entry : modes.entrySet()) {
+                String modelName = entry.getKey();
+                List<BambooApiMethod> apiMethods = entry.getValue();
+                ModuleNode moduleNode = new ModuleNode(modelName);
+                for (BambooApiMethod method : apiMethods) {
+                    MethodModel methodModel = new MethodModel();
+                    methodModel.setUrl(method.getUrl());
+                    methodModel.setDesc(method.getDescription());
+                    methodModel.setMethodType(method.getMethodType());
+                    MethodNode methodNode = new MethodNode(methodModel);
+                    moduleNode.add(methodNode);
+                }
+                projectModel.add(moduleNode);
+            }
+            projectModels.add(projectModel);
+        }
+        projectModels.forEach(e -> {
+            root.add(e);
+        });
     }
 
     public static Map<String, List<ApiClass>> convertToMap(List<ApiClass> apiClasses) {

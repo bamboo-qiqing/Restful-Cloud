@@ -7,7 +7,7 @@ import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
 import com.bamboo.tool.components.api.enums.*;
 import com.bamboo.tool.config.model.PsiClassCache;
-import com.bamboo.tool.util.PsiUtil;
+import com.bamboo.tool.util.PsiUtils;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
@@ -15,11 +15,7 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.ProjectScope;
-import com.intellij.psi.search.searches.AllClassesSearch;
-import com.intellij.util.Query;
-import com.intellij.util.SlowOperations;
+import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -47,7 +43,7 @@ public class FrameworkExecute {
      */
     public static List<ApiClass> buildApiMethod(Project project) {
         List<ApiClass> apiClasses = new ArrayList<>();
-        List<PsiClassCache> allPsiClass = PsiUtil.getALLPsiClass(project);
+        List<PsiClassCache> allPsiClass = PsiUtils.getALLPsiClass(project);
         allPsiClass.forEach(cache -> {
             Module module = ModuleUtil.findModuleForPsiElement(cache.getPsiClass());
             if (module != null) {
@@ -58,13 +54,18 @@ public class FrameworkExecute {
                 apiClass.setPackageName(packageName);
                 apiClass.setModuleName(module.getName());
                 List<PsiClassCache.ClassAnnotationProcessCache> classAnnotationProcesses = cache.getProcessCaches();
+                List<String> classPaths = new ArrayList<>();
                 classAnnotationProcesses.parallelStream().forEach(e -> {
                     e.getClassAnnotationProcesses().buildClass(apiClass, e.getPsiAnnotation());
+                    classPaths.add(e.getClassAnnotationProcesses().getClassAnnotationType().getClassPath());
                 });
-
-                // 构建ApiMethod
-                PsiMethod[] methods = psiClass.getMethods();
-                List<ApiMethod> apiMethods = Arrays.stream(methods).parallel().map(e -> buildMethod(e, apiClass)).filter(e -> e != null).collect(Collectors.toList());
+                List<PsiMethod> methodList;
+                if (classPaths.contains(ClassAnnotationType.SOA_SERVICE_CLIENT)) {
+                    methodList = Arrays.stream(psiClass.getMethods()).filter(e -> PsiUtil.getAccessLevel(e.getModifierList()) == PsiUtil.ACCESS_LEVEL_PUBLIC).collect(Collectors.toList());
+                } else {
+                    methodList = Arrays.asList(psiClass.getMethods());
+                }
+                List<ApiMethod> apiMethods = methodList.stream().parallel().map(e -> buildMethod(e, apiClass, classPaths)).filter(e -> e != null).collect(Collectors.toList());
                 apiClass.setMethods(apiMethods);
                 apiClasses.add(apiClass);
             }
@@ -72,7 +73,7 @@ public class FrameworkExecute {
         return apiClasses;
     }
 
-    private static ApiMethod buildMethod(PsiMethod method, ApiClass psiClass) {
+    private static ApiMethod buildMethod(PsiMethod method, ApiClass psiClass, List<String> classPaths) {
         ApiMethod apiMethod = new ApiMethod();
         apiMethod.setMethodName(method.getName());
         apiMethod.setPsiMethod(method);
@@ -91,22 +92,17 @@ public class FrameworkExecute {
             }
         }
         if (isSoa) {
-            String odianyun = FrameworkType.O_DIAN_YUN.getCode();
-            String serviceCode = InterfaceType.SERVICE.getCode();
-            String clientCode = InterfaceType.CLIENT.getCode();
-            if (psiClass.getTypes().contains(odianyun)) {
-                if (psiClass.getTypes().contains(clientCode)) {
-                    apiMethod.getMethodUrls().add(method.getName());
-                    apiMethod.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
-                    apiMethod.getTypes().add(InterfaceType.CLIENT.getCode());
-                    apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
-                }
-                if (psiClass.getTypes().contains(serviceCode)) {
-                    apiMethod.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
-                    apiMethod.getTypes().add(InterfaceType.SERVICE.getCode());
-                    apiMethod.getMethodUrls().add(method.getName());
-                    apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
-                }
+            if (classPaths.contains(ClassAnnotationType.SOA_SERVICE_CLIENT.getClassPath())) {
+                apiMethod.getMethodUrls().add(method.getName());
+                apiMethod.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
+                apiMethod.getTypes().add(InterfaceType.CLIENT.getCode());
+                apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
+            }
+            if (classPaths.contains(ClassAnnotationType.SOA_SERVICE_REGISTER.getClassPath())) {
+                apiMethod.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
+                apiMethod.getTypes().add(InterfaceType.SERVICE.getCode());
+                apiMethod.getMethodUrls().add(method.getName());
+                apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
             }
         }
         if (CollectionUtil.isEmpty(apiMethod.getMethodUrls())) {

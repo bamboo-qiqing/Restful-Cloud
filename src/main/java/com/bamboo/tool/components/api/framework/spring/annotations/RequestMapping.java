@@ -7,7 +7,7 @@ import com.bamboo.tool.components.api.entity.ApiMethod;
 import com.bamboo.tool.components.api.enums.*;
 import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
 import com.bamboo.tool.components.api.factory.MethodAnnotationProcess;
-import com.bamboo.tool.util.PsiUtil;
+import com.bamboo.tool.util.PsiUtils;
 import com.bamboo.tool.util.StringUtil;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiNameValuePair;
@@ -69,7 +69,7 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
     public void buildMethod(ApiMethod apiMethod, PsiAnnotation annotation, ApiClass apiClass) {
         apiMethod.getTypes().add(getFrameworkType().getCode());
         apiMethod.getTypes().add(InterfaceType.SERVICE.getCode());
-        PsiUtil.buildValuePair(apiMethod, annotation, apiClass,null);
+        PsiUtils.buildValuePair(apiMethod, annotation, apiClass,null);
     }
 
     @Override

@@ -16,22 +16,30 @@
 
 package com.bamboo.tool.components.api.view.component.tree;
 
-import com.bamboo.tool.components.api.entity.ApiMethod;
+import com.bamboo.tool.components.api.view.component.entity.MethodModel;
+import com.intellij.icons.AllIcons;
+import org.jetbrains.annotations.Nullable;
 
-public class MethodNode extends BaseNode<ApiMethod> {
+import javax.swing.*;
 
-    public MethodNode(ApiMethod apiMethod) {
-        super(apiMethod);
+public class MethodNode extends BaseNode<MethodModel> {
+
+    public MethodNode(MethodModel model) {
+        super(model);
     }
-
+    @Override
+    public @Nullable
+    Icon getIcon(boolean selected) {
+        return AllIcons.Nodes.Method;
+    }
     @Override
     public String toString() {
-        ApiMethod method = this.getSource();
-        return method.getUrlStr();
+        MethodModel source = this.getSource();
+        return source.getUrl()+"["+source.getMethodType()+"]";
     }
 
     public String getToolTipText() {
-        ApiMethod method = this.getSource();
-        return method.getDescription();
+        MethodModel method = this.getSource();
+        return method.getDesc();
     }
 }

@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 @Getter
 public enum FrameworkType {
-    SPRING("SPRING"), JAX_RS("JAX_RS"), O_DIAN_YUN("O_DIAN_YUN");
+    SPRING("SPRING"), JAX_RS("JAX_RS"), O_DIAN_YUN("O_DIAN_YUN"), SWAGGER("swagger");
 
     private String code;
 

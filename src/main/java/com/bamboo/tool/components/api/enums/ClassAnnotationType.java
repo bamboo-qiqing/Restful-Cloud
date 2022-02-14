@@ -1,7 +1,6 @@
 package com.bamboo.tool.components.api.enums;
 
 import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
-import com.bamboo.tool.components.api.framework.odianyun.annotations.SoaMethodClient;
 import com.bamboo.tool.components.api.framework.odianyun.annotations.SoaServiceClient;
 import com.bamboo.tool.components.api.framework.odianyun.annotations.SoaServiceRegister;
 import com.bamboo.tool.components.api.framework.spring.annotations.Controller;

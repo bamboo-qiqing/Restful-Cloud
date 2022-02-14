@@ -2,6 +2,7 @@ package com.bamboo.tool.db.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.bamboo.tool.components.api.entity.ApiClass;
+import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.SqlConstant;
 import com.bamboo.tool.db.SqliteConfig;
@@ -13,6 +14,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,17 +61,8 @@ public class ApiMethodService {
             String methodTypes = StringUtils.join(apiMethod.getMethodTypes(), ',');
             apiMethod.getUrls().stream().forEach(e -> {
                 StringBuffer str = new StringBuffer();
-                str.append("INSERT INTO bamboo_api_method(project_id, description, method_name, method_type, " +
-                        "content_type, header, params, url, model_name, class_name, class_desc,types,service_name)VALUES(");
-                String values = StringUtil.format("{},'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}','{}','{}');",
-                        projectInfo.getId(), apiMethod.getDescription(),
-                        apiMethod.getMethodName(), methodTypes,
-                        contentTypes,
-                        headers,
-                        params, e,
-                        apiClass.getModuleName(), apiClass.getClassName(),
-                        apiClass.getDescription(),
-                        types,apiClass.getServiceName());
+                str.append("INSERT INTO bamboo_api_method(project_id, description, method_name, method_type, " + "content_type, header, params, url, model_name, class_name, class_desc,types,service_name)VALUES(");
+                String values = StringUtil.format("{},'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}','{}','{}');", projectInfo.getId(), apiMethod.getDescription(), apiMethod.getMethodName(), methodTypes, contentTypes, headers, params, e, apiClass.getModuleName(), apiClass.getClassName(), apiClass.getDescription(), types, apiClass.getServiceName());
                 str.append(values);
                 try {
                     state.addBatch(str.toString());
@@ -91,4 +84,54 @@ public class ApiMethodService {
         conn.close();
     }
 
+    @SneakyThrows
+    public List<BambooApiMethod> getOtherAllApis() {
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        ResultSet resultSet = state.executeQuery(StringUtil.format(SqlConstant.OTHER_ALL_API_SQL));
+        List<BambooApiMethod> apiMethods = new ArrayList<>();
+        while (resultSet.next()) {
+            String id = resultSet.getString("id");
+            String projectId = resultSet.getString("project_id");
+            String description = resultSet.getString("description");
+            String methodName = resultSet.getString("method_name");
+            String methodType = resultSet.getString("method_type");
+            String contentType = resultSet.getString("content_type");
+            String header = resultSet.getString("header");
+            String params = resultSet.getString("params");
+            String url = resultSet.getString("url");
+            String modelName = resultSet.getString("model_name");
+            String className = resultSet.getString("class_name");
+            String classDesc = resultSet.getString("class_desc");
+            String types = resultSet.getString("types");
+            String serviceName = resultSet.getString("service_name");
+            String projectName = resultSet.getString("project_name");
+            String projectPath = resultSet.getString("project_path");
+//            String apiFileName = resultSet.getString("api_file_name");
+//            String apiFilePath = resultSet.getString("api_file_path");
+            BambooApiMethod bambooApiMethod = new BambooApiMethod();
+            bambooApiMethod.setProjectName(projectName);
+            bambooApiMethod.setProjectPath(projectPath);
+            bambooApiMethod.setId(id);
+            bambooApiMethod.setProjectId(projectId);
+            bambooApiMethod.setDescription(description);
+            bambooApiMethod.setMethodName(methodName);
+            bambooApiMethod.setMethodType(methodType);
+            bambooApiMethod.setContentType(contentType);
+            bambooApiMethod.setHeader(header);
+            bambooApiMethod.setParams(params);
+            bambooApiMethod.setUrl(url);
+            bambooApiMethod.setModelName(modelName);
+            bambooApiMethod.setClassName(className);
+            bambooApiMethod.setClassDesc(classDesc);
+            bambooApiMethod.setTypes(types);
+            bambooApiMethod.setServiceName(serviceName);
+            apiMethods.add(bambooApiMethod);
+        }
+        resultSet.close();
+        state.close();
+        conn.close();
+
+        return apiMethods;
+    }
 }
