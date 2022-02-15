@@ -4,8 +4,8 @@
     <vendor email="760560079@qq.com" url="http://baidu.com">bamboo</vendor>
 
     <description><![CDATA[
-    Restful Fast Request is a powerful restful api toolkit plugin(http client)
-    ]]>
+        Restful Fast Request is a powerful restful api toolkit plugin(http client)
+        ]]>
     </description>
 
     <!-- 插件版本号 -->
@@ -25,16 +25,24 @@
         <!--兼容性处理code-->
         <notificationGroup id="toolWindowNotificationGroup" displayType="TOOL_WINDOW"/>
 
-<!--        <searchEverywhereContributor-->
-<!--                implementation="com.bamboo.tool.components.api.view.action.FastRequestGotoContributor$Factory"/>-->
+        <searchEverywhereMlService
+                implementation="com.bamboo.tool.components.api.view.action.Test"/>
+        <gotoSymbolContributor
+                implementation="com.bamboo.tool.components.api.contributor.RequestMappingByNameContributor"/>
+    </extensions>
+    <extensions defaultExtensionNs="com.intellij.searchEverywhereContributor">
 
     </extensions>
-   <actions>
-       <action id="bambooApi.goToBambooApiRequest"
-               class="com.bamboo.tool.components.api.view.action.GotoRequestAction">
-           <keyboard-shortcut first-keystroke="alt F" keymap="$default"/>
-       </action>
-   </actions>
+
+    <extensionPoints>
+        <extensionPoint name="requestMappingContributor" interface="com.intellij.navigation.ChooseByNameContributor"
+                        dynamic="true"/>
+    </extensionPoints>
+    <extensions defaultExtensionNs="com.bamboo.bamboo-tool">
+        <requestMappingContributor
+                implementation="com.bamboo.tool.components.api.contributor.RequestMappingByNameContributor"/>
+    </extensions>
+
     <projectListeners>
         <listener class="com.bamboo.tool.listeners.ToolProjectManagerListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
