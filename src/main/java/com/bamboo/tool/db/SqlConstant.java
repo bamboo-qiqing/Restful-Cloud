@@ -11,7 +11,8 @@ public class SqlConstant {
 
     public static final String CREAT_PROJECT_SQL = "create table bamboo_api_project ( id integer not null constraint bamboo_api_project_pk primary key autoincrement, project_name text, project_path text, api_file_path text, api_file_name text );";
 
-    public static final String CREAT_METHOD_SQL = "create table bamboo_api_method ( id integer not null constraint bamboo_api_method_pk primary key autoincrement, project_id integer not null, description text, method_name text, method_type text," + " content_type text, header text, params text, url text, model_name text, class_name text, class_desc text,types text,service_name text );";
+    public static final String CREAT_METHOD_SQL = "create table bamboo_api_method ( id integer not null constraint bamboo_api_method_pk primary key autoincrement, project_id integer not null, description text, method_name text, method_type text,"
+            + " content_type text, header text, params text, url text, model_name text, class_name text, class_desc text,types text,service_name text,class_path text);";
 
     public static final String SQLITE_MASTER_QUERY = "SELECT  * FROM sqlite_master WHERE type='table' AND name = '{}'";
 

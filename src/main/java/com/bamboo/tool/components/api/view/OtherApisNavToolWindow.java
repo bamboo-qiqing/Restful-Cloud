@@ -84,7 +84,7 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
-                List<BambooApiMethod> otherAllApis = apiMethodService.getOtherAllApis().stream()
+                List<BambooApiMethod> otherAllApis = apiMethodService.getAllApis().stream()
                         .filter(e -> !(e.getProjectName().equals(myProject.getName())&&e.getProjectPath().equals(myProject.getBasePath())))
                         .collect(Collectors.toList());
                 Map<String, Map<String, List<BambooApiMethod>>> map = otherAllApis.stream().collect(Collectors.groupingBy(e -> e.getProjectName() + "_" + e.getProjectPath(), Collectors.groupingBy(e -> e.getModelName(), Collectors.toList())));

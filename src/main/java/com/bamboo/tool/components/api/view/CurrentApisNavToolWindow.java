@@ -3,7 +3,6 @@ package com.bamboo.tool.components.api.view;
 import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
 import com.bamboo.tool.components.api.factory.FrameworkExecute;
-import com.bamboo.tool.components.api.view.action.GotoRequestAction;
 import com.bamboo.tool.components.api.view.component.tree.ApiTree;
 import com.bamboo.tool.components.api.view.component.tree.BaseNode;
 import com.bamboo.tool.components.api.view.component.tree.MethodNode;
@@ -165,7 +164,7 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
         group.add(new RefreshApiAction());
         group.add(CommonActionsManager.getInstance().createExpandAllAction(apiTree, apiTree));
         group.add(CommonActionsManager.getInstance().createCollapseAllAction(apiTree, apiTree));
-
+//        GotoRequestAction gotoFastRequestAction = (GotoRequestAction) ActionManager.getInstance().getAction("bambooApi.goToBambooApiRequest");
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, group, true);
         actionToolbar.setTargetComponent(panel);
         JComponent toolbarComponent = actionToolbar.getComponent();

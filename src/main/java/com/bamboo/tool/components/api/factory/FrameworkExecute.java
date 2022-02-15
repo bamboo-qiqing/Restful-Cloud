@@ -50,8 +50,7 @@ public class FrameworkExecute {
                 PsiClass psiClass = cache.getPsiClass();
                 ApiClass apiClass = new ApiClass();
                 apiClass.setClassName(psiClass.getName());
-                String packageName = getPackageName(psiClass);
-                apiClass.setPackageName(packageName);
+                apiClass.setClassPath(PsiUtil.getVirtualFile(psiClass).getPath());
                 apiClass.setModuleName(module.getName());
                 List<PsiClassCache.ClassAnnotationProcessCache> classAnnotationProcesses = cache.getProcessCaches();
                 List<String> classPaths = new ArrayList<>();

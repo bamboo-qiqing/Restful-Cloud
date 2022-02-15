@@ -61,8 +61,12 @@ public class ApiMethodService {
             String methodTypes = StringUtils.join(apiMethod.getMethodTypes(), ',');
             apiMethod.getUrls().stream().forEach(e -> {
                 StringBuffer str = new StringBuffer();
-                str.append("INSERT INTO bamboo_api_method(project_id, description, method_name, method_type, " + "content_type, header, params, url, model_name, class_name, class_desc,types,service_name)VALUES(");
-                String values = StringUtil.format("{},'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}','{}','{}');", projectInfo.getId(), apiMethod.getDescription(), apiMethod.getMethodName(), methodTypes, contentTypes, headers, params, e, apiClass.getModuleName(), apiClass.getClassName(), apiClass.getDescription(), types, apiClass.getServiceName());
+                str.append("INSERT INTO bamboo_api_method(project_id, description, method_name, method_type, "
+                        + "content_type, header, params, url, model_name, class_name, class_desc,types,service_name,class_path)VALUES(");
+                String values = StringUtil.format("{},'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}','{}','{}','{}');", projectInfo.getId(), apiMethod.getDescription(), apiMethod.getMethodName(), methodTypes, contentTypes, headers, params, e,
+                        apiClass.getModuleName(), apiClass.getClassName(),
+                        apiClass.getDescription(), types,
+                        apiClass.getServiceName(),apiClass.getClassPath());
                 str.append(values);
                 try {
                     state.addBatch(str.toString());
@@ -85,7 +89,7 @@ public class ApiMethodService {
     }
 
     @SneakyThrows
-    public List<BambooApiMethod> getOtherAllApis() {
+    public List<BambooApiMethod> getAllApis() {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         ResultSet resultSet = state.executeQuery(StringUtil.format(SqlConstant.OTHER_ALL_API_SQL));
@@ -102,6 +106,7 @@ public class ApiMethodService {
             String url = resultSet.getString("url");
             String modelName = resultSet.getString("model_name");
             String className = resultSet.getString("class_name");
+            String classPath = resultSet.getString("class_path");
             String classDesc = resultSet.getString("class_desc");
             String types = resultSet.getString("types");
             String serviceName = resultSet.getString("service_name");
@@ -126,6 +131,7 @@ public class ApiMethodService {
             bambooApiMethod.setClassDesc(classDesc);
             bambooApiMethod.setTypes(types);
             bambooApiMethod.setServiceName(serviceName);
+            bambooApiMethod.setClassPath(classPath);
             apiMethods.add(bambooApiMethod);
         }
         resultSet.close();

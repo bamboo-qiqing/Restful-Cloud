@@ -1,5 +1,6 @@
 package com.bamboo.tool.components.api.view.action;
 
+import com.bamboo.tool.components.api.contributor.FastRequestGotoContributor;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.actions.SearchEverywhereBaseAction;
 import com.intellij.ide.actions.searcheverywhere.SymbolSearchEverywhereContributor;

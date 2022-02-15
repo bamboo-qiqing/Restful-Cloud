@@ -1,4 +1,4 @@
-package com.bamboo.tool.components.api.view.action;
+package com.bamboo.tool.components.api.contributor;
 
 import com.intellij.ide.actions.searcheverywhere.AbstractGotoSEContributor;
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributor;
@@ -14,38 +14,45 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Create by GuoQing
- * Date 2022/2/14 18:00
+ * Date 2022/2/15 9:53
  * Description
  */
 public class FastRequestGotoContributor extends AbstractGotoSEContributor {
+
     private Project myProject;
     private RequestMappingModel requestMappingModel;
+
     protected FastRequestGotoContributor(@NotNull AnActionEvent event) {
         super(event);
         myProject = event.getProject();
-        requestMappingModel = new RequestMappingModel(myProject, ExtensionPointName.<ChooseByNameContributor>create("io.github.kings1990.FastRequest.requestMappingContributor").getExtensionList());
+        requestMappingModel = new RequestMappingModel(myProject, ExtensionPointName.<ChooseByNameContributor>create("com.bamboo.bamboo-tool.requestMappingContributor").getExtensionList());
     }
 
     @Override
-    protected @NotNull FilteringGotoByModel<?> createModel(@NotNull Project project) {
+    protected @NotNull
+    FilteringGotoByModel<?> createModel(@NotNull Project project) {
         return requestMappingModel;
     }
 
     @Override
     public @NotNull
-    @Nls String getGroupName() {
-        return null;
+    @Nls
+    String getGroupName() {
+        return "Bamboo Apis";
     }
 
     @Override
     public int getSortWeight() {
-        return 0;
+        return 1000;
     }
+
     @Override
     public @Nullable
-    @Nls String getAdvertisement() {
-        return "type [/url] or [post /url] to search";
+    @Nls
+    String getAdvertisement() {
+        return "url to search";
     }
+
     static class Factory implements SearchEverywhereContributorFactory<Object> {
 
         @Override
@@ -53,5 +60,7 @@ public class FastRequestGotoContributor extends AbstractGotoSEContributor {
         SearchEverywhereContributor<Object> createContributor(@NotNull AnActionEvent initEvent) {
             return new FastRequestGotoContributor(initEvent);
         }
+
+
     }
 }

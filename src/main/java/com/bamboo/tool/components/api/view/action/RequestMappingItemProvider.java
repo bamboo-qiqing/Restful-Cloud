@@ -16,6 +16,7 @@
 
 package com.bamboo.tool.components.api.view.action;
 
+import com.bamboo.tool.components.api.contributor.RequestMappingModel;
 import com.intellij.ide.util.gotoByName.*;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
@@ -32,69 +33,54 @@ import java.util.*;
 
 public class RequestMappingItemProvider implements ChooseByNameItemProvider {
     private RequestMappingModel model;
+
+
     public RequestMappingItemProvider(RequestMappingModel model) {
         this.model = model;
     }
 
 
-
-
-    public @NotNull List<String> filterNames(@NotNull ChooseByNameViewModel base, String[] names, @NotNull String pattern) {
+    public @NotNull
+    List<String> filterNames(@NotNull ChooseByNameViewModel base, String[] names, @NotNull String pattern) {
         return new ArrayList<>();
     }
 
 
-
-
     public boolean filterElements(@NotNull ChooseByNameViewModel base, @NotNull String pattern, boolean everywhere, @NotNull ProgressIndicator indicator, @NotNull Processor<Object> consumer) {
         Project project = base.getProject();
-        if(project == null){
+        if (project == null) {
             return false;
         }
         project.putUserData(ChooseByNamePopup.CURRENT_SEARCH_PATTERN, pattern);
         GlobalSearchScope searchScope = FindSymbolParameters.searchScopeFor(project, everywhere);
-        FindSymbolParameters parameters = FindSymbolParameters.wrap(pattern,searchScope);
+        FindSymbolParameters parameters = FindSymbolParameters.wrap(pattern, searchScope);
         List<String> namesList = getSortedResults(base, pattern, indicator, parameters);
         indicator.checkCanceled();
         return processByNames(base, everywhere, indicator, consumer, namesList, parameters);
     }
 
-    private List<String> getSortedResults(
-            ChooseByNameViewModel base,
-             String pattern,
-            ProgressIndicator indicator,
-            FindSymbolParameters parameters
-    ) {
-//        if (pattern.isEmpty() && !base.canShowListForEmptyPattern()) {
-//            return new ArrayList<>();
-//        }
+    private List<String> getSortedResults(ChooseByNameViewModel base, String pattern, ProgressIndicator indicator, FindSymbolParameters parameters) {
+
 
         List<String> namesList = new ArrayList<>();
         CollectConsumer<String> collect = new SynchronizedCollectConsumer<>(namesList);
-//        ChooseByNameModel model = base.getModel();
+
         if (model != null) {
             indicator.checkCanceled();
             ((ChooseByNameModelEx) model).processNames(sequence -> {
                 indicator.checkCanceled();
-                if (matches(sequence, pattern) ) {
+                if (matches(sequence, pattern)) {
                     collect.consume(sequence);
                     return true;
                 }
                 return false;
-            },parameters);
+            }, parameters);
         }
         indicator.checkCanceled();
         return namesList;
     }
 
-    private boolean processByNames(
-            ChooseByNameViewModel base,
-            Boolean everywhere,
-            ProgressIndicator indicator,
-            Processor<Object> consumer,
-            List<String> namesList,
-            FindSymbolParameters parameters
-    ) {
+    private boolean processByNames(ChooseByNameViewModel base, Boolean everywhere, ProgressIndicator indicator, Processor<Object> consumer, List<String> namesList, FindSymbolParameters parameters) {
 
         List<Object> sameNameElements = new ArrayList<>();
         Map<Object, MatchResult> qualifierMatchResults = new HashMap<>();
@@ -102,7 +88,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         for (String name : namesList) {
             indicator.checkCanceled();
             Object[] elements;
-            if(model instanceof ContributorsBasedGotoByModel){
+            if (model instanceof ContributorsBasedGotoByModel) {
                 elements = ((ContributorsBasedGotoByModel) model).getElementsByName(name, parameters, indicator);
             } else {
                 elements = model.getElementsByName(name, everywhere, parameters.getCompletePattern());
@@ -131,14 +117,11 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
                 return true;
             } else {
                 String[] patternSplit = pattern.split(" ");
-                if(patternSplit.length == 1){
-                    return NameUtil.buildMatcher("*"+pattern, NameUtil.MatchingCaseSensitivity.NONE).matches(name);
+                if (patternSplit.length == 1) {
+                    return NameUtil.buildMatcher("*" + pattern, NameUtil.MatchingCaseSensitivity.NONE).matches(name);
                 } else {
                     String[] nameSplit = name.split(" ");
-                    return
-                            NameUtil.buildMatcher("*"+patternSplit[0].toUpperCase(), NameUtil.MatchingCaseSensitivity.NONE).matches(nameSplit[0])
-                            && NameUtil.buildMatcher("*"+patternSplit[1].toUpperCase(), NameUtil.MatchingCaseSensitivity.NONE).matches(nameSplit[1])
-                            ;
+                    return NameUtil.buildMatcher("*" + patternSplit[0].toUpperCase(), NameUtil.MatchingCaseSensitivity.NONE).matches(nameSplit[0]) && NameUtil.buildMatcher("*" + patternSplit[1].toUpperCase(), NameUtil.MatchingCaseSensitivity.NONE).matches(nameSplit[1]);
                 }
             }
         } catch (Exception e) {
@@ -147,11 +130,4 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         }
     }
 
-    public @NotNull List<String> filterNames(@NotNull ChooseByNameBase base, String[] names, @NotNull String pattern) {
-        return new ArrayList<>();
-    }
-
-    public boolean filterElements(@NotNull ChooseByNameBase base, @NotNull String pattern, boolean everywhere, @NotNull ProgressIndicator cancelled, @NotNull Processor<Object> consumer) {
-        return false;
-    }
 }

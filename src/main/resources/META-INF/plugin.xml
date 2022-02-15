@@ -25,10 +25,10 @@
         <!--兼容性处理code-->
         <notificationGroup id="toolWindowNotificationGroup" displayType="TOOL_WINDOW"/>
 
-        <searchEverywhereMlService
-                implementation="com.bamboo.tool.components.api.view.action.Test"/>
-        <gotoSymbolContributor
-                implementation="com.bamboo.tool.components.api.contributor.RequestMappingByNameContributor"/>
+        <searchEverywhereContributor
+                implementation="com.bamboo.tool.components.api.contributor.FastRequestGotoContributor$Factory"/>
+        <searchEverywhereResultsEqualityProvider
+                implementation="com.bamboo.tool.components.api.contributor.FastRequestEqualityProvider"/>
     </extensions>
     <extensions defaultExtensionNs="com.intellij.searchEverywhereContributor">
 
@@ -41,13 +41,12 @@
     <extensions defaultExtensionNs="com.bamboo.bamboo-tool">
         <requestMappingContributor
                 implementation="com.bamboo.tool.components.api.contributor.RequestMappingByNameContributor"/>
+
     </extensions>
 
     <projectListeners>
         <listener class="com.bamboo.tool.listeners.ToolProjectManagerListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </projectListeners>
-    <actions>
-        <!-- Add your actions here -->
-    </actions>
+
 </idea-plugin>

@@ -22,6 +22,7 @@ public class BambooApiMethod {
     private String url;
     private String modelName;
     private String className;
+    private String classPath;
     private String classDesc;
     private String types;
     private String serviceName;
