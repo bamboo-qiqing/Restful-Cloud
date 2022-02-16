@@ -6,6 +6,7 @@ import com.bamboo.tool.components.api.enums.ClassAnnotationType;
 import com.bamboo.tool.components.api.enums.FrameworkType;
 import com.bamboo.tool.components.api.enums.InterfaceType;
 import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
+import com.bamboo.tool.util.PsiUtils;
 import com.bamboo.tool.util.StringUtil;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiNameValuePair;
@@ -27,6 +28,11 @@ public class SoaServiceRegister implements ClassAnnotationProcess {
                 }
                 apiClass.setServiceName(text);
                 apiClass.getClassUrls().add( CharSequenceUtil.addPrefixIfNot(StringUtil.lowerFirst(text), "/"));
+               continue;
+            }
+            if (Objects.equals(attributeName, "desc")) {
+                PsiUtils.getAnnotationAttributeValues(pair);
+                apiClass.setDescription(pair.getValue().getText());
             }
         }
     }

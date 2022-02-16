@@ -1,15 +1,30 @@
 package com.bamboo.tool.components.api.contributor;
 
+import com.intellij.ide.lightEdit.LightEdit;
+import com.intellij.ide.lightEdit.LightEditFeatureUsagesUtil;
+import com.intellij.ide.lightEdit.LightEditService;
+import com.intellij.ide.util.PsiNavigationSupport;
+import com.intellij.lang.jvm.JvmMethod;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
+import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.NlsSafe;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.*;
 import com.intellij.psi.search.searches.ReferencesSearch;
+import com.intellij.psi.util.PsiClassUtil;
+import com.intellij.psi.util.PsiUtil;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 /**
  * Create by GuoQing
@@ -27,6 +42,9 @@ public class RequestMappingNavigationItem implements NavigationItem {
     private String types;
     private String modelName;
     private String projectName;
+    private String methodName;
+    private Project project;
+
     public RequestMappingNavigationItem() {
 
     }
@@ -46,8 +64,12 @@ public class RequestMappingNavigationItem implements NavigationItem {
 
     @Override
     public void navigate(boolean requestFocus) {
-        if (navigationElement != null) {
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByPath(classPath);
 
+        if (file != null && file.isValid()) {
+            openFile(file, project, methodName);
+        }
+        if (navigationElement != null) {
             navigationElement.navigate(requestFocus);
         }
     }
@@ -62,5 +84,37 @@ public class RequestMappingNavigationItem implements NavigationItem {
         return true;
     }
 
+    public static void openFile(@NotNull VirtualFile file, @NotNull Project project, String methodName) {
+        if (file == null) {
+            return;
+        }
 
+        if (project == null) {
+            return;
+        }
+
+        NonProjectFileWritingAccessProvider.allowWriting(Collections.singletonList(file));
+        if (LightEdit.owns(project)) {
+            LightEditService.getInstance().openFile(file);
+            LightEditFeatureUsagesUtil.logFileOpen(project, LightEditFeatureUsagesUtil.OpenPlace.LightEditOpenAction);
+        } else {
+            PsiFile psiFile = PsiUtil.getPsiFile(project, file);
+            if (psiFile instanceof PsiJavaFile) {
+                PsiJavaFile javaFile = (PsiJavaFile) psiFile;
+                PsiClass[] classes = javaFile.getClasses();
+                if (classes.length > 0) {
+                    PsiClass aClass = classes[0];
+                    PsiElement psiElement = Arrays.stream(aClass.getMethods()).filter(e -> e.getName().equals(methodName)).map(e -> e.getNavigationElement()).findFirst().get();
+                    Navigatable navigatable = (Navigatable) psiElement;
+                    navigatable.navigate(true);
+                } else {
+                    PsiNavigationSupport.getInstance().createNavigatable(project, file, -1).navigate(true);
+                }
+            } else {
+                PsiNavigationSupport.getInstance().createNavigatable(project, file, -1).navigate(true);
+            }
+
+        }
+
+    }
 }

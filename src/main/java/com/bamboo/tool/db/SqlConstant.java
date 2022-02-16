@@ -26,5 +26,5 @@ public class SqlConstant {
 
     public static final String QUERY_METHOD_TABLE = StringUtil.format(SQLITE_MASTER_QUERY, METHOD_TABLE_NAME);
 
-    public static final String OTHER_ALL_API_SQL = "select bam.id, bam.project_id, bam.description, bam.method_name, bam.method_type, bam.content_type, bam.header, bam.params, bam.url, bam.model_name, bam.class_name, bam.class_desc, bam.types, bam.service_name, bap.project_name, bap.project_path, bap.api_file_name, bap.api_file_path, bap.id as project_id from bamboo_api_method bam inner join bamboo_api_project bap on bap.id = bam.project_id";
+    public static final String OTHER_ALL_API_SQL = "select bam.id, bam.project_id, bam.description, bam.method_name, bam.method_type, bam.content_type, bam.header, bam.params, bam.url, bam.model_name, bam.class_name, bam.class_desc, bam.types, bam.service_name,bam.class_path,bap.project_name, bap.project_path, bap.api_file_name, bap.api_file_path, bap.id as project_id from bamboo_api_method bam inner join bamboo_api_project bap on bap.id = bam.project_id";
 }

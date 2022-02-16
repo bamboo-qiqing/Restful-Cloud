@@ -1,12 +1,10 @@
 package com.bamboo.tool.components.api.contributor;
 
-import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.ApiMethodService;
 import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +26,8 @@ public class RequestMappingByNameContributor implements ChooseByNameContributor 
             item.setTypes(e.getTypes());
             item.setModelName(e.getModelName());
             item.setProjectName(e.getProjectName());
+            item.setMethodName(e.getMethodName());
+            item.setProject(project);
             return item;
         }).collect(Collectors.toList());
         String[] strings = navigationItems.stream().map(RequestMappingNavigationItem::getName).distinct().toArray(String[]::new);
