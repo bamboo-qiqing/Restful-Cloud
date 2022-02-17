@@ -29,6 +29,11 @@
                 implementation="com.bamboo.tool.components.api.contributor.FastRequestGotoContributor$Factory"/>
         <searchEverywhereResultsEqualityProvider
                 implementation="com.bamboo.tool.components.api.contributor.FastRequestEqualityProvider"/>
+<!--        <applicationConfigurable id="p" displayName="Bamboo Tool">-->
+<!--            <configurable parentId="p"-->
+<!--                          instance="com.bamboo.tool.components.api.configurable.AnnotationsConfigurable"/>-->
+<!--        </applicationConfigurable>-->
+
     </extensions>
     <extensions defaultExtensionNs="com.intellij.searchEverywhereContributor">
 

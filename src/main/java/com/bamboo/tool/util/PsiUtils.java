@@ -6,6 +6,7 @@ import com.bamboo.tool.components.api.entity.ApiMethod;
 import com.bamboo.tool.components.api.enums.RequestMethod;
 import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
 import com.bamboo.tool.components.api.factory.FrameworkExecute;
+import com.bamboo.tool.components.api.util.PsiAnnotationMemberUtil;
 import com.bamboo.tool.components.api.view.component.entity.MethodModel;
 import com.bamboo.tool.components.api.view.component.tree.*;
 import com.bamboo.tool.config.model.PsiClassCache;
@@ -94,6 +95,7 @@ public class PsiUtils {
             String attributeName = pair.getName();
             // url
             if (Objects.equals(attributeName, "value") || Objects.equals(attributeName, "path") || StringUtil.isBlank(attributeName)) {
+                PsiAnnotationMemberUtil.getAnnotationAttributeValue(pair);
                 List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
                 apiMethod.getMethodUrls().addAll(values);
             }

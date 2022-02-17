@@ -1,7 +1,7 @@
 package com.bamboo.tool.components.api.framework.spring.annotations;
 
 import com.bamboo.tool.components.api.entity.ApiClass;
-import com.bamboo.tool.components.api.enums.ClassAnnotationType;
+import com.bamboo.tool.components.api.enums.AnnotationType;
 import com.bamboo.tool.components.api.enums.FrameworkType;
 import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
 import com.intellij.psi.PsiAnnotation;
@@ -17,8 +17,8 @@ public class Controller implements ClassAnnotationProcess {
     }
 
     @Override
-    public ClassAnnotationType getClassAnnotationType() {
-        return ClassAnnotationType.CONTROLLER;
+    public AnnotationType getClassAnnotationType() {
+        return AnnotationType.CONTROLLER;
     }
 
     @Override

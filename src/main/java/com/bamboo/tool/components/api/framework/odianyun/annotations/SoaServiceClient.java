@@ -2,7 +2,7 @@ package com.bamboo.tool.components.api.framework.odianyun.annotations;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import com.bamboo.tool.components.api.entity.ApiClass;
-import com.bamboo.tool.components.api.enums.ClassAnnotationType;
+import com.bamboo.tool.components.api.enums.AnnotationType;
 import com.bamboo.tool.components.api.enums.FrameworkType;
 import com.bamboo.tool.components.api.enums.InterfaceType;
 import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
@@ -49,8 +49,8 @@ public class SoaServiceClient implements ClassAnnotationProcess {
     }
 
     @Override
-    public ClassAnnotationType getClassAnnotationType() {
-        return ClassAnnotationType.SOA_SERVICE_CLIENT;
+    public AnnotationType getClassAnnotationType() {
+        return AnnotationType.SOA_SERVICE_CLIENT;
     }
 
     @Override

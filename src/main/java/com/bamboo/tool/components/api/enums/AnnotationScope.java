@@ -4,16 +4,16 @@ import lombok.Getter;
 
 /**
  * Create by GuoQing
- * Date 2022/1/21 14:19
+ * Date 2022/2/16 13:07
  * Description
  */
 @Getter
-public enum FrameworkType {
-    SPRING("SPRING"), JAX_RS("JAX_RS"), O_DIAN_YUN("O_DIAN_YUN"), SWAGGER("swagger");
+public enum AnnotationScope {
+    CLASS("Class"), METHOD("Method");
 
     private String code;
 
-    FrameworkType(String code) {
+    AnnotationScope(String code) {
         this.code = code;
     }
 }

@@ -61,8 +61,8 @@ public class RequestMapping implements ClassAnnotationProcess, MethodAnnotationP
     }
 
     @Override
-    public ClassAnnotationType getClassAnnotationType() {
-        return ClassAnnotationType.REQUEST_MAPPING;
+    public AnnotationType getClassAnnotationType() {
+        return AnnotationType.REQUEST_MAPPING;
     }
 
     @Override

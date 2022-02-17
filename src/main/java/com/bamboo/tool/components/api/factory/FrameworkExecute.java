@@ -3,6 +3,8 @@ package com.bamboo.tool.components.api.factory;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
+import com.bamboo.tool.components.api.entity.AnnotationFrameWork;
+import com.bamboo.tool.components.api.entity.AnnotationInfo;
 import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
 import com.bamboo.tool.components.api.enums.*;
@@ -30,8 +32,10 @@ public class FrameworkExecute {
     public static Map<String, ClassAnnotationProcess> classAnnotationProcessMap = new HashMap();
     public static Map<String, MethodAnnotationProcess> methodAnnotationProcessMap = new HashMap();
 
+
+
     static {
-        classAnnotationProcessMap = Arrays.stream(ClassAnnotationType.values()).filter(e -> e.getClassAnnotationProcess() != null).collect(Collectors.toMap(e -> e.getClassAnnotationProcess().getClassShortName(), e -> e.getClassAnnotationProcess()));
+        classAnnotationProcessMap = Arrays.stream(AnnotationType.values()).filter(e -> e.getClassAnnotationProcess() != null).collect(Collectors.toMap(e -> e.getClassAnnotationProcess().getClassShortName(), e -> e.getClassAnnotationProcess()));
         methodAnnotationProcessMap = Arrays.stream(MethodAnnotationType.values()).filter(e -> e.getMethodAnnotationProcess() != null).collect(Collectors.toMap(e -> e.getCode(), e -> e.getMethodAnnotationProcess()));
     }
 
@@ -59,7 +63,7 @@ public class FrameworkExecute {
                     classPaths.add(e.getClassAnnotationProcesses().getClassAnnotationType().getClassPath());
                 });
                 List<PsiMethod> methodList;
-                if (classPaths.contains(ClassAnnotationType.SOA_SERVICE_CLIENT)) {
+                if (classPaths.contains(AnnotationType.SOA_SERVICE_CLIENT)) {
                     methodList = Arrays.stream(psiClass.getMethods()).filter(e -> PsiUtil.getAccessLevel(e.getModifierList()) == PsiUtil.ACCESS_LEVEL_PUBLIC).collect(Collectors.toList());
                 } else {
                     methodList = Arrays.asList(psiClass.getMethods());
@@ -91,13 +95,13 @@ public class FrameworkExecute {
             }
         }
         if (isSoa) {
-            if (classPaths.contains(ClassAnnotationType.SOA_SERVICE_CLIENT.getClassPath())) {
+            if (classPaths.contains(AnnotationType.SOA_SERVICE_CLIENT.getClassPath())) {
                 apiMethod.getMethodUrls().add(method.getName());
                 apiMethod.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
                 apiMethod.getTypes().add(InterfaceType.CLIENT.getCode());
                 apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
             }
-            if (classPaths.contains(ClassAnnotationType.SOA_SERVICE_REGISTER.getClassPath())) {
+            if (classPaths.contains(AnnotationType.SOA_SERVICE_REGISTER.getClassPath())) {
                 apiMethod.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
                 apiMethod.getTypes().add(InterfaceType.SERVICE.getCode());
                 apiMethod.getMethodUrls().add(method.getName());
