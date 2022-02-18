@@ -19,6 +19,11 @@
         <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
         <applicationService serviceImplementation="com.bamboo.tool.db.service.ApiProjectService"/>
         <applicationService serviceImplementation="com.bamboo.tool.db.service.ApiMethodService"/>
+        <applicationService serviceImplementation="com.bamboo.tool.db.service.AnnotationInfoService"/>
+        <applicationService serviceImplementation="com.bamboo.tool.db.service.AnnotationMethodScopeService"/>
+        <applicationService serviceImplementation="com.bamboo.tool.db.service.AnnotationParamService"/>
+        <applicationService serviceImplementation="com.bamboo.tool.db.service.FrameworkService"/>
+
 
         <toolWindow id="tool api" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
                     secondary="false"/>

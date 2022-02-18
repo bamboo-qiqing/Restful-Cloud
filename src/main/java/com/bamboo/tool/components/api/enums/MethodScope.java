@@ -4,21 +4,21 @@ import lombok.Getter;
 
 /**
  * Create by GuoQing
- * Date 2022/2/16 13:07
+ * Date 2022/2/18 15:21
  * Description
  */
 @Getter
-public enum AnnotationScope {
-    CLASS("Class"), METHOD("Method");
+public enum MethodScope {
+    All("all"), PUBLIC("public"), PRIVATE("private"), ANNOTATION("annotation");
 
     private String code;
 
-    AnnotationScope(String code) {
+    MethodScope(String code) {
         this.code = code;
     }
 
-    public static AnnotationScope getAnnotationScope(String code) {
-        for (AnnotationScope value : AnnotationScope.values()) {
+    public static MethodScope getMethodScope(String code) {
+        for (MethodScope value : MethodScope.values()) {
             if (value.getCode().equals(code)) {
                 return value;
             }

@@ -1,6 +1,7 @@
 package com.bamboo.tool.util;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.bamboo.tool.components.api.entity.AnnotationInfo;
 import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
 import com.bamboo.tool.components.api.enums.RequestMethod;
@@ -11,6 +12,8 @@ import com.bamboo.tool.components.api.view.component.entity.MethodModel;
 import com.bamboo.tool.components.api.view.component.tree.*;
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.db.entity.BambooApiMethod;
+import com.bamboo.tool.db.service.AnnotationInfoService;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.ProjectScope;
@@ -28,25 +31,18 @@ import java.util.stream.Collectors;
 public class PsiUtils {
 
 
-    public static final List<PsiClassCache> getALLPsiClass(Project project) {
+    public static final Collection<PsiClass> getALLPsiClass(Project project) {
+        AnnotationInfoService annotationInfoService = ApplicationManager.getApplication().getService(AnnotationInfoService.class);
+        List<AnnotationInfo> annotationInfos = annotationInfoService.selectScannClassAll();
+        List<String> annotationName = annotationInfos.stream().map(e -> e.getAnnotationName()).collect(Collectors.toList());
         Query<PsiClass> query = AllClassesSearch.search(ProjectScope.getContentScope(project), project);
-        List<PsiClassCache> psiClassCaches = new ArrayList<>();
-        query.allowParallelProcessing().forEachAsync(psiClass -> {
-            PsiAnnotation[] annotations = psiClass.getAnnotations();
-            List<PsiClassCache.ClassAnnotationProcessCache> processList = Arrays.stream(annotations).parallel().filter(e -> !Objects.isNull(FrameworkExecute.classAnnotationProcessMap.get(e.getNameReferenceElement().getReferenceName()))).map(e -> {
-                ClassAnnotationProcess classAnnotationProcess = FrameworkExecute.classAnnotationProcessMap.get(e.getNameReferenceElement().getReferenceName());
-                PsiClassCache.ClassAnnotationProcessCache cache = new PsiClassCache.ClassAnnotationProcessCache();
-                cache.setPsiAnnotation(e);
-                cache.setClassAnnotationProcesses(classAnnotationProcess);
-                return cache;
-            }).collect(Collectors.toList());
 
-            if (processList.size() > 0) {
-                psiClassCaches.add(new PsiClassCache(psiClass, processList));
-            }
-            return true;
-        });
-        return psiClassCaches;
+        Collection<PsiClass> all = query.allowParallelProcessing().filtering(psiClass -> {
+            long count = Arrays.stream(psiClass.getAnnotations()).parallel()
+                    .filter(e -> annotationName.contains(e.getNameReferenceElement().getReferenceName())).count();
+            return count > 0;
+        }).allowParallelProcessing().findAll();
+        return all;
     }
 
 
@@ -84,9 +80,9 @@ public class PsiUtils {
 
     @NotNull
     public static void buildValuePair(ApiMethod apiMethod, PsiAnnotation annotation, ApiClass apiClass, String method) {
-      if(StringUtil.isNotEmpty(method)){
-          apiMethod.getMethodTypes().add(method);
-      }
+        if (StringUtil.isNotEmpty(method)) {
+            apiMethod.getMethodTypes().add(method);
+        }
         PsiNameValuePair[] pairs = annotation.getParameterList().getAttributes();
         if (pairs == null && pairs.length < 1) {
             return;
@@ -138,7 +134,7 @@ public class PsiUtils {
                         apiMethod.setUrlStr(e);
                         MethodModel methodModel = new MethodModel();
                         methodModel.setUrl(apiMethod.getUrlStr());
-                        methodModel.setDesc( apiMethod.getDescription());
+                        methodModel.setDesc(apiMethod.getDescription());
                         methodModel.setMethodType(StringUtils.join(apiMethod.getMethodTypes(), ','));
                         methodModel.setPsiMethod(apiMethod.getPsiMethod());
                         moduleNode.add(new MethodNode(methodModel));

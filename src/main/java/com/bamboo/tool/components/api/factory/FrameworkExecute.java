@@ -9,7 +9,10 @@ import com.bamboo.tool.components.api.entity.ApiClass;
 import com.bamboo.tool.components.api.entity.ApiMethod;
 import com.bamboo.tool.components.api.enums.*;
 import com.bamboo.tool.config.model.PsiClassCache;
+import com.bamboo.tool.db.service.AnnotationInfoService;
+import com.bamboo.tool.db.service.ApiMethodService;
 import com.bamboo.tool.util.PsiUtils;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
@@ -29,15 +32,7 @@ import java.util.stream.Collectors;
  * Description
  */
 public class FrameworkExecute {
-    public static Map<String, ClassAnnotationProcess> classAnnotationProcessMap = new HashMap();
-    public static Map<String, MethodAnnotationProcess> methodAnnotationProcessMap = new HashMap();
 
-
-
-    static {
-        classAnnotationProcessMap = Arrays.stream(AnnotationType.values()).filter(e -> e.getClassAnnotationProcess() != null).collect(Collectors.toMap(e -> e.getClassAnnotationProcess().getClassShortName(), e -> e.getClassAnnotationProcess()));
-        methodAnnotationProcessMap = Arrays.stream(MethodAnnotationType.values()).filter(e -> e.getMethodAnnotationProcess() != null).collect(Collectors.toMap(e -> e.getCode(), e -> e.getMethodAnnotationProcess()));
-    }
 
     /**
      * 构建当前项目 api集合
@@ -46,22 +41,20 @@ public class FrameworkExecute {
      * @return
      */
     public static List<ApiClass> buildApiMethod(Project project) {
+        AnnotationInfoService annotationInfoService = ApplicationManager.getApplication().getService(AnnotationInfoService.class);
+        List<AnnotationInfo> annotationInfos = annotationInfoService.selectAll();
+        List<AnnotationInfo> attribute = annotationInfos.stream().filter(e -> e.getEffect().contains("attribute")).collect(Collectors.toList());
         List<ApiClass> apiClasses = new ArrayList<>();
-        List<PsiClassCache> allPsiClass = PsiUtils.getALLPsiClass(project);
-        allPsiClass.forEach(cache -> {
-            Module module = ModuleUtil.findModuleForPsiElement(cache.getPsiClass());
+        Collection<PsiClass> allPsiClass = PsiUtils.getALLPsiClass(project);
+        allPsiClass.forEach(psiClass -> {
+            Module module = ModuleUtil.findModuleForPsiElement(psiClass);
             if (module != null) {
-                PsiClass psiClass = cache.getPsiClass();
                 ApiClass apiClass = new ApiClass();
                 apiClass.setClassName(psiClass.getName());
                 apiClass.setClassPath(PsiUtil.getVirtualFile(psiClass).getPath());
                 apiClass.setModuleName(module.getName());
-                List<PsiClassCache.ClassAnnotationProcessCache> classAnnotationProcesses = cache.getProcessCaches();
-                List<String> classPaths = new ArrayList<>();
-                classAnnotationProcesses.parallelStream().forEach(e -> {
-                    e.getClassAnnotationProcesses().buildClass(apiClass, e.getPsiAnnotation());
-                    classPaths.add(e.getClassAnnotationProcesses().getClassAnnotationType().getClassPath());
-                });
+                psiClass.getAnnotations();
+
                 List<PsiMethod> methodList;
                 if (classPaths.contains(AnnotationType.SOA_SERVICE_CLIENT)) {
                     methodList = Arrays.stream(psiClass.getMethods()).filter(e -> PsiUtil.getAccessLevel(e.getModifierList()) == PsiUtil.ACCESS_LEVEL_PUBLIC).collect(Collectors.toList());
@@ -120,22 +113,6 @@ public class FrameworkExecute {
         return apiMethod;
     }
 
-    private static String getPackageName(@NotNull PsiClass psiClass) {
-        String defaultPackageName = "";
-        String qualifiedName = psiClass.getQualifiedName();
-        if (StrUtil.isEmpty(qualifiedName)) {
-            return defaultPackageName;
-        }
 
-        String fileName = psiClass.getName();
-        if (StrUtil.isEmpty(fileName)) {
-            return defaultPackageName;
-        }
-
-        if (!qualifiedName.equals(fileName)) {
-            return qualifiedName.substring(0, qualifiedName.lastIndexOf('.'));
-        }
-        return defaultPackageName;
-    }
 
 }
