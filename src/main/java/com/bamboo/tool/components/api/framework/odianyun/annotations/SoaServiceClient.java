@@ -1,7 +1,7 @@
 //package com.bamboo.tool.components.api.framework.odianyun.annotations;
 //
 //import cn.hutool.core.text.CharSequenceUtil;
-//import com.bamboo.tool.components.api.entity.ApiClass;
+//import com.bamboo.tool.components.api.entity.BambooClass;
 //import com.bamboo.tool.components.api.enums.AnnotationType;
 //import com.bamboo.tool.components.api.enums.FrameworkType;
 //import com.bamboo.tool.components.api.enums.InterfaceType;
@@ -20,9 +20,9 @@
 // */
 //public class SoaServiceClient implements ClassAnnotationProcess {
 //    @Override
-//    public void buildClass(ApiClass apiClass, PsiAnnotation psiAnnotation) {
-//        apiClass.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
-//        apiClass.getTypes().add(InterfaceType.CLIENT.getCode());
+//    public void buildClass(BambooClass BambooClass, PsiAnnotation psiAnnotation) {
+//        BambooClass.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
+//        BambooClass.getTypes().add(InterfaceType.CLIENT.getCode());
 //        PsiNameValuePair[] pairs = psiAnnotation.getParameterList().getAttributes();
 //        String poolName = "";
 //        String interfaceName = "";
@@ -39,13 +39,13 @@
 //        }
 //        String url = "";
 //        if (StringUtil.isNotEmpty(poolName)) {
-//            apiClass.setServiceName(poolName);
+//            BambooClass.setServiceName(poolName);
 //        }
 //        if (StringUtil.isNotEmpty(interfaceName)) {
 //            String[] split = interfaceName.split("\\.");
 //            url = url + CharSequenceUtil.addPrefixIfNot(StringUtil.lowerFirst(split[split.length - 1]), "/");
 //        }
-//        apiClass.getClassUrls().add(url);
+//        BambooClass.getClassUrls().add(url);
 //    }
 //
 //    @Override

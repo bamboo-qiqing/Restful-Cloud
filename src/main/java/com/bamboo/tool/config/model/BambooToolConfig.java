@@ -1,7 +1,6 @@
 package com.bamboo.tool.config.model;
 
-import cn.hutool.core.io.FileUtil;
-import com.bamboo.tool.components.api.entity.ApiMethod;
+import com.bamboo.tool.components.api.entity.BambooMethod;
 import lombok.Data;
 
 import java.util.List;
@@ -18,5 +17,5 @@ public class BambooToolConfig {
 
     private ProjectInfo projectInfo;
 
-    private List<ApiMethod> apiMethods;
+    private List<BambooMethod> bambooMethods;
 }

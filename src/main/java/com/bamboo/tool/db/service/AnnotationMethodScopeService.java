@@ -1,6 +1,5 @@
 package com.bamboo.tool.db.service;
 
-import com.bamboo.tool.components.api.entity.AnnotationInfo;
 import com.bamboo.tool.components.api.entity.AnnotationMethodScope;
 import com.bamboo.tool.db.SqliteConfig;
 import lombok.SneakyThrows;
@@ -23,9 +22,9 @@ public class AnnotationMethodScopeService {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         StringBuffer str = new StringBuffer();
-        str.append("select");
-        str.append("ams.*");
-        str.append("from");
+        str.append("select ");
+        str.append("ams.* ");
+        str.append("from ");
         str.append("annotation_method_scope ams;");
         ResultSet resultSet = state.executeQuery(str.toString());
         List<AnnotationMethodScope> methodScopes = new ArrayList<>();

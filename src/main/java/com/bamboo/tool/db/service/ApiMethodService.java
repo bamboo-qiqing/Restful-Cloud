@@ -1,7 +1,7 @@
 package com.bamboo.tool.db.service;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.bamboo.tool.components.api.entity.ApiClass;
+import com.bamboo.tool.components.api.entity.BambooClass;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.SqlConstant;
@@ -38,7 +38,7 @@ public class ApiMethodService {
     }
 
     @SneakyThrows
-    public void saveMethods(List<ApiClass> allApiList, ProjectInfo projectInfo) {
+    public void saveMethods(List<BambooClass> allApiList, ProjectInfo projectInfo) {
         this.createMethodTable();
         if (CollectionUtil.isEmpty(allApiList)) {
             return;
@@ -46,35 +46,35 @@ public class ApiMethodService {
         this.deleteMethodsByProjectId(projectInfo.getId());
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
-        allApiList.stream().forEach(apiClass -> {
-            addBatch(projectInfo, state, apiClass);
+        allApiList.stream().forEach(BambooClass -> {
+            addBatch(projectInfo, state, BambooClass);
         });
         state.executeBatch();
     }
 
-    private void addBatch(ProjectInfo projectInfo, Statement state, ApiClass apiClass) {
-        apiClass.getMethods().stream().forEach(apiMethod -> {
-            String types = StringUtils.join(apiMethod.getTypes(), ',');
-            String params = StringUtils.join(apiMethod.getParams(), ',');
-            String headers = StringUtils.join(apiMethod.getHeaders(), ',');
-            String contentTypes = StringUtils.join(apiMethod.getContentTypes(), ',');
-            String methodTypes = StringUtils.join(apiMethod.getMethodTypes(), ',');
-            apiMethod.getUrls().stream().forEach(e -> {
-                StringBuffer str = new StringBuffer();
-                str.append("INSERT INTO bamboo_api_method(project_id, description, method_name, method_type, "
-                        + "content_type, header, params, url, model_name, class_name, class_desc,types,service_name,class_path)VALUES(");
-                String values = StringUtil.format("{},'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}','{}','{}','{}');", projectInfo.getId(), apiMethod.getDescription(), apiMethod.getMethodName(), methodTypes, contentTypes, headers, params, e,
-                        apiClass.getModuleName(), apiClass.getClassName(),
-                        apiClass.getDescription(), types,
-                        apiClass.getServiceName(),apiClass.getClassPath());
-                str.append(values);
-                try {
-                    state.addBatch(str.toString());
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            });
-        });
+    private void addBatch(ProjectInfo projectInfo, Statement state, BambooClass BambooClass) {
+//        BambooClass.getMethods().stream().forEach(apiMethod -> {
+//            String types = StringUtils.join(apiMethod.getTypes(), ',');
+//            String params = StringUtils.join(apiMethod.getParams(), ',');
+//            String headers = StringUtils.join(apiMethod.getHeaders(), ',');
+//            String contentTypes = StringUtils.join(apiMethod.getContentTypes(), ',');
+//            String methodTypes = StringUtils.join(apiMethod.getMethodTypes(), ',');
+//            apiMethod.getUrls().stream().forEach(e -> {
+//                StringBuffer str = new StringBuffer();
+//                str.append("INSERT INTO bamboo_api_method(project_id, description, method_name, method_type, "
+//                        + "content_type, header, params, url, model_name, class_name, class_desc,types,service_name,class_path)VALUES(");
+//                String values = StringUtil.format("{},'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}','{}','{}','{}');", projectInfo.getId(), apiMethod.getDescription(), apiMethod.getMethodName(), methodTypes, contentTypes, headers, params, e,
+//                        BambooClass.getModuleName(), BambooClass.getClassName(),
+//                        BambooClass.getDescription(), types,
+//                        BambooClass.getServiceName(),BambooClass.getClassPath());
+//                str.append(values);
+//                try {
+//                    state.addBatch(str.toString());
+//                } catch (SQLException ex) {
+//                    ex.printStackTrace();
+//                }
+//            });
+//        });
     }
 
     @SneakyThrows

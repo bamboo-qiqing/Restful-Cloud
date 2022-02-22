@@ -11,14 +11,18 @@ import java.lang.reflect.Method;
  */
 @Getter
 public enum PsiAnnotationMemberType {
-    PsiReferenceExpression("PsiReferenceExpression"),
-    PsiLiteralExpression("PsiLiteralExpression"),
-    PsiArrayInitializerMemberValue("PsiArrayInitializerMemberValue"),
-    PsiClassObjectAccessExpression("PsiClassObjectAccessExpression");
+    PsiReferenceExpression("PsiReferenceExpression",""),
+    PsiLiteralExpression("PsiLiteralExpression","String"),
+    PsiArrayInitializerMemberValue("PsiArrayInitializerMemberValue",""),
+    PsiClassObjectAccessExpression("PsiClassObjectAccessExpression","");
 
     private String code;
+    private String name;
 
-    PsiAnnotationMemberType(String code) {
+    PsiAnnotationMemberType(String code,String name) {
         this.code = code;
+        this.name = name;
     }
+
+
 }

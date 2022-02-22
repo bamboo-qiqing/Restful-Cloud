@@ -1,11 +1,10 @@
 package com.bamboo.tool.components.api.contributor;
 
-import com.bamboo.tool.components.api.enums.FrameworkType;
-import com.bamboo.tool.components.api.enums.InterfaceType;
-import icons.PluginIcons;
+
 import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.NlsSafe;
+import icons.PluginIcons;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -40,20 +39,20 @@ public class RequestMappingItemPresentation implements ItemPresentation {
     @Override
     public @Nullable
     Icon getIcon(boolean b) {
-        if (item.getTypes().contains(FrameworkType.O_DIAN_YUN.getCode())) {
-            if (item.getTypes().contains(InterfaceType.SERVICE.getCode())) {
-                return PluginIcons.SOA_SERVICE;
-            }
-            if (item.getTypes().contains(InterfaceType.CLIENT.getCode())) {
-                return PluginIcons.SOA_CLIENT;
-            }
-        }
-        if (item.getTypes().contains(InterfaceType.SERVICE.getCode())) {
-            return AllIcons.Nodes.Static;
-        }
-        if (item.getTypes().contains(InterfaceType.CLIENT.getCode())) {
-            return AllIcons.Nodes.Class;
-        }
+//        if (item.getTypes().contains(FrameworkType.O_DIAN_YUN.getCode())) {
+//            if (item.getTypes().contains(InterfaceType.SERVICE.getCode())) {
+//                return PluginIcons.SOA_SERVICE;
+//            }
+//            if (item.getTypes().contains(InterfaceType.CLIENT.getCode())) {
+//                return PluginIcons.SOA_CLIENT;
+//            }
+//        }
+//        if (item.getTypes().contains(InterfaceType.SERVICE.getCode())) {
+//            return AllIcons.Nodes.Static;
+//        }
+//        if (item.getTypes().contains(InterfaceType.CLIENT.getCode())) {
+//            return AllIcons.Nodes.Class;
+//        }
         return null;
     }
 }

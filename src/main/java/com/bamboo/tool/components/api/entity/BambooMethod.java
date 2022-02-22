@@ -14,18 +14,11 @@ import java.util.List;
  * Description
  */
 @Data
-public class ApiMethod {
+public class BambooMethod {
     private String description = StringUtils.EMPTY;
     private String methodName = StringUtils.EMPTY;
-    private List<String> methodTypes = new ArrayList<>();
-    private List<String> methodUrls = new ArrayList<>();
-    private List<String> contentTypes = new ArrayList<>();
-    private List<String> headers = new ArrayList<>();
-    private List<String> params = new ArrayList<>();
-    private List<String> urls = new ArrayList<>();
-    private List<String> types = new ArrayList<>();
-    @JSONField(serialize = false)
-    private String urlStr;
+    private String url = StringUtils.EMPTY;
     @JSONField(serialize = false)
     private PsiMethod psiMethod;
+    List<BambooAnnotationInfo> annotationInfos;
 }

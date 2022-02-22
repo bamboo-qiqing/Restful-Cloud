@@ -5,7 +5,7 @@ import cn.hutool.core.io.file.FileReader;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.bamboo.tool.components.api.entity.ApiClass;
+import com.bamboo.tool.components.api.entity.BambooClass;
 import com.bamboo.tool.components.api.factory.FrameworkExecute;
 import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.BambooToolConfig;

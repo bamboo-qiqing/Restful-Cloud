@@ -1,48 +1,53 @@
 package com.bamboo.tool.util;
 
-import cn.hutool.core.collection.CollectionUtil;
-import com.bamboo.tool.components.api.entity.AnnotationInfo;
-import com.bamboo.tool.components.api.entity.ApiClass;
-import com.bamboo.tool.components.api.entity.ApiMethod;
-import com.bamboo.tool.components.api.enums.RequestMethod;
-import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
-import com.bamboo.tool.components.api.factory.FrameworkExecute;
-import com.bamboo.tool.components.api.util.PsiAnnotationMemberUtil;
+import cn.hutool.core.text.CharSequenceUtil;
+import com.bamboo.tool.components.api.entity.AnnotationInfoSetting;
+import com.bamboo.tool.components.api.entity.BambooClass;
+import com.bamboo.tool.components.api.entity.BambooMethod;
+import com.bamboo.tool.components.api.enums.AnnotationScope;
+
 import com.bamboo.tool.components.api.view.component.entity.MethodModel;
 import com.bamboo.tool.components.api.view.component.tree.*;
+
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.db.entity.BambooApiMethod;
-import com.bamboo.tool.db.service.AnnotationInfoService;
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.configurationStore.schemeManager.SchemeAddOrUpdateEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
 import com.intellij.util.Query;
+import nonapi.io.github.classgraph.utils.StringUtils;
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class PsiUtils {
 
 
-    public static final Collection<PsiClass> getALLPsiClass(Project project) {
-        AnnotationInfoService annotationInfoService = ApplicationManager.getApplication().getService(AnnotationInfoService.class);
-        List<AnnotationInfo> annotationInfos = annotationInfoService.selectScannClassAll();
-        List<String> annotationName = annotationInfos.stream().map(e -> e.getAnnotationName()).collect(Collectors.toList());
-        Query<PsiClass> query = AllClassesSearch.search(ProjectScope.getContentScope(project), project);
+    public static final List<PsiClassCache> getALLPsiClass(Project project, List<AnnotationInfoSetting> annotationInfoSettings) {
+        final List<AnnotationInfoSetting> infos = annotationInfoSettings.stream().filter(e -> AnnotationScope.CLASS.equals(e.getScope())).filter(e -> e.getEffect().contains("scann")).collect(Collectors.toList());
 
-        Collection<PsiClass> all = query.allowParallelProcessing().filtering(psiClass -> {
-            long count = Arrays.stream(psiClass.getAnnotations()).parallel()
-                    .filter(e -> annotationName.contains(e.getNameReferenceElement().getReferenceName())).count();
-            return count > 0;
-        }).allowParallelProcessing().findAll();
-        return all;
+        final Map<String, AnnotationInfoSetting> infoMap = infos.stream().collect(Collectors.toMap(e -> e.getAnnotationPath(), e -> e));
+        Query<PsiClass> query = AllClassesSearch.search(ProjectScope.getContentScope(project), project);
+        final List<PsiClassCache> caches = new ArrayList<>();
+        query.allowParallelProcessing().forEachAsync(e -> {
+            final PsiAnnotation[] annotations = e.getAnnotations();
+            Arrays.stream(annotations).forEach(annotation -> {
+                final AnnotationInfoSetting annotationInfoSetting = infoMap.get(annotation.getQualifiedName());
+                if (annotationInfoSetting != null) {
+                    caches.add(new PsiClassCache(annotationInfoSetting, e));
+                }
+            });
+            return true;
+        });
+        return caches;
+
     }
 
 
@@ -78,68 +83,117 @@ public class PsiUtils {
         return values;
     }
 
-    @NotNull
-    public static void buildValuePair(ApiMethod apiMethod, PsiAnnotation annotation, ApiClass apiClass, String method) {
-        if (StringUtil.isNotEmpty(method)) {
-            apiMethod.getMethodTypes().add(method);
-        }
-        PsiNameValuePair[] pairs = annotation.getParameterList().getAttributes();
-        if (pairs == null && pairs.length < 1) {
-            return;
-        }
-        for (PsiNameValuePair pair : pairs) {
-            String attributeName = pair.getName();
-            // url
-            if (Objects.equals(attributeName, "value") || Objects.equals(attributeName, "path") || StringUtil.isBlank(attributeName)) {
-                PsiAnnotationMemberUtil.getAnnotationAttributeValue(pair);
-                List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
-                apiMethod.getMethodUrls().addAll(values);
-            }
-            // method
-            if (Objects.equals(attributeName, "method")) {
-                if (StringUtil.isBlank(method)) {
-                    List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
-                    apiMethod.getMethodTypes().addAll(values);
-                }
-            }
+//    @NotNull
+//    public static void buildValuePair(BambooMethod bambooMethod, PsiAnnotation annotation, BambooClass BambooClass, String method) {
+//        if (StringUtil.isNotEmpty(method)) {
+//            bambooMethod.getMethodTypes().add(method);
+//        }
+//        PsiNameValuePair[] pairs = annotation.getParameterList().getAttributes();
+//        if (pairs == null && pairs.length < 1) {
+//            return;
+//        }
+//        for (PsiNameValuePair pair : pairs) {
+//            String attributeName = pair.getName();
+//            // url
+//            if (Objects.equals(attributeName, "value") || Objects.equals(attributeName, "path") || StringUtil.isBlank(attributeName)) {
+//                PsiAnnotationMemberUtil.getAnnotationAttributeValue(pair);
+//                List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
+//                bambooMethod.getMethodUrls().addAll(values);
+//            }
+//            // method
+//            if (Objects.equals(attributeName, "method")) {
+//                if (StringUtil.isBlank(method)) {
+//                    List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
+//                    bambooMethod.getMethodTypes().addAll(values);
+//                }
+//            }
+//
+//            //ContentType
+//            if (Objects.equals(attributeName, "produces") || Objects.equals(attributeName, "consumes")) {
+//                List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
+//                bambooMethod.getContentTypes().addAll(values);
+//            }
+//            //headers
+//            if (Objects.equals(attributeName, "headers")) {
+//                List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
+//                bambooMethod.getHeaders().addAll(values);
+//            }
+//        }
+//        if (CollectionUtil.isEmpty(bambooMethod.getMethodTypes())) {
+//            bambooMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
+//        }
+//
+//    }
 
-            //ContentType
-            if (Objects.equals(attributeName, "produces") || Objects.equals(attributeName, "consumes")) {
-                List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
-                apiMethod.getContentTypes().addAll(values);
-            }
-            //headers
-            if (Objects.equals(attributeName, "headers")) {
-                List<String> values = PsiUtils.getAnnotationAttributeValues(pair.getValue());
-                apiMethod.getHeaders().addAll(values);
-            }
-        }
-        if (CollectionUtil.isEmpty(apiMethod.getMethodTypes())) {
-            apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
-        }
-
-    }
-
-    public static void convertToRoot(DefaultMutableTreeNode root, Map<String, List<ApiClass>> dataMap) {
+    public static void convertToRoot(DefaultMutableTreeNode root, Map<String, List<BambooClass>> dataMap) {
         List<ModuleNode> moduleNodeList = new ArrayList<>();
-        for (Map.Entry<String, List<ApiClass>> moduleEntry : dataMap.entrySet()) {
+        for (Map.Entry<String, List<BambooClass>> moduleEntry : dataMap.entrySet()) {
             String moduleName = moduleEntry.getKey();
             ModuleNode moduleNode = new ModuleNode(moduleName);
-            List<ApiClass> classList = moduleEntry.getValue();
+            List<BambooClass> classList = moduleEntry.getValue();
+            for (BambooClass bambooClass : classList) {
+                final ClassNode classNode = new ClassNode(bambooClass.getClassName());
+                AtomicReference<Boolean> isSoaServiceClient = new AtomicReference<>(false);
+                AtomicReference<Boolean> isSoaServiceRegister = new AtomicReference<>(false);
 
-            for (ApiClass apiClass : classList) {
-                List<ApiMethod> apiMethodList = apiClass.getMethods();
-                apiMethodList.forEach(apiMethod -> {
-                    apiMethod.getUrls().forEach(e -> {
-                        apiMethod.setUrlStr(e);
-                        MethodModel methodModel = new MethodModel();
-                        methodModel.setUrl(apiMethod.getUrlStr());
-                        methodModel.setDesc(apiMethod.getDescription());
-                        methodModel.setMethodType(StringUtils.join(apiMethod.getMethodTypes(), ','));
-                        methodModel.setPsiMethod(apiMethod.getPsiMethod());
-                        moduleNode.add(new MethodNode(methodModel));
-                    });
+                List<String> classUrls = new ArrayList<>();
+                bambooClass.getAnnotations().parallelStream().forEach(e -> {
+                    final AnnotationInfoSetting annotationInfoSetting = e.getAnnotationInfoSetting();
+                    String path = annotationInfoSetting.getAnnotationPath();
+                    final String name = e.getParam().getName();
+                    if ("com.odianyun.soa.annotation.SoaServiceRegister".equals(path) && "interfaceClass".equals(name)) {
+                        isSoaServiceRegister.set(true);
+                        final String[] split = e.getValue().split("\\.");
+                        final String url = CharSequenceUtil.addPrefixIfNot(StringUtil.lowerFirst(split[split.length - 1]), "/");
+                        classUrls.add(url);
+                    }
+                    if ("com.odianyun.soa.client.annotation.SoaServiceClient".equals(path) && "interfaceName".equals(name)) {
+                        final String[] split = e.getValue().split("\\.");
+                        final String url = CharSequenceUtil.addPrefixIfNot(StringUtil.lowerFirst(split[split.length - 1]), "/");
+                        isSoaServiceClient.set(true);
+                        classUrls.add(url);
+                    }
+                    if ("org.springframework.web.bind.annotation.RequestMapping".equals(path) && "value".equals(name)) {
+                        final String url = CharSequenceUtil.addPrefixIfNot(StringUtil.lowerFirst(e.getValue()), "/");
+                        classUrls.add(url);
+                    }
                 });
+                List<BambooMethod> bambooMethodList = bambooClass.getMethods();
+                bambooMethodList.forEach(bambooMethod -> {
+                    classUrls.forEach(classUrl -> {
+                        if (isSoaServiceClient.get()) {
+                            MethodModel methodModel = new MethodModel();
+                            methodModel.setUrl(classUrl + CharSequenceUtil.addPrefixIfNot(bambooMethod.getMethodName(), "/"));
+                            methodModel.setDesc(bambooMethod.getDescription());
+//                            methodModel.setMethodType(StringUtils.join(bambooMethod.getMethodTypes(), ','));
+                            methodModel.setPsiMethod(bambooMethod.getPsiMethod());
+                            classNode.add(new MethodNode(methodModel));
+                        } else if (isSoaServiceRegister.get()) {
+                            MethodModel methodModel = new MethodModel();
+                            methodModel.setUrl(classUrl + CharSequenceUtil.addPrefixIfNot(bambooMethod.getMethodName(), "/"));
+                            methodModel.setDesc(bambooMethod.getDescription());
+//                            methodModel.setMethodType(StringUtils.join(bambooMethod.getMethodTypes(), ','));
+                            methodModel.setPsiMethod(bambooMethod.getPsiMethod());
+                            classNode.add(new MethodNode(methodModel));
+                        } else {
+                            bambooMethod.getAnnotationInfos().forEach(bambooAnnotationInfo -> {
+                                final AnnotationInfoSetting annotationInfoSetting = bambooAnnotationInfo.getAnnotationInfoSetting();
+                                String path = annotationInfoSetting.getAnnotationPath();
+                                final String name = bambooAnnotationInfo.getParam().getName();
+                                if ("org.springframework.web.bind.annotation.RequestMapping".equals(path) && ("value".equals(name)||"null".equals(name)||"path".equals(name))) {
+                                    MethodModel methodModel = new MethodModel();
+                                    methodModel.setUrl(classUrl + CharSequenceUtil.addPrefixIfNot(bambooAnnotationInfo.getValue(), "/"));
+                                    methodModel.setDesc(bambooMethod.getDescription());
+                                    // methodModel.setMethodType(StringUtils.join(bambooMethod.getMethodTypes(), ','));
+                                    methodModel.setPsiMethod(bambooMethod.getPsiMethod());
+                                    classNode.add(new MethodNode(methodModel));
+                                }
+                            });
+                        }
+                    });
+
+                });
+                moduleNode.add(classNode);
             }
             moduleNodeList.add(moduleNode);
         }
@@ -175,8 +229,8 @@ public class PsiUtils {
         });
     }
 
-    public static Map<String, List<ApiClass>> convertToMap(List<ApiClass> apiClasses) {
-        Map<String, List<ApiClass>> dataMap = apiClasses.parallelStream().collect(Collectors.groupingBy(ApiClass::getModuleName));
+    public static Map<String, List<BambooClass>> convertToMap(List<BambooClass> BambooClasses) {
+        Map<String, List<BambooClass>> dataMap = BambooClasses.parallelStream().collect(Collectors.groupingBy(BambooClass::getModuleName));
         return dataMap;
     }
 

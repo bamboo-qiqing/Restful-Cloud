@@ -32,8 +32,8 @@ public class BambooToolComponent implements PersistentStateComponent<BambooToolC
         if (Objects.isNull(toolConfig)) {
             toolConfig = new BambooToolConfig();
         }
-        if(toolConfig.getApiMethods()==null){
-            toolConfig.setApiMethods(new ArrayList<>());
+        if(toolConfig.getBambooMethods()==null){
+            toolConfig.setBambooMethods(new ArrayList<>());
         }
         if(toolConfig.getProjectInfo()==null){
             toolConfig.setProjectInfo(new ProjectInfo());

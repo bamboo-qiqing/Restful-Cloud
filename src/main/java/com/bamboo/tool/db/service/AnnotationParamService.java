@@ -23,10 +23,10 @@ public class AnnotationParamService {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         StringBuffer str = new StringBuffer();
-        str.append("select");
+        str.append("select ");
         str.append("ap.*");
-        str.append("from");
-        str.append("annotation_param ap;");
+        str.append("from ");
+        str.append("annotation_param_setting ap;");
         ResultSet resultSet = state.executeQuery(str.toString());
         List<AnnotationParam> params = new ArrayList<>();
         while (resultSet.next()) {
@@ -34,7 +34,7 @@ public class AnnotationParamService {
             String name = resultSet.getString("name");
             String type = resultSet.getString("type");
             String describe = resultSet.getString("describe");
-            int annotationInfoId = resultSet.getInt("annotation_info_id");
+            int annotationInfoId = resultSet.getInt("annotation_info_setting_id");
             AnnotationParam annotationInfo = new AnnotationParam();
             annotationInfo.setId(id);
             annotationInfo.setName(name);

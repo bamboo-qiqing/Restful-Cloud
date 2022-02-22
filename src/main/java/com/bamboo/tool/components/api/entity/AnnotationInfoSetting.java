@@ -3,6 +3,7 @@ package com.bamboo.tool.components.api.entity;
 import com.bamboo.tool.components.api.enums.AnnotationScope;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  * Description
  */
 @Data
-public class AnnotationInfo {
+public class AnnotationInfoSetting {
     private Integer id;
     private String annotationName;
     private String annotationPath;
@@ -19,6 +20,7 @@ public class AnnotationInfo {
     private AnnotationScope scope;
     private String soaType;
     private String effect;
-    private List<AnnotationParam> params;
-    List<AnnotationMethodScope> methodScopes;
+    private List<AnnotationParam> params = new ArrayList<>();
+    List<AnnotationMethodScope> methodScopes = new ArrayList<>();
+
 }

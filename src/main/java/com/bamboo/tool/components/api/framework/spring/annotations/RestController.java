@@ -1,6 +1,6 @@
 //package com.bamboo.tool.components.api.framework.spring.annotations;
 //
-//import com.bamboo.tool.components.api.entity.ApiClass;
+//import com.bamboo.tool.components.api.entity.BambooClass;
 //import com.bamboo.tool.components.api.enums.AnnotationType;
 //import com.bamboo.tool.components.api.enums.FrameworkType;
 //import com.bamboo.tool.components.api.enums.InterfaceType;
@@ -11,7 +11,7 @@
 //@Data
 //public class RestController implements ClassAnnotationProcess {
 //    @Override
-//    public void buildClass(ApiClass apiMethod, PsiAnnotation psiAnnotation) {
+//    public void buildClass(BambooClass apiMethod, PsiAnnotation psiAnnotation) {
 //        apiMethod.getTypes().add(getFrameworkType().getCode());
 //        apiMethod.getTypes().add(InterfaceType.SERVICE.getCode());
 //    }

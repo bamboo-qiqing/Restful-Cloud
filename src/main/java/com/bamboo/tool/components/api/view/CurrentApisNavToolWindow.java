@@ -1,7 +1,7 @@
 package com.bamboo.tool.components.api.view;
 
-import com.bamboo.tool.components.api.entity.ApiClass;
-import com.bamboo.tool.components.api.entity.ApiMethod;
+import com.bamboo.tool.components.api.entity.BambooMethod;
+import com.bamboo.tool.components.api.entity.BambooClass;
 import com.bamboo.tool.components.api.factory.FrameworkExecute;
 import com.bamboo.tool.components.api.view.component.tree.ApiTree;
 import com.bamboo.tool.components.api.view.component.tree.BaseNode;
@@ -47,7 +47,7 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
     private final Project myProject;
     private JPanel panel;
     private ApiTree apiTree;
-    private List<ApiClass> allApiList;
+    private List<BambooClass> allApiList;
 
     public CurrentApisNavToolWindow(Project project) {
         super(false, false);
@@ -145,14 +145,14 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
 
                 allApiList = FrameworkExecute.buildApiMethod(myProject);
                 indicator.setText("Rendering");
-                List<ApiMethod> filterMethodList = new ArrayList<>();
+                List<BambooMethod> filterMethodList = new ArrayList<>();
                 allApiList.stream().map(e -> e.getMethods()).forEach(filterMethodList::addAll);
                 RootNode root = new RootNode("apis");
                 PsiUtils.convertToRoot(root, PsiUtils.convertToMap(allApiList));
                 apiTree.setModel(new DefaultTreeModel(root));
                 ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
-                ApiMethodService apiMethodService = ApplicationManager.getApplication().getService(ApiMethodService.class);
-                apiMethodService.saveMethods(allApiList, projectInfo);
+//                ApiMethodService apiMethodService = ApplicationManager.getApplication().getService(ApiMethodService.class);
+//                apiMethodService.saveMethods(allApiList, projectInfo);
                 NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
             }
         };

@@ -1,12 +1,8 @@
 package com.bamboo.tool.config.model;
 
-import com.bamboo.tool.components.api.factory.ClassAnnotationProcess;
-import com.intellij.psi.PsiAnnotation;
+import com.bamboo.tool.components.api.entity.AnnotationInfoSetting;
 import com.intellij.psi.PsiClass;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Create by GuoQing
@@ -17,16 +13,11 @@ import java.util.List;
 public class PsiClassCache {
 
     private PsiClass psiClass;
-    private List<ClassAnnotationProcessCache> processCaches = new ArrayList<>();
+    private AnnotationInfoSetting info;
 
-    public PsiClassCache(PsiClass psiClass, List<ClassAnnotationProcessCache> processCaches) {
+    public PsiClassCache(AnnotationInfoSetting info, PsiClass psiClass) {
         this.psiClass = psiClass;
-        this.processCaches = processCaches;
+        this.info = info;
     }
-    @Data
-    public static class ClassAnnotationProcessCache {
-        private ClassAnnotationProcess classAnnotationProcesses;
-        private PsiAnnotation psiAnnotation;
 
-    }
 }

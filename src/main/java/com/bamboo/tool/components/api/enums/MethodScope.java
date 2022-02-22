@@ -25,4 +25,5 @@ public enum MethodScope {
         }
         return null;
     }
+
 }

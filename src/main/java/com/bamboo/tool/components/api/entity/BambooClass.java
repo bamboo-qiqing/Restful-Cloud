@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class ApiClass {
+public class BambooClass {
     private String className = StringUtils.EMPTY;
     private String moduleName = StringUtils.EMPTY;
-    private String serviceName = StringUtils.EMPTY;
-    private List<String> classUrls = new ArrayList<>();
     private String description = StringUtils.EMPTY;
-    private List<String> types = new ArrayList<>();
-    private List<ApiMethod> methods;
-    private String classPath= StringUtils.EMPTY;
+    private String classPath = StringUtils.EMPTY;
+    private String qualifiedName = StringUtils.EMPTY;
+    private List<BambooMethod> methods = new ArrayList<>();
+    private List<BambooAnnotationInfo> annotations = new ArrayList<>();
+    private AnnotationInfoSetting annotationInfoSetting;
 }

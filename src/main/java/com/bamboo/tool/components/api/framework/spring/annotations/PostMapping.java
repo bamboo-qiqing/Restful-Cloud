@@ -1,6 +1,6 @@
 //package com.bamboo.tool.components.api.framework.spring.annotations;
 //
-//import com.bamboo.tool.components.api.entity.ApiClass;
+//import com.bamboo.tool.components.api.entity.BambooClass;
 //import com.bamboo.tool.components.api.entity.ApiMethod;
 //import com.bamboo.tool.components.api.enums.FrameworkType;
 //import com.bamboo.tool.components.api.enums.InterfaceType;
@@ -13,10 +13,10 @@
 //public class PostMapping implements MethodAnnotationProcess {
 //
 //    @Override
-//    public void buildMethod(ApiMethod apiMethod, PsiAnnotation annotation, ApiClass apiClass) {
+//    public void buildMethod(ApiMethod apiMethod, PsiAnnotation annotation, BambooClass BambooClass) {
 //        apiMethod.getTypes().add(getFrameworkType().getCode());
 //        apiMethod.getTypes().add(InterfaceType.SERVICE.getCode());
-//        PsiUtils.buildValuePair(apiMethod, annotation, apiClass, RequestMethod.POST.getCode());
+//        PsiUtils.buildValuePair(apiMethod, annotation, BambooClass, RequestMethod.POST.getCode());
 //    }
 //
 //    @Override

@@ -21,9 +21,9 @@ public class FrameworkService {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         StringBuffer str = new StringBuffer();
-        str.append("select");
+        str.append("select ");
         str.append("f.*");
-        str.append("from");
+        str.append("from ");
         str.append("framework f;");
         ResultSet resultSet = state.executeQuery(str.toString());
         List<Framework> frameworks = new ArrayList<>();

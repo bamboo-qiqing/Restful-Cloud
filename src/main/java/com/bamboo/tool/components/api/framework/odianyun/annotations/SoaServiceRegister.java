@@ -1,7 +1,7 @@
 //package com.bamboo.tool.components.api.framework.odianyun.annotations;
 //
 //import cn.hutool.core.text.CharSequenceUtil;
-//import com.bamboo.tool.components.api.entity.ApiClass;
+//import com.bamboo.tool.components.api.entity.BambooClass;
 //import com.bamboo.tool.components.api.enums.AnnotationType;
 //import com.bamboo.tool.components.api.enums.FrameworkType;
 //import com.bamboo.tool.components.api.enums.InterfaceType;
@@ -14,9 +14,9 @@
 //
 //public class SoaServiceRegister implements ClassAnnotationProcess {
 //    @Override
-//    public void buildClass(ApiClass apiClass, PsiAnnotation psiAnnotation) {
-//        apiClass.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
-//        apiClass.getTypes().add(InterfaceType.SERVICE.getCode());
+//    public void buildClass(BambooClass BambooClass, PsiAnnotation psiAnnotation) {
+//        BambooClass.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
+//        BambooClass.getTypes().add(InterfaceType.SERVICE.getCode());
 //        PsiNameValuePair[] pairs = psiAnnotation.getParameterList().getAttributes();
 //        for (PsiNameValuePair pair : pairs) {
 //            String attributeName = pair.getName();
@@ -25,12 +25,12 @@
 //                if (text.contains(".class")) {
 //                    text = text.replaceAll(".class", "");
 //                }
-//                apiClass.setServiceName(text);
-//                apiClass.getClassUrls().add(CharSequenceUtil.addPrefixIfNot(StringUtil.lowerFirst(text), "/"));
+//                BambooClass.setServiceName(text);
+//                BambooClass.getClassUrls().add(CharSequenceUtil.addPrefixIfNot(StringUtil.lowerFirst(text), "/"));
 //                continue;
 //            }
 //            if (Objects.equals(attributeName, "desc")) {
-//                apiClass.setDescription(pair.getValue().getText());
+//                BambooClass.setDescription(pair.getValue().getText());
 //            }
 //        }
 //    }

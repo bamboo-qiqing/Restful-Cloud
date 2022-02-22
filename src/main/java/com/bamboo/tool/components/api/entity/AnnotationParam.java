@@ -13,5 +13,6 @@ public class AnnotationParam {
     private String name;
     private String type;
     private String describe;
+    private String attribute;
     private Integer annotationInfoId;
 }
