@@ -75,7 +75,7 @@ public class FrameworkExecute {
                                             bambooClass.getMethods().add(bambooMethod);
                                         }
                                     }
-                                }else{
+                                } else {
                                     bambooClass.getMethods().add(bambooMethod);
                                 }
 
@@ -84,26 +84,6 @@ public class FrameworkExecute {
 
                     });
                 }
-//                final Map<String, AnnotationMethodScope> methodScopes = info.getMethodScopes().stream().collect(Collectors.toMap(AnnotationMethodScope::getMethodScope, methodScope -> methodScope));
-//                Arrays.stream(psiClass.getMethods()).forEach(method -> {
-//                    final int accessLevel = PsiUtil.getAccessLevel(method.getModifierList());
-//                    final AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION);
-//                    if(annotationMethodScope!=null){
-//                        final PsiAnnotation[] methodAnnotations = method.getAnnotations();
-//                        for (PsiAnnotation methodAnnotation :methodAnnotations) {
-//
-//                        }
-//                    }
-//                });
-//                Arrays.stream(psiClass.getMethods()).filter(e->{e})
-//                List<PsiMethod> methodList;
-//                if (classPaths.contains(AnnotationType.SOA_SERVICE_CLIENT)) {
-//                    methodList = Arrays.stream(psiClass.getMethods()).filter(e -> PsiUtil.getAccessLevel(e.getModifierList()) == PsiUtil.ACCESS_LEVEL_PUBLIC).collect(Collectors.toList());
-//                } else {
-//                    methodList = Arrays.asList(psiClass.getMethods());
-//                }
-//                List<ApiMethod> apiMethods = methodList.stream().parallel().map(e -> buildMethod(e, BambooClass, classPaths)).filter(e -> e != null).collect(Collectors.toList());
-//                BambooClass.setMethods(apiMethods);
                 bambooClasses.add(bambooClass);
             }
         });
@@ -143,13 +123,13 @@ public class FrameworkExecute {
                     for (PsiNameValuePair attribute : attributes) {
                         PsiAnnotationMemberValue value = attribute.getValue();
                         String name = attribute.getName();
-                        if(StringUtil.isEmpty(name)){
-                            name="null";
+                        if (StringUtil.isEmpty(name)) {
+                            name = "null";
                         }
                         AnnotationParam annotationParam = params.get(name);
                         if (!Objects.isNull(annotationParam)) {
-                            final List<String> values = PsiAnnotationMemberUtil.getValue(annotationParam.getType(), value);
-                            values.stream().forEach(a->{
+                            final List<String> values = PsiAnnotationMemberUtil.getValue(value);
+                            values.stream().forEach(a -> {
                                 BambooAnnotationInfo bambooAnnotationInfo = new BambooAnnotationInfo();
                                 bambooAnnotationInfo.setValue(a);
                                 bambooAnnotationInfo.setAnnotationInfoSetting(annotationInfoSetting);
@@ -164,50 +144,4 @@ public class FrameworkExecute {
         });
         return annotationInfos;
     }
-
-//    private static ApiMethod buildMethod(PsiMethod method, BambooClass psiClass, List<String> classPaths) {
-//        ApiMethod apiMethod = new ApiMethod();
-//        apiMethod.setMethodName(method.getName());
-//        apiMethod.setPsiMethod(method);
-//
-//        boolean isSoa = true;
-//        PsiAnnotation[] methodAnnotations = method.getAnnotations();
-//        if (methodAnnotations != null || methodAnnotations.length > 0) {
-//            for (PsiAnnotation methodAnnotation : methodAnnotations) {
-//                PsiJavaCodeReferenceElement referenceElement = methodAnnotation.getNameReferenceElement();
-//                String qualifiedName = referenceElement.getQualifiedName();
-//                MethodAnnotationProcess methodAnnotationProcess = methodAnnotationProcessMap.get(qualifiedName);
-//                if (!Objects.isNull(methodAnnotationProcess) && methodAnnotationProcess.getClassShortName().equals(referenceElement.getReferenceName())) {
-//                    methodAnnotationProcess.buildMethod(apiMethod, methodAnnotation, psiClass);
-//                    isSoa = false;
-//                }
-//            }
-//        }
-//        if (isSoa) {
-//            if (classPaths.contains(AnnotationType.SOA_SERVICE_CLIENT.getClassPath())) {
-//                apiMethod.getMethodUrls().add(method.getName());
-//                apiMethod.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
-//                apiMethod.getTypes().add(InterfaceType.CLIENT.getCode());
-//                apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
-//            }
-//            if (classPaths.contains(AnnotationType.SOA_SERVICE_REGISTER.getClassPath())) {
-//                apiMethod.getTypes().add(FrameworkType.O_DIAN_YUN.getCode());
-//                apiMethod.getTypes().add(InterfaceType.SERVICE.getCode());
-//                apiMethod.getMethodUrls().add(method.getName());
-//                apiMethod.getMethodTypes().add(RequestMethod.ALL.getCode());
-//            }
-//        }
-//        if (CollectionUtil.isEmpty(apiMethod.getMethodUrls())) {
-//            return null;
-//        }
-//        List<String> classUrls = apiMethod.getMethodUrls().parallelStream().map(e -> CharSequenceUtil.addPrefixIfNot(e, "/")).collect(Collectors.toList());
-//        apiMethod.setMethodUrls(classUrls);
-//        psiClass.getClassUrls().parallelStream().forEach(e -> {
-//            List<String> urls = apiMethod.getMethodUrls().parallelStream().map(a -> e + a).collect(Collectors.toList());
-//            apiMethod.getUrls().addAll(urls);
-//        });
-//        return apiMethod;
-//    }
-
-
 }

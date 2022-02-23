@@ -1,6 +1,5 @@
 package com.bamboo.tool.db.service;
 
-import com.bamboo.tool.components.api.entity.AnnotationMethodScope;
 import com.bamboo.tool.components.api.entity.AnnotationParam;
 import com.bamboo.tool.db.SqliteConfig;
 import lombok.SneakyThrows;

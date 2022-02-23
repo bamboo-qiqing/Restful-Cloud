@@ -11,7 +11,7 @@ public class PsiAnnotationMemberUtil {
 
 
     @SneakyThrows
-    public static List<String> getValue(String type, PsiAnnotationMemberValue value) {
+    public static List<String> getValue(PsiAnnotationMemberValue value) {
         List<String> values = new ArrayList<>();
         final String name = value.getClass().getName();
         if (name.contains("PsiArrayInitializerMemberValue")) {
@@ -42,16 +42,4 @@ public class PsiAnnotationMemberUtil {
             values.add(reference.getReferenceName());
         }
     }
-
-
-    public static String getClass(PsiAnnotationMemberValue value) {
-        PsiClassObjectAccessExpression classObject = (PsiClassObjectAccessExpression) value;
-        return classObject.getOperand().getType().getCanonicalText();
-    }
-
-    public static String getRequestMethod(PsiAnnotationMemberValue value) {
-        PsiReferenceExpression reference = (PsiReferenceExpression) value;
-        return reference.getReferenceName();
-    }
-
 }
