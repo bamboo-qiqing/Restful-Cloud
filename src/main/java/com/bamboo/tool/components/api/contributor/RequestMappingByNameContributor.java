@@ -39,4 +39,5 @@ public class RequestMappingByNameContributor implements ChooseByNameContributor 
         RequestMappingNavigationItem[] requestMappingItems = navigationItems.stream().filter(q -> q.getName().equals(name)).toArray(RequestMappingNavigationItem[]::new);
         return requestMappingItems;
     }
+
 }
