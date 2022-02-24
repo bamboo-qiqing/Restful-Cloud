@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>com.bamboo.bamboo-tool</id>
+    <id>com.bamboo</id>
     <name>bamboo-tool</name>
     <vendor email="760560079@qq.com" url="http://baidu.com">bamboo</vendor>
 
@@ -17,6 +17,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
+        <applicationService serviceImplementation="com.bamboo.tool.components.api.configurable.BambooApiFilterConfiguration"/>
         <applicationService serviceImplementation="com.bamboo.tool.db.service.ApiProjectService"/>
         <applicationService serviceImplementation="com.bamboo.tool.db.service.ApiMethodService"/>
         <applicationService serviceImplementation="com.bamboo.tool.db.service.AnnotationInfoSettingService"/>
@@ -45,7 +46,7 @@
         <extensionPoint name="requestMappingContributor" interface="com.intellij.navigation.ChooseByNameContributor"
                         dynamic="true"/>
     </extensionPoints>
-    <extensions defaultExtensionNs="com.bamboo.bamboo-tool">
+    <extensions defaultExtensionNs="com.bamboo">
         <requestMappingContributor
                 implementation="com.bamboo.tool.components.api.contributor.RequestMappingByNameContributor"/>
 

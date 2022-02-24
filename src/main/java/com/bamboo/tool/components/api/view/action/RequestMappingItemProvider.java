@@ -16,6 +16,7 @@
 
 package com.bamboo.tool.components.api.view.action;
 
+import b.C.S;
 import com.bamboo.tool.components.api.contributor.RequestMappingModel;
 import com.intellij.ide.util.gotoByName.*;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -42,7 +43,11 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
 
     public @NotNull
     List<String> filterNames(@NotNull ChooseByNameViewModel base, String[] names, @NotNull String pattern) {
-        return new ArrayList<>();
+        ArrayList<String> objects = new ArrayList<>();
+        objects.add("test1");
+        objects.add("test2");
+        objects.add("test3");
+        return objects;
     }
 
 

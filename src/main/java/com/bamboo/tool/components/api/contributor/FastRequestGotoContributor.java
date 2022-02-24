@@ -1,16 +1,23 @@
 package com.bamboo.tool.components.api.contributor;
 
-import com.intellij.ide.actions.searcheverywhere.AbstractGotoSEContributor;
-import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributor;
-import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributorFactory;
+import com.bamboo.tool.components.api.configurable.ApiSearchEverywhereFiltersAction;
+import com.bamboo.tool.components.api.configurable.BambooApiFilterConfiguration;
+import com.bamboo.tool.components.api.enums.RequestMethod;
+import com.intellij.ide.actions.searcheverywhere.*;
 import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
+import com.intellij.ide.util.gotoByName.LanguageRef;
 import com.intellij.navigation.ChooseByNameContributor;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Create by GuoQing
@@ -20,17 +27,21 @@ import org.jetbrains.annotations.Nullable;
 public class FastRequestGotoContributor extends AbstractGotoSEContributor {
 
     private Project myProject;
-    private RequestMappingModel requestMappingModel;
+
+    private final PersistentSearchEverywhereContributorFilter<RequestMethod> myFilter;
 
     protected FastRequestGotoContributor(@NotNull AnActionEvent event) {
         super(event);
         myProject = event.getProject();
-        requestMappingModel = new RequestMappingModel(myProject, ExtensionPointName.<ChooseByNameContributor>create("com.bamboo.bamboo-tool.requestMappingContributor").getExtensionList());
+        BambooApiFilterConfiguration instance = BambooApiFilterConfiguration.getInstance(myProject);
+        myFilter = new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null);
     }
 
     @Override
     protected @NotNull
     FilteringGotoByModel<?> createModel(@NotNull Project project) {
+        RequestMappingModel requestMappingModel = new RequestMappingModel(myProject, ExtensionPointName.<ChooseByNameContributor>create("com.bamboo.requestMappingContributor").getExtensionList());
+        requestMappingModel.setFilterItems(myFilter.getAllElements());
         return requestMappingModel;
     }
 
@@ -45,6 +56,16 @@ public class FastRequestGotoContributor extends AbstractGotoSEContributor {
     public int getSortWeight() {
         return 1000;
     }
+
+    @Override
+    public @NotNull
+    List<AnAction> getActions(@NotNull Runnable onChanged) {
+        BambooApiFilterConfiguration instance = BambooApiFilterConfiguration.getInstance(myProject);
+        List<AnAction> actions = new ArrayList<>();
+        actions.add(new ApiSearchEverywhereFiltersAction(new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null), onChanged));
+        return actions;
+    }
+
 
     @Override
     public @Nullable
