@@ -19,6 +19,7 @@ public class FastRequestEqualityProvider extends AbstractEqualityProvider {
         String newItemElementString = getString(newItemElement);
         String alreadyFoundItemElementString = getString(alreadyFoundItemElement);
         return newItemElementString != null && newItemElementString.equals(alreadyFoundItemElementString);
+//        return Objects.equals(newItem,alreadyFoundItem);
     }
 
     private static String getString(Object item) {

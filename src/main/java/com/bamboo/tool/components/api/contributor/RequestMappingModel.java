@@ -6,7 +6,6 @@ import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
 import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.psi.PsiElement;
@@ -22,7 +21,7 @@ import java.util.List;
  * Date 2022/2/15 10:38
  * Description
  */
-public class RequestMappingModel extends FilteringGotoByModel<FileType> implements DumbAware {
+public class RequestMappingModel extends FilteringGotoByModel<FileType> {
 
     protected RequestMappingModel(@NotNull Project project, @NotNull List<ChooseByNameContributor> contributors) {
         super(project, contributors);
@@ -31,15 +30,8 @@ public class RequestMappingModel extends FilteringGotoByModel<FileType> implemen
     @Override
     protected @Nullable
     FileType filterValueFor(NavigationItem navigationItem) {
-        System.out.printf("");
+
         return null;
-    }
-
-
-
-    @Override
-    public synchronized void setFilterItems(Collection<? extends FileType> filterItems) {
-        super.setFilterItems(filterItems);
     }
 
     @Override
@@ -57,20 +49,18 @@ public class RequestMappingModel extends FilteringGotoByModel<FileType> implemen
     @Override
     public @NotNull
     @NlsContexts.Label String getNotFoundMessage() {
-
         return null;
     }
 
     @Override
     public @Nullable
     @NlsContexts.Label String getCheckBoxName() {
-
-        return "text111";
+        return null;
     }
 
     @Override
     public boolean loadInitialCheckBoxState() {
-        return true;
+        return false;
     }
 
     @Override
@@ -80,14 +70,12 @@ public class RequestMappingModel extends FilteringGotoByModel<FileType> implemen
 
     @Override
     public String[] getSeparators() {
-
         return new String[0];
     }
 
     @Override
     public @Nullable
     String getFullName(@NotNull Object element) {
-
         return getElementName(element);
     }
 
@@ -99,7 +87,6 @@ public class RequestMappingModel extends FilteringGotoByModel<FileType> implemen
     @Override
     protected synchronized @Nullable
     Collection<FileType> getFilterItems() {
-
         return super.getFilterItems();
     }
     @Override

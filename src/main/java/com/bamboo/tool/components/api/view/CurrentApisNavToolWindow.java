@@ -151,8 +151,8 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                 PsiUtils.convertToRoot(root, PsiUtils.convertToMap(allApiList));
                 apiTree.setModel(new DefaultTreeModel(root));
                 ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
-                //ApiMethodService apiMethodService = ApplicationManager.getApplication().getService(ApiMethodService.class);
-                //apiMethodService.saveMethods(allApiList, projectInfo);
+//                ApiMethodService apiMethodService = ApplicationManager.getApplication().getService(ApiMethodService.class);
+//                apiMethodService.saveMethods(allApiList, projectInfo);
                 NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
             }
         };
