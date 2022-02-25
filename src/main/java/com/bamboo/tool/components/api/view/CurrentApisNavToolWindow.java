@@ -148,11 +148,11 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                 List<BambooMethod> filterMethodList = new ArrayList<>();
                 allApiList.stream().map(e -> e.getMethods()).forEach(filterMethodList::addAll);
                 RootNode root = new RootNode("apis");
-                PsiUtils.convertToRoot(root, PsiUtils.convertToMap(allApiList));
+                List<BambooClass> classList = PsiUtils.convertToRoot(root, PsiUtils.convertToMap(allApiList));
                 apiTree.setModel(new DefaultTreeModel(root));
                 ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
-//                ApiMethodService apiMethodService = ApplicationManager.getApplication().getService(ApiMethodService.class);
-//                apiMethodService.saveMethods(allApiList, projectInfo);
+                ApiMethodService apiMethodService = ApplicationManager.getApplication().getService(ApiMethodService.class);
+                apiMethodService.saveMethods(classList, projectInfo);
                 NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
             }
         };

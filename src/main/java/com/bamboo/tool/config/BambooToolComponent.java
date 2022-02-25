@@ -32,14 +32,9 @@ public class BambooToolComponent implements PersistentStateComponent<BambooToolC
         if (Objects.isNull(toolConfig)) {
             toolConfig = new BambooToolConfig();
         }
-        if(toolConfig.getBambooMethods()==null){
-            toolConfig.setBambooMethods(new ArrayList<>());
-        }
+
         if(toolConfig.getProjectInfo()==null){
             toolConfig.setProjectInfo(new ProjectInfo());
-        }
-        if(StrUtil.isEmpty(toolConfig.getProjectSavePath())){
-            toolConfig.setProjectSavePath(FileUtil.getUserHomePath() + "\\bambooTool\\");
         }
 
         return toolConfig;

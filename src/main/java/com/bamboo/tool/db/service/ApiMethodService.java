@@ -46,14 +46,14 @@ public class ApiMethodService {
         this.deleteMethodsByProjectId(projectInfo.getId());
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
-        allApiList.stream().forEach(BambooClass -> {
-            addBatch(projectInfo, state, BambooClass);
+        allApiList.stream().forEach(bambooClass -> {
+            addBatch(projectInfo, state, bambooClass);
         });
         state.executeBatch();
     }
 
-    private void addBatch(ProjectInfo projectInfo, Statement state, BambooClass BambooClass) {
-//        BambooClass.getMethods().stream().forEach(apiMethod -> {
+    private void addBatch(ProjectInfo projectInfo, Statement state, BambooClass bambooClasss) {
+//        bambooClasss.getMethods().stream().forEach(apiMethod -> {
 //            String types = StringUtils.join(apiMethod.getTypes(), ',');
 //            String params = StringUtils.join(apiMethod.getParams(), ',');
 //            String headers = StringUtils.join(apiMethod.getHeaders(), ',');

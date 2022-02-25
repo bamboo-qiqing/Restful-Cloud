@@ -12,6 +12,7 @@ import com.bamboo.tool.config.model.BambooToolConfig;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.SqliteConfig;
 import com.bamboo.tool.db.service.ApiProjectService;
+import com.bamboo.tool.util.StringUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Create by GuoQing
@@ -37,36 +39,27 @@ public class ToolProjectManagerListener implements ProjectManagerListener {
 
     @Override
     public void projectOpened(@NotNull Project project) {
-
         BambooToolConfig state = BambooToolComponent.getInstance().getState();
-        String projectsPath = state.getProjectSavePath() + "bamboo-projects.json";
-        String projectName = project.getName();
-        String projectPath = project.getBasePath();
-        String apiUrlFileName = String.format("%s-api.json", projectName);
-        String apiUrlFilePath = String.format("%s%s%s", projectPath, "/.idea/bamboo-api/", apiUrlFileName);
-
-        boolean exist = FileUtil.exist(projectsPath);
-        List<ProjectInfo> bambooToolConfigs;
-        if (exist) {
-            FileReader fileReader = new FileReader(projectsPath);
-            String projectStr = fileReader.readString();
-            bambooToolConfigs = JSONUtil.toList(projectStr, ProjectInfo.class);
-        } else {
-            bambooToolConfigs = new ArrayList<>();
-        }
-        ProjectInfo projectInfo = state.getProjectInfo();
-        projectInfo.setProjectName(projectName);
-        projectInfo.setProjectPath(projectPath);
-        projectInfo.setApiUrlFilePath(apiUrlFilePath);
-        projectInfo.setApiUrlFileName(apiUrlFileName);
-        long count = bambooToolConfigs.stream().filter(e -> projectName.equals(e.getProjectName())).filter(e -> projectPath.equals(e.getProjectPath())).count();
-        if (count < 1) {
-            bambooToolConfigs.add(projectInfo);
-        }
         ApiProjectService apiProjectService = ApplicationManager.getApplication().getService(ApiProjectService.class);
-        ProjectInfo projectInfo1 = apiProjectService.saveProject(projectInfo);
-        state.setProjectInfo(projectInfo1);
-        ProjectManagerListener.super.projectOpened(project);
+        ProjectInfo projectInfo=null;
+        if(StringUtil.isNotEmpty(state.getProjectId())){
+            ProjectInfo   currentProject = apiProjectService.queryProject(state.getProjectId());
+           if(currentProject!=null){
+               projectInfo=currentProject;
+           }else{
+               String projectId= UUID.randomUUID().toString();
+               projectInfo=new ProjectInfo();
+               projectInfo.setProjectId(projectId);
+           }
+        }else{
+            String projectId= UUID.randomUUID().toString();
+            projectInfo=new ProjectInfo();
+            projectInfo.setProjectId(projectId);
+        }
+        projectInfo.setProjectPath(project.getBasePath());
+        projectInfo.setProjectName(project.getName());
+        projectInfo = apiProjectService.saveProject(projectInfo);
+        state.setProjectInfo(projectInfo);
     }
 
     @Override

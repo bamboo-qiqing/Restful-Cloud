@@ -1,7 +1,6 @@
 package com.bamboo.tool.components.api.contributor;
 
 import com.bamboo.tool.components.api.enums.RequestMethod;
-import com.bamboo.tool.components.api.view.action.RequestMappingItemProvider;
 import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
 import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
 import com.intellij.navigation.ChooseByNameContributor;
@@ -13,6 +12,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -65,6 +65,11 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
     @Override
     public void saveInitialCheckBoxState(boolean b) {
 
+    }
+
+    @Override
+    protected synchronized @Nullable Collection<RequestMethod> getFilterItems() {
+        return super.getFilterItems();
     }
 
     @Override

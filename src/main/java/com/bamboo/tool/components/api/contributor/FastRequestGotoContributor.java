@@ -39,7 +39,7 @@ public class FastRequestGotoContributor extends AbstractGotoSEContributor {
 
     @Override
     protected @NotNull
-    FilteringGotoByModel<?> createModel(@NotNull Project project) {
+    FilteringGotoByModel<RequestMethod> createModel(@NotNull Project project) {
         RequestMappingModel requestMappingModel = new RequestMappingModel(myProject, ExtensionPointName.<ChooseByNameContributor>create("com.bamboo.requestMappingContributor").getExtensionList());
         requestMappingModel.setFilterItems(myFilter.getAllElements());
         return requestMappingModel;

@@ -15,14 +15,14 @@ import java.util.List;
 /**
  * Create by GuoQing
  * Date 2022/2/8 11:29
- * Description 
+ * Description
  */
 public class ApiProjectService {
 
     @SneakyThrows
-    public ProjectInfo queryProject(String projectName, String projectPath) {
+    public ProjectInfo queryProject(String projectId) {
         this.createProject();
-        String sql = StringUtil.format("SELECT * FROM bamboo_api_project where project_name='{}' and project_path='{}'; ", projectName, projectPath);
+        String sql = StringUtil.format("SELECT * FROM bamboo_api_project where project_id='{}'; ", projectId);
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         ResultSet rs = state.executeQuery(sql);
@@ -32,13 +32,10 @@ public class ApiProjectService {
             String name = rs.getString("project_name");
             int id = rs.getInt("id");
             String path = rs.getString("project_path");
-            String filePath = rs.getString("api_file_path");
-            String fileName = rs.getString("api_file_name");
+            projectInfo.setProjectId(rs.getString("project_id"));
             projectInfo.setProjectPath(path);
             projectInfo.setProjectName(name);
             projectInfo.setId(id);
-            projectInfo.setApiUrlFileName(fileName);
-            projectInfo.setApiUrlFilePath(filePath);
             projectInfos.add(projectInfo);
         }
         rs.close();
@@ -60,19 +57,18 @@ public class ApiProjectService {
 
     @SneakyThrows
     public ProjectInfo saveProject(ProjectInfo projectInfo) {
-        ProjectInfo project = this.queryProject(projectInfo.getProjectName(), projectInfo.getProjectPath());
+        ProjectInfo project = this.queryProject(projectInfo.getProjectId());
         if (project == null) {
             StringBuffer str = new StringBuffer();
-            str.append("INSERT INTO bamboo_api_project (project_name, project_path, api_file_path, api_file_name) VALUES ( ");
+            str.append("INSERT INTO bamboo_api_project (project_name, project_path,project_id) VALUES ( ");
             str.append(StringUtil.format("'{}',", projectInfo.getProjectName()));
             str.append(StringUtil.format("'{}',", projectInfo.getProjectPath()));
-            str.append(StringUtil.format("'{}',", projectInfo.getApiUrlFilePath()));
-            str.append(StringUtil.format("'{}');", projectInfo.getApiUrlFileName()));
+            str.append(StringUtil.format("'{}',", projectInfo.getProjectId()));
             Connection conn = SqliteConfig.getConnection();
             Statement state = conn.createStatement();
             state.executeUpdate(str.toString());
             conn.close();
-            project = this.queryProject(projectInfo.getProjectName(), projectInfo.getProjectPath());
+            project = this.queryProject(projectInfo.getProjectId());
         }
         return project;
     }

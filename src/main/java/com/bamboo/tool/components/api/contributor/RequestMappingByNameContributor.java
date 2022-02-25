@@ -17,6 +17,7 @@ public class RequestMappingByNameContributor implements ChooseByNameContributor 
 
     @Override
     public String[] getNames(Project project, boolean b) {
+        System.out.printf("2222222222222");
         navigationItems = apiMethodService.getAllApis().stream().parallel().map(e -> {
             RequestMappingNavigationItem item = new RequestMappingNavigationItem();
             item.setRequestMethod(e.getMethodType());
@@ -36,6 +37,7 @@ public class RequestMappingByNameContributor implements ChooseByNameContributor 
 
     @Override
     public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
+        System.out.printf("3333");
         RequestMappingNavigationItem[] requestMappingItems = navigationItems.stream().filter(q -> q.getName().equals(name)).toArray(RequestMappingNavigationItem[]::new);
         return requestMappingItems;
     }

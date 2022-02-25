@@ -13,9 +13,8 @@ import java.util.List;
 @Data
 public class BambooToolConfig {
 
-    private String projectSavePath ;
+    private String projectId;
 
     private ProjectInfo projectInfo;
 
-    private List<BambooMethod> bambooMethods;
 }

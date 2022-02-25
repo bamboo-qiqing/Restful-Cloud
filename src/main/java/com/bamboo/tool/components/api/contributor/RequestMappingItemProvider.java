@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.bamboo.tool.components.api.view.action;
+package com.bamboo.tool.components.api.contributor;
 
-import b.C.S;
-import com.bamboo.tool.components.api.contributor.RequestMappingModel;
+import com.bamboo.tool.components.api.enums.RequestMethod;
 import com.intellij.ide.util.gotoByName.*;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
@@ -43,15 +42,13 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
 
     public @NotNull
     List<String> filterNames(@NotNull ChooseByNameViewModel base, String[] names, @NotNull String pattern) {
-        ArrayList<String> objects = new ArrayList<>();
-        objects.add("test1");
-        objects.add("test2");
-        objects.add("test3");
-        return objects;
+        return null;
     }
 
 
     public boolean filterElements(@NotNull ChooseByNameViewModel base, @NotNull String pattern, boolean everywhere, @NotNull ProgressIndicator indicator, @NotNull Processor<Object> consumer) {
+
+
         Project project = base.getProject();
         if (project == null) {
             return false;

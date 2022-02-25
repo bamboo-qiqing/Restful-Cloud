@@ -1,6 +1,5 @@
 package com.bamboo.tool.components.api.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.intellij.psi.PsiMethod;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +17,7 @@ public class BambooMethod {
     private String description = StringUtils.EMPTY;
     private String methodName = StringUtils.EMPTY;
     private String url = StringUtils.EMPTY;
-    @JSONField(serialize = false)
     private PsiMethod psiMethod;
     List<BambooAnnotationInfo> annotationInfos;
+    List<BambooApiModel> apis=new ArrayList<>();
 }
