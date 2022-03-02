@@ -10,6 +10,7 @@ import com.bamboo.tool.components.api.view.component.tree.RootNode;
 import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.service.ApiMethodService;
+import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
@@ -142,17 +143,16 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
-
                 allApiList = FrameworkExecute.buildApiMethod(myProject);
                 indicator.setText("Rendering");
-                List<BambooMethod> filterMethodList = new ArrayList<>();
-                allApiList.stream().map(e -> e.getMethods()).forEach(filterMethodList::addAll);
                 RootNode root = new RootNode("apis");
                 List<BambooClass> classList = PsiUtils.convertToRoot(root, PsiUtils.convertToMap(allApiList));
                 apiTree.setModel(new DefaultTreeModel(root));
                 ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
-                ApiMethodService apiMethodService = ApplicationManager.getApplication().getService(ApiMethodService.class);
-                apiMethodService.saveMethods(classList, projectInfo);
+//                ApiMethodService apiMethodService = ApplicationManager.getApplication().getService(ApiMethodService.class);
+                BambooService bambooService = ApplicationManager.getApplication().getService(BambooService.class);
+                bambooService.saveClass(allApiList, projectInfo);
+//                apiMethodService.saveMethods(classList, projectInfo);
                 NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
             }
         };

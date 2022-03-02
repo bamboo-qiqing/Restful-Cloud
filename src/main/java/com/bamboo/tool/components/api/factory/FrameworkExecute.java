@@ -50,6 +50,7 @@ public class FrameworkExecute {
                 bambooClass.setClassName(psiClass.getName());
                 bambooClass.setClassPath(PsiUtil.getVirtualFile(psiClass).getPath());
                 bambooClass.setModuleName(module.getName());
+
                 PsiAnnotation[] annotations = psiClass.getAnnotations();
                 if (annotations.length > 0) {
                     List<BambooAnnotationInfo> classAnnotations = buildAnnotations(infoSettingClassMap, annotations);

@@ -14,6 +14,7 @@ import java.util.List;
  */
 @Data
 public class BambooMethod {
+    private String id;
     private String description = StringUtils.EMPTY;
     private String methodName = StringUtils.EMPTY;
     private String url = StringUtils.EMPTY;

@@ -8,6 +8,7 @@ import java.util.List;
 
 @Data
 public class BambooClass {
+    private String id;
     private String className = StringUtils.EMPTY;
     private String moduleName = StringUtils.EMPTY;
     private String description = StringUtils.EMPTY;
@@ -15,5 +16,4 @@ public class BambooClass {
     private String qualifiedName = StringUtils.EMPTY;
     private List<BambooMethod> methods = new ArrayList<>();
     private List<BambooAnnotationInfo> annotations = new ArrayList<>();
-    private AnnotationInfoSetting annotationInfoSetting;
 }

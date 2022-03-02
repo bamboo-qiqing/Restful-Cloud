@@ -12,6 +12,7 @@ import com.bamboo.tool.config.model.BambooToolConfig;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.SqliteConfig;
 import com.bamboo.tool.db.service.ApiProjectService;
+import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.StringUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -60,6 +61,8 @@ public class ToolProjectManagerListener implements ProjectManagerListener {
         projectInfo.setProjectName(project.getName());
         projectInfo = apiProjectService.saveProject(projectInfo);
         state.setProjectInfo(projectInfo);
+        final BambooService service = ApplicationManager.getApplication().getService(BambooService.class);
+        service.initTable();
     }
 
     @Override

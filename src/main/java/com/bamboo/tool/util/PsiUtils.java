@@ -1,13 +1,18 @@
 package com.bamboo.tool.util;
 
-import b.C.S;
+
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import com.bamboo.tool.components.api.entity.*;
+import com.bamboo.tool.components.api.entity.AnnotationInfoSetting;
+import com.bamboo.tool.components.api.entity.BambooApiModel;
+import com.bamboo.tool.components.api.entity.BambooClass;
+import com.bamboo.tool.components.api.entity.BambooMethod;
 import com.bamboo.tool.components.api.enums.AnnotationScope;
 import com.bamboo.tool.components.api.enums.RequestMethod;
-import com.bamboo.tool.components.api.view.component.entity.MethodModel;
-import com.bamboo.tool.components.api.view.component.tree.*;
+import com.bamboo.tool.components.api.view.component.tree.ClassNode;
+import com.bamboo.tool.components.api.view.component.tree.MethodNode;
+import com.bamboo.tool.components.api.view.component.tree.ModuleNode;
+import com.bamboo.tool.components.api.view.component.tree.ProjectModel;
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.intellij.openapi.project.Project;
@@ -16,7 +21,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
 import com.intellij.util.Query;
-import org.apache.commons.collections.IteratorUtils;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.*;
@@ -94,10 +98,11 @@ public class PsiUtils {
                             methodModel.setPsiMethod(bambooMethod.getPsiMethod());
                             methodModels.add(methodModel);
                         } else {
+                            BambooApiModel methodModel = new BambooApiModel();
+                            methodModel.setDesc(bambooMethod.getDescription());
+                            methodModel.setPsiMethod(bambooMethod.getPsiMethod());
                             bambooMethod.getAnnotationInfos().forEach(bambooAnnotationInfo -> {
-                                BambooApiModel methodModel = new BambooApiModel();
-                                methodModel.setDesc(bambooMethod.getDescription());
-                                methodModel.setPsiMethod(bambooMethod.getPsiMethod());
+
                                 final AnnotationInfoSetting annotationInfoSetting = bambooAnnotationInfo.getAnnotationInfoSetting();
                                 String path = annotationInfoSetting.getAnnotationPath();
                                 final String name = bambooAnnotationInfo.getParam().getName();
@@ -107,31 +112,31 @@ public class PsiUtils {
                                     }
                                     if ("method".equals(name)) {
                                         if (StringUtil.isEmpty(methodModel.getRequestType())) {
-                                            methodModel.setRequestType(bambooAnnotationInfo.getValue());
-                                        } else {
                                             if ("org.springframework.web.bind.annotation.PostMapping".equals(path)) {
-                                                methodModel.setRequestType(methodModel.getRequestType() + "," + bambooAnnotationInfo.getValue());
+                                                methodModel.setRequestType(RequestMethod.POST.getCode());
+                                            } else if ("org.springframework.web.bind.annotation.GetMapping".equals(path)) {
+                                                methodModel.setRequestType(RequestMethod.POST.getCode());
+                                            } else {
+                                                methodModel.setRequestType(bambooAnnotationInfo.getValue());
                                             }
-                                        }
-                                    } else {
-                                        if (StringUtil.isEmpty(methodModel.getRequestType()) || !methodModel.getRequestType().contains(RequestMethod.POST.getCode())) {
-                                            methodModel.setRequestType(RequestMethod.POST.getCode());
+                                        } else {
+                                            methodModel.setRequestType(methodModel.getRequestType() + "," + bambooAnnotationInfo.getValue());
                                         }
                                     }
                                 }
                             });
-                        }
-                        if (CollectionUtil.isNotEmpty(methodModels)) {
-                            bambooMethod.getApis().addAll(methodModels);
-                            methodModels.parallelStream().forEach(e -> {
-                                if (StringUtil.isEmpty(e.getRequestType())) {
-                                    e.setRequestType(RequestMethod.ALL.getCode());
-                                }
-                                classNode.add(new MethodNode(e));
-                            });
+                            methodModels.add(methodModel);
                         }
                     });
-
+                    if (CollectionUtil.isNotEmpty(methodModels)) {
+                        bambooMethod.getApis().addAll(methodModels);
+                        methodModels.parallelStream().forEach(e -> {
+                            if (StringUtil.isEmpty(e.getRequestType())) {
+                                e.setRequestType(RequestMethod.ALL.getCode());
+                            }
+                            classNode.add(new MethodNode(e));
+                        });
+                    }
                 });
                 list.add(bambooClass);
                 moduleNode.add(classNode);
@@ -176,20 +181,4 @@ public class PsiUtils {
         Map<String, List<BambooClass>> dataMap = BambooClasses.parallelStream().collect(Collectors.groupingBy(BambooClass::getModuleName));
         return dataMap;
     }
-
-
-    private static void sortChildNode(BaseNode rootNode) {
-        ArrayList<BaseNode> nodeList = (ArrayList<BaseNode>) IteratorUtils.toList(rootNode.children().asIterator());
-        nodeList.sort((n1, n2) -> {
-            String prefix1 = n1 instanceof ClassNode ? "999999" : "000000";
-            String prefix2 = n2 instanceof ClassNode ? "999999" : "000000";
-            String name1 = n1.toString();
-            String name2 = n2.toString();
-            return (prefix1 + name1).compareTo(prefix2 + name2);
-        });
-        rootNode.removeAllChildren();
-        nodeList.forEach(rootNode::add);
-    }
-
-
 }

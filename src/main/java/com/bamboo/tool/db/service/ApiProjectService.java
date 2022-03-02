@@ -60,10 +60,10 @@ public class ApiProjectService {
         ProjectInfo project = this.queryProject(projectInfo.getProjectId());
         if (project == null) {
             StringBuffer str = new StringBuffer();
-            str.append("INSERT INTO bamboo_api_project (project_name, project_path,project_id) VALUES ( ");
+            str.append("INSERT INTO bamboo_api_project (project_name, project_path,project_id) VALUES (");
             str.append(StringUtil.format("'{}',", projectInfo.getProjectName()));
             str.append(StringUtil.format("'{}',", projectInfo.getProjectPath()));
-            str.append(StringUtil.format("'{}',", projectInfo.getProjectId()));
+            str.append(StringUtil.format("'{}')", projectInfo.getProjectId()));
             Connection conn = SqliteConfig.getConnection();
             Statement state = conn.createStatement();
             state.executeUpdate(str.toString());

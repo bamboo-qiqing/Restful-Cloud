@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class BambooAnnotationInfo {
-    private Integer id;
+    private String id;
     private String value;
     private AnnotationInfoSetting annotationInfoSetting;
     private Integer classId;
