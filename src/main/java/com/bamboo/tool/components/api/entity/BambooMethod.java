@@ -18,6 +18,8 @@ public class BambooMethod {
     private String description = StringUtils.EMPTY;
     private String methodName = StringUtils.EMPTY;
     private String url = StringUtils.EMPTY;
+    private String projectId;
+    private String classId;
     private PsiMethod psiMethod;
     List<BambooAnnotationInfo> annotationInfos;
     List<BambooApiModel> apis=new ArrayList<>();

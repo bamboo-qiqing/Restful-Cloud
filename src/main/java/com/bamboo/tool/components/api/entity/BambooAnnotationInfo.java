@@ -6,7 +6,9 @@ import lombok.Data;
 public class BambooAnnotationInfo {
     private String id;
     private String value;
+    private String settingId;
+    private String associatedId;
+    private String projectId;
     private AnnotationInfoSetting annotationInfoSetting;
-    private Integer classId;
     private AnnotationParam param;
 }

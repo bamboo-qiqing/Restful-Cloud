@@ -61,6 +61,7 @@ public class ToolProjectManagerListener implements ProjectManagerListener {
         projectInfo.setProjectName(project.getName());
         projectInfo = apiProjectService.saveProject(projectInfo);
         state.setProjectInfo(projectInfo);
+        state.setProjectId(projectInfo.getProjectId());
         final BambooService service = ApplicationManager.getApplication().getService(BambooService.class);
         service.initTable();
     }

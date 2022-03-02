@@ -27,13 +27,14 @@ public class AnnotationInfoSettingService {
     @SneakyThrows
     public List<AnnotationInfoSetting> selectAll() {
         Application application = ApplicationManager.getApplication();
+        final BambooService bambooService = application.getService(BambooService.class);
         FrameworkService frameworkService = application.getService(FrameworkService.class);
         Map<Integer, Framework> framework = frameworkService.selectAll().stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
 
         List<AnnotationMethodScope> methodScopes = application.getService(AnnotationMethodScopeService.class).selectAll();
         Map<Integer, List<AnnotationMethodScope>> methodScopeMap = methodScopes.stream().collect(Collectors.groupingBy(e -> e.getAnnotationId(), Collectors.toList()));
 
-        List<AnnotationParam> params = application.getService(AnnotationParamService.class).selectAll();
+        List<AnnotationParam> params = bambooService.selectAllAnnotationParam();
         Map<Integer, List<AnnotationParam>> paramMap = params.stream().collect(Collectors.groupingBy(e -> e.getAnnotationInfoId(), Collectors.toList()));
 
         Connection conn = SqliteConfig.getConnection();
