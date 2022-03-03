@@ -145,9 +145,9 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                 indicator.setIndeterminate(false);
                 allApiList = FrameworkExecute.buildApiMethod(myProject);
                 indicator.setText("Rendering");
-                RootNode root = new RootNode("apis");
-                List<BambooClass> classList = PsiUtils.convertToRoot(root, PsiUtils.convertToMap(allApiList));
-                apiTree.setModel(new DefaultTreeModel(root));
+//                RootNode root = new RootNode("apis");
+//                List<BambooClass> classList = PsiUtils.convertToRoot(root, PsiUtils.convertToMap(allApiList));
+//                apiTree.setModel(new DefaultTreeModel(root));
                 ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
 //                ApiMethodService apiMethodService = ApplicationManager.getApplication().getService(ApiMethodService.class);
                 BambooService bambooService = ApplicationManager.getApplication().getService(BambooService.class);
