@@ -455,9 +455,9 @@ public class BambooService {
 
     @SneakyThrows
     public static List<AnnotationInfoSetting> selectAllAnnotationInfoSetting() {
-        Map<Integer, Framework> framework = BambooService.selectAllFramework().stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
-        Map<Integer, List<AnnotationMethodScope>> methodScopeMap = BambooService.selectAllAnnotationMethodScope().stream().collect(Collectors.groupingBy(e -> e.getAnnotationId(), Collectors.toList()));
-        Map<Integer, List<AnnotationParam>> paramMap = BambooService.selectAllAnnotationParam().stream().collect(Collectors.groupingBy(e -> e.getAnnotationInfoId(), Collectors.toList()));
+        Map<Integer, Framework> framework = BambooService.selectAllFramework().stream().collect(Collectors.toMap(Framework::getId, e -> e));
+        Map<Integer, List<AnnotationMethodScope>> methodScopeMap = BambooService.selectAllAnnotationMethodScope().stream().collect(Collectors.groupingBy(AnnotationMethodScope::getAnnotationId, Collectors.toList()));
+        Map<Integer, List<AnnotationParam>> paramMap = BambooService.selectAllAnnotationParam().stream().collect(Collectors.groupingBy(AnnotationParam::getAnnotationInfoId, Collectors.toList()));
 
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
@@ -476,7 +476,7 @@ public class BambooService {
 
     @NotNull
     private static String getQuerySQL() {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         str.append("select ");
         str.append("ai.id,");
         str.append("ai.class_path,");
@@ -500,9 +500,9 @@ public class BambooService {
         String soaType = resultSet.getString("soa_type");
         String effect = resultSet.getString("effect");
         int frameworkId = resultSet.getInt("framework_id");
-        Framework framework = frameworkMap.get(Integer.valueOf(frameworkId));
-        List<AnnotationMethodScope> annotationMethodScopes = methodScopeMap.get(Integer.valueOf(id));
-        List<AnnotationParam> params = paramMap.get(Integer.valueOf(id));
+        Framework framework = frameworkMap.get(frameworkId);
+        List<AnnotationMethodScope> annotationMethodScopes = methodScopeMap.get(id);
+        List<AnnotationParam> params = paramMap.get(id);
 
 
         annotationInfoSetting.setId(id);
@@ -526,8 +526,22 @@ public class BambooService {
 
     public static void main(String[] args) throws SQLException {
         List<BambooAnnotationInfo> bambooAnnotationInfos = BambooService.selectAllAnnotationInfo();
-        List<BambooClass> classList = BambooService.selectAllClass();
+        Map<String, List<BambooAnnotationInfo>> bambooAnnotationInfoMap = bambooAnnotationInfos.parallelStream().collect(Collectors.groupingBy(e -> e.getAssociatedId(), Collectors.toList()));
         List<BambooMethod> bambooMethods = BambooService.selectAllMethod();
+        Map<String, List<BambooMethod>> methodMap = bambooMethods.parallelStream().map(e -> {
+            e.setAnnotationInfos(bambooAnnotationInfoMap.get(e.getId()));
+            return e;
+        }).collect(Collectors.groupingBy(e -> e.getClassId(), Collectors.toList()));
+
+        List<BambooClass> classList = BambooService.selectAllClass();
+        Map<String, Map<String, List<BambooClass>>> projectMap = classList.parallelStream().map(e -> {
+            e.setAnnotations(bambooAnnotationInfoMap.get(e.getId()));
+            e.setMethods(methodMap.get(e.getId()));
+            return e;
+        }).collect(Collectors.groupingBy(e -> e.getProjectId(), Collectors.groupingBy(a -> a.getModuleName(), Collectors.toList())));
+
+        System.out.printf("");
+
 //        String sql = "select bc.project_id as projectId, bc.model_name as modelName, bc.class_name as className, bc.class_path as className, bc.description as classDescription, bamim.value classAnnotationValue, aism.soa_type as classAnnotationSoaType, aism.class_path as classAnnotationPath, aism.class_short_name as classAnnotationShortName, f.name as classAnnotationFrameworkName, bm.method_name as methodName, bm.description as methodDescription, bamic.value from bamboo_method bm left join bamboo_annotation_info bamim on bamim.associated_id = bm.id inner join annotation_info_setting aism on aism.id = bamim.setting_id inner join framework f on aism.framework_id = f.id inner join bamboo_class bc on bc.id = bm.class_id left join bamboo_annotation_info bamic on bamic.associated_id = bc.id; ";
 //        Connection conn = SqliteConfig.getConnection();
 //        Statement state = conn.createStatement();

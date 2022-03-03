@@ -89,18 +89,17 @@ public class PsiUtils {
                             BambooApiModel methodModel = new BambooApiModel();
                             methodModel.setUrl(classUrl + CharSequenceUtil.addPrefixIfNot(bambooMethod.getMethodName(), "/"));
                             methodModel.setDesc(bambooMethod.getDescription());
-                            methodModel.setPsiMethod(bambooMethod.getPsiMethod());
                             methodModels.add(methodModel);
                         } else if (isSoaServiceRegister.get()) {
                             BambooApiModel methodModel = new BambooApiModel();
                             methodModel.setUrl(classUrl + CharSequenceUtil.addPrefixIfNot(bambooMethod.getMethodName(), "/"));
                             methodModel.setDesc(bambooMethod.getDescription());
-                            methodModel.setPsiMethod(bambooMethod.getPsiMethod());
+
                             methodModels.add(methodModel);
                         } else {
                             BambooApiModel methodModel = new BambooApiModel();
                             methodModel.setDesc(bambooMethod.getDescription());
-                            methodModel.setPsiMethod(bambooMethod.getPsiMethod());
+
                             bambooMethod.getAnnotationInfos().forEach(bambooAnnotationInfo -> {
 
                                 final AnnotationInfoSetting annotationInfoSetting = bambooAnnotationInfo.getAnnotationInfoSetting();
@@ -129,7 +128,7 @@ public class PsiUtils {
                         }
                     });
                     if (CollectionUtil.isNotEmpty(methodModels)) {
-                        bambooMethod.getApis().addAll(methodModels);
+//                        bambooMethod.getApis().addAll(methodModels);
                         methodModels.parallelStream().forEach(e -> {
                             if (StringUtil.isEmpty(e.getRequestType())) {
                                 e.setRequestType(RequestMethod.ALL.getCode());

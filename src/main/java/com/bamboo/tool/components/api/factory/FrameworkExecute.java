@@ -45,7 +45,6 @@ public class FrameworkExecute {
             Module module = ModuleUtil.findModuleForPsiElement(psiClass);
             if (module != null) {
                 BambooClass bambooClass = new BambooClass();
-                bambooClass.setQualifiedName(psiClass.getQualifiedName());
                 bambooClass.setClassName(psiClass.getName());
                 bambooClass.setClassPath(PsiUtil.getVirtualFile(psiClass).getPath());
                 bambooClass.setModuleName(module.getName());
@@ -64,7 +63,7 @@ public class FrameworkExecute {
                             if (satisfyScope) {
                                 BambooMethod bambooMethod = new BambooMethod();
                                 bambooMethod.setMethodName(method.getName());
-                                bambooMethod.setPsiMethod(method);
+
                                 final AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
                                 if (annotationMethodScope != null) {
                                     final PsiAnnotation[] methodAnnotations = method.getAnnotations();

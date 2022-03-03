@@ -1,7 +1,9 @@
 package com.bamboo.tool.components.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intellij.psi.PsiMethod;
 import lombok.Data;
+import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -13,14 +15,12 @@ import java.util.List;
  * Description
  */
 @Data
+@ToString
 public class BambooMethod {
     private String id;
     private String description = StringUtils.EMPTY;
     private String methodName = StringUtils.EMPTY;
-    private String url = StringUtils.EMPTY;
     private String projectId;
     private String classId;
-    private PsiMethod psiMethod;
-    List<BambooAnnotationInfo> annotationInfos;
-    List<BambooApiModel> apis=new ArrayList<>();
+    List<BambooAnnotationInfo> annotationInfos=new ArrayList<>();
 }
