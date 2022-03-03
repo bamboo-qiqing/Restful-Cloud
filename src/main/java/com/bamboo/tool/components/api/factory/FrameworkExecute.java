@@ -5,11 +5,10 @@ import com.bamboo.tool.components.api.entity.*;
 import com.bamboo.tool.components.api.enums.AnnotationScope;
 import com.bamboo.tool.components.api.enums.MethodScope;
 import com.bamboo.tool.config.model.PsiClassCache;
-import com.bamboo.tool.db.service.AnnotationInfoSettingService;
+import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiAnnotationMemberUtil;
 import com.bamboo.tool.util.PsiUtils;
 import com.bamboo.tool.util.StringUtil;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
@@ -34,8 +33,8 @@ public class FrameworkExecute {
      * @return
      */
     public static List<BambooClass> buildApiMethod(Project project) {
-        AnnotationInfoSettingService annotationInfoSettingService = ApplicationManager.getApplication().getService(AnnotationInfoSettingService.class);
-        List<AnnotationInfoSetting> annotationInfoSettings = annotationInfoSettingService.selectAll();
+
+        List<AnnotationInfoSetting> annotationInfoSettings = BambooService.selectAllAnnotationInfoSetting();
         Map<String, AnnotationInfoSetting> infoSettingClassMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.CLASS.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
         Map<String, AnnotationInfoSetting> infoSettingMethodMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
         List<BambooClass> bambooClasses = new ArrayList<>();
