@@ -1,6 +1,5 @@
 package com.bamboo.tool.components.api.view;
 
-import com.bamboo.tool.components.api.entity.BambooMethod;
 import com.bamboo.tool.components.api.entity.BambooClass;
 import com.bamboo.tool.components.api.factory.FrameworkExecute;
 import com.bamboo.tool.components.api.view.component.tree.ApiTree;
@@ -9,7 +8,6 @@ import com.bamboo.tool.components.api.view.component.tree.MethodNode;
 import com.bamboo.tool.components.api.view.component.tree.RootNode;
 import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.ProjectInfo;
-import com.bamboo.tool.db.service.ApiMethodService;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiUtils;
 import com.intellij.icons.AllIcons;
@@ -17,7 +15,6 @@ import com.intellij.ide.CommonActionsManager;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -43,6 +40,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements Disposable {
     private final Project myProject;
@@ -145,14 +143,13 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                 indicator.setIndeterminate(false);
                 allApiList = FrameworkExecute.buildApiMethod(myProject);
                 indicator.setText("Rendering");
-//                RootNode root = new RootNode("apis");
-//                List<BambooClass> classList = PsiUtils.convertToRoot(root, PsiUtils.convertToMap(allApiList));
-//                apiTree.setModel(new DefaultTreeModel(root));
+                RootNode root = new RootNode("apis");
+                apiTree.setModel(new DefaultTreeModel(root));
                 ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
-//                ApiMethodService apiMethodService = ApplicationManager.getApplication().getService(ApiMethodService.class);
-                BambooService bambooService = ApplicationManager.getApplication().getService(BambooService.class);
-                bambooService.saveClass(allApiList, projectInfo);
-//                apiMethodService.saveMethods(classList, projectInfo);
+                BambooService.saveClass(allApiList, projectInfo);
+                Map<String, Map<String, List<BambooClass>>> projectsBambooClass = BambooService.getProjectsBambooClass();
+                Map<String, List<BambooClass>> stringListMap = projectsBambooClass.get(projectInfo.getProjectId());
+                List<BambooClass> classList = PsiUtils.convertToRoot(root, stringListMap);
                 NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
             }
         };

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
  * Description
  */
 public class BambooService {
+    public static Map<String, Map<String, List<BambooClass>>> projectMap = new HashMap<>();
 
     @SneakyThrows
     public void initTable() {
@@ -38,7 +39,9 @@ public class BambooService {
             initClassTable.append("model_name  text,");
             initClassTable.append("description text,");
             initClassTable.append("class_path  text,");
-            initClassTable.append("project_id  text");
+            initClassTable.append("project_id  text,");
+            initClassTable.append("setting_id  text");
+
             initClassTable.append(");");
             exeSql.add(initClassTable.toString());
             //初始化索引
@@ -64,7 +67,8 @@ public class BambooService {
             initAnnotationInfoTable.append("setting_id  text,");
             initAnnotationInfoTable.append("value    text,");
             initAnnotationInfoTable.append("associated_id   text,");
-            initAnnotationInfoTable.append("project_id   text");
+            initAnnotationInfoTable.append("project_id   text,");
+            initAnnotationInfoTable.append("param_id   text");
             initAnnotationInfoTable.append(");");
             exeSql.add(initAnnotationInfoTable.toString());
 
@@ -210,15 +214,14 @@ public class BambooService {
         allClasses.stream().forEach(bambooClass -> {
             bambooClass.setId(UUID.randomUUID().toString());
             StringBuffer sql = new StringBuffer();
-            sql.append("INSERT INTO bamboo_class (");
-            sql.append("id,class_name, model_name, description, class_path, project_id");
-            sql.append(") VALUES (");
+            sql.append("INSERT INTO bamboo_class (id,class_name, model_name, description, class_path, project_id,setting_id) VALUES (");
             sql.append("'" + bambooClass.getId() + "',");
             sql.append("'" + bambooClass.getClassName() + "',");
             sql.append("'" + bambooClass.getModuleName() + "',");
             sql.append("'" + bambooClass.getDescription() + "',");
             sql.append("'" + bambooClass.getClassPath() + "',");
-            sql.append("'" + projectInfo.getProjectId() + "'");
+            sql.append("'" + projectInfo.getProjectId() + "',");
+            sql.append("'" + bambooClass.getSetting().getId() + "'");
             sql.append(");");
             sqls.add(sql.toString());
             final List<BambooAnnotationInfo> annotations = bambooClass.getAnnotations();
@@ -226,13 +229,15 @@ public class BambooService {
                 annotations.forEach(annotation -> {
                     annotation.setId(UUID.randomUUID().toString());
                     StringBuffer annotationSql = new StringBuffer();
-                    annotationSql.append("INSERT INTO bamboo_annotation_info(id, setting_id, value, associated_id,project_id)");
+                    annotationSql.append("INSERT INTO bamboo_annotation_info(id, setting_id, value, associated_id,project_id,param_id)");
                     annotationSql.append("VALUES (");
                     annotationSql.append("'" + annotation.getId() + "',");
                     annotationSql.append("'" + annotation.getAnnotationInfoSetting().getId() + "',");
                     annotationSql.append("'" + annotation.getValue() + "',");
                     annotationSql.append("'" + bambooClass.getId() + "',");
-                    annotationSql.append("'" + projectInfo.getId() + "'");
+                    annotationSql.append("'" + projectInfo.getId() + "',");
+                    annotationSql.append("'" + annotation.getParam().getId() + "'");
+
                     annotationSql.append(");");
                     sqls.add(annotationSql.toString());
                 });
@@ -255,13 +260,14 @@ public class BambooService {
                         annotationInfos.forEach(annotation -> {
                             annotation.setId(UUID.randomUUID().toString());
                             StringBuffer annotationSql = new StringBuffer();
-                            annotationSql.append("INSERT INTO bamboo_annotation_info(id, setting_id, value, associated_id,project_id)");
+                            annotationSql.append("INSERT INTO bamboo_annotation_info(id, setting_id, value, associated_id,project_id,param_id)");
                             annotationSql.append("VALUES (");
                             annotationSql.append("'" + annotation.getId() + "',");
                             annotationSql.append("'" + annotation.getAnnotationInfoSetting().getId() + "',");
                             annotationSql.append("'" + annotation.getValue() + "',");
                             annotationSql.append("'" + method.getId() + "',");
-                            annotationSql.append("'" + projectInfo.getId() + "'");
+                            annotationSql.append("'" + projectInfo.getId() + "',");
+                            annotationSql.append("'" + annotation.getParam().getId() + "'");
                             annotationSql.append(");");
                             sqls.add(annotationSql.toString());
                         });
@@ -524,9 +530,14 @@ public class BambooService {
         return annotationInfoSetting;
     }
 
-    public static void main(String[] args) throws SQLException {
+    public static Map<String, Map<String, List<BambooClass>>> getProjectsBambooClass() {
+        List<AnnotationInfoSetting> annotationInfoSettings = BambooService.selectAllAnnotationInfoSetting();
+        Map<Integer, AnnotationInfoSetting> settingMap = annotationInfoSettings.stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
         List<BambooAnnotationInfo> bambooAnnotationInfos = BambooService.selectAllAnnotationInfo();
-        Map<String, List<BambooAnnotationInfo>> bambooAnnotationInfoMap = bambooAnnotationInfos.parallelStream().collect(Collectors.groupingBy(e -> e.getAssociatedId(), Collectors.toList()));
+        Map<String, List<BambooAnnotationInfo>> bambooAnnotationInfoMap = bambooAnnotationInfos.parallelStream().map(e -> {
+            e.setAnnotationInfoSetting(settingMap.get(Integer.valueOf(e.getSettingId())));
+            return e;
+        }).collect(Collectors.groupingBy(e -> e.getAssociatedId(), Collectors.toList()));
         List<BambooMethod> bambooMethods = BambooService.selectAllMethod();
         Map<String, List<BambooMethod>> methodMap = bambooMethods.parallelStream().map(e -> {
             e.setAnnotationInfos(bambooAnnotationInfoMap.get(e.getId()));
@@ -540,31 +551,7 @@ public class BambooService {
             return e;
         }).collect(Collectors.groupingBy(e -> e.getProjectId(), Collectors.groupingBy(a -> a.getModuleName(), Collectors.toList())));
 
-        System.out.printf("");
-
-//        String sql = "select bc.project_id as projectId, bc.model_name as modelName, bc.class_name as className, bc.class_path as className, bc.description as classDescription, bamim.value classAnnotationValue, aism.soa_type as classAnnotationSoaType, aism.class_path as classAnnotationPath, aism.class_short_name as classAnnotationShortName, f.name as classAnnotationFrameworkName, bm.method_name as methodName, bm.description as methodDescription, bamic.value from bamboo_method bm left join bamboo_annotation_info bamim on bamim.associated_id = bm.id inner join annotation_info_setting aism on aism.id = bamim.setting_id inner join framework f on aism.framework_id = f.id inner join bamboo_class bc on bc.id = bm.class_id left join bamboo_annotation_info bamic on bamic.associated_id = bc.id; ";
-//        Connection conn = SqliteConfig.getConnection();
-//        Statement state = conn.createStatement();
-//        ResultSet resultSet = state.executeQuery(sql);
-//        List<BambooModel> list = new ArrayList<>();
-//        while (resultSet.next()) {
-//            String projectId = resultSet.getString("projectId");
-//            String modelName = resultSet.getString("modelName");
-//            String className = resultSet.getString("className");
-//            String classDescription = resultSet.getString("classDescription");
-//            String classAnnotationValue = resultSet.getString("classAnnotationValue");
-//            String classAnnotationSoaType = resultSet.getString("classAnnotationSoaType");
-//            String classAnnotationPath = resultSet.getString("classAnnotationPath");
-//            String classAnnotationShortName = resultSet.getString("classAnnotationShortName");
-//            String classAnnotationFrameworkName = resultSet.getString("classAnnotationFrameworkName");
-//            String methodName = resultSet.getString("methodName");
-//            String methodDescription = resultSet.getString("methodDescription");
-//            BambooModel apiModel = new BambooModel(projectId, modelName, className, classDescription, classAnnotationValue, classAnnotationSoaType, classAnnotationPath, classAnnotationShortName, classAnnotationFrameworkName, methodName, methodDescription);
-//            list.add(apiModel);
-//        }
-//        System.out.printf(list.toString());
-//        System.out.printf("1");
-//        System.out.printf("1");
-
+        return projectMap;
     }
+
 }
