@@ -8,6 +8,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +48,7 @@ public class BambooToolComponent implements PersistentStateComponent<BambooToolC
 
 
     public static BambooToolComponent getInstance() {
-        return ApplicationManager.getApplication().getService(BambooToolComponent.class);
+        return ProjectManager.getInstance().getDefaultProject().getService(BambooToolComponent.class);
     }
 
 }

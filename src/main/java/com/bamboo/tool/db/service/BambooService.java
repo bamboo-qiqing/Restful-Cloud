@@ -275,7 +275,7 @@ public class BambooService {
                 if (StringUtil.isEmpty(classUrl) || "/".equals(classUrl)) {
                     classUrl = "";
                 } else {
-                    poolUrl = StringUtil.addPrefixIfNot(classUrl, "/");
+                    classUrl = StringUtil.addPrefixIfNot(classUrl, "/");
                 }
                 final List<String> requestMethods = method.getRequestMethods();
                 if (CollectionUtil.isEmpty(requestMethods)) {
@@ -284,7 +284,7 @@ public class BambooService {
                 api.append("insert into bamboo_api (id, method_id, url, request_methods,project_id) VALUES(");
                 api.append("'" + UUID.randomUUID() + "',");
                 api.append("'" + method.getId() + "',");
-                api.append("'" + poolUrl + classUrl + methodUrl + "',");
+                api.append("'" + poolUrl + classUrl + StringUtil.addPrefixIfNot(methodUrl, "/") + "',");
                 api.append("'" + requestMethods + "',");
                 api.append("'" + projectInfo.getProjectId() + "'");
                 api.append(");");
