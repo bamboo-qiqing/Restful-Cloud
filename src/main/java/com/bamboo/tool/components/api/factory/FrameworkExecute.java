@@ -51,8 +51,7 @@ public class FrameworkExecute {
                 bambooClass.setSetting(info);
                 PsiAnnotation[] annotations = psiClass.getAnnotations();
                 if (annotations.length > 0) {
-                    List<BambooAnnotationInfo> classAnnotations = buildAnnotations(infoSettingClassMap, annotations);
-                    bambooClass.setAnnotations(classAnnotations);
+                    buildAnnotations(bambooClass, null, infoSettingClassMap, annotations);
                 }
                 final PsiMethod[] methods = psiClass.getMethods();
                 if (methods.length > 0) {
@@ -63,16 +62,12 @@ public class FrameworkExecute {
                             if (satisfyScope) {
                                 BambooMethod bambooMethod = new BambooMethod();
                                 bambooMethod.setMethodName(method.getName());
-
                                 final AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
                                 if (annotationMethodScope != null) {
                                     final PsiAnnotation[] methodAnnotations = method.getAnnotations();
                                     if (methodAnnotations.length > 0) {
-                                        List<BambooAnnotationInfo> bambooAnnotationInfos = buildAnnotations(infoSettingMethodMap, methodAnnotations);
-                                        if (bambooAnnotationInfos.size() > 0) {
-                                            bambooMethod.setAnnotationInfos(bambooAnnotationInfos);
-                                            bambooClass.getMethods().add(bambooMethod);
-                                        }
+                                        buildAnnotations(null, bambooMethod, infoSettingMethodMap, methodAnnotations);
+                                        bambooClass.getMethods().add(bambooMethod);
                                     }
                                 } else {
                                     bambooClass.getMethods().add(bambooMethod);
@@ -111,8 +106,8 @@ public class FrameworkExecute {
         return true;
     }
 
-    private static List<BambooAnnotationInfo> buildAnnotations(Map<String, AnnotationInfoSetting> infoSettingMap, PsiAnnotation[] annotations) {
-        final List<BambooAnnotationInfo> annotationInfos = new ArrayList<>();
+    private static void buildAnnotations(BambooClass bambooClass, BambooMethod bambooMethod, Map<String, AnnotationInfoSetting> infoSettingMap, PsiAnnotation[] annotations) {
+
         Arrays.stream(annotations).forEach(annotation -> {
             AnnotationInfoSetting annotationInfoSetting = infoSettingMap.get(annotation.getQualifiedName());
             if (!Objects.isNull(annotationInfoSetting)) {
@@ -128,19 +123,23 @@ public class FrameworkExecute {
                         AnnotationParam annotationParam = params.get(name);
                         if (!Objects.isNull(annotationParam)) {
                             final List<String> values = PsiAnnotationMemberUtil.getValue(value);
-                            values.stream().forEach(a -> {
-                                BambooAnnotationInfo bambooAnnotationInfo = new BambooAnnotationInfo();
-                                bambooAnnotationInfo.setValue(a);
-                                bambooAnnotationInfo.setAnnotationInfoSetting(annotationInfoSetting);
-                                bambooAnnotationInfo.setParam(annotationParam);
-                                annotationInfos.add(bambooAnnotationInfo);
-                            });
-
+                            final String type = annotationParam.getType();
+                            if ("poolUrl".equals(type)) {
+                                bambooClass.setPoolUrl(values.get(0));
+                            }
+                            if ("classUrl".equals(type)) {
+                                bambooClass.setClassUrl(values);
+                            }
+                            if ("methodUrl".equals(type)) {
+                                bambooMethod.setMethodUrl(values);
+                            }
+                            if ("requestMethod".equals(type)) {
+                                bambooMethod.setRequestMethods(values);
+                            }
                         }
                     }
                 }
             }
         });
-        return annotationInfos;
     }
 }

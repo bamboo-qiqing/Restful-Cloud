@@ -1,20 +1,15 @@
 package com.bamboo.tool.util;
 
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import com.bamboo.tool.components.api.entity.AnnotationInfoSetting;
-import com.bamboo.tool.components.api.entity.BambooApiModel;
-import com.bamboo.tool.components.api.entity.BambooClass;
-import com.bamboo.tool.components.api.entity.BambooMethod;
 import com.bamboo.tool.components.api.enums.AnnotationScope;
-import com.bamboo.tool.components.api.enums.RequestMethod;
 import com.bamboo.tool.components.api.view.component.tree.ClassNode;
 import com.bamboo.tool.components.api.view.component.tree.MethodNode;
 import com.bamboo.tool.components.api.view.component.tree.ModuleNode;
 import com.bamboo.tool.components.api.view.component.tree.ProjectModel;
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.db.entity.BambooApiMethod;
+import com.intellij.openapi.externalSystem.view.ProjectNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
@@ -23,8 +18,11 @@ import com.intellij.psi.search.searches.AllClassesSearch;
 import com.intellij.util.Query;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class PsiUtils {
@@ -48,136 +46,54 @@ public class PsiUtils {
         return caches;
     }
 
-    public static List<BambooClass> convertToRoot(DefaultMutableTreeNode root, Map<String, List<BambooClass>> dataMap) {
-        List<BambooClass> list = new ArrayList<>();
-        List<ModuleNode> moduleNodeList = new ArrayList<>();
-        for (Map.Entry<String, List<BambooClass>> moduleEntry : dataMap.entrySet()) {
-            String moduleName = moduleEntry.getKey();
-            ModuleNode moduleNode = new ModuleNode(moduleName);
-            List<BambooClass> classList = moduleEntry.getValue();
-            for (BambooClass bambooClass : classList) {
-                final ClassNode classNode = new ClassNode(bambooClass.getClassName());
-                AtomicReference<Boolean> isSoaServiceClient = new AtomicReference<>(false);
-                AtomicReference<Boolean> isSoaServiceRegister = new AtomicReference<>(false);
-                List<String> classUrls = new ArrayList<>();
-                bambooClass.getAnnotations().parallelStream().forEach(e -> {
-                    final AnnotationInfoSetting annotationInfoSetting = e.getAnnotationInfoSetting();
-                    String path = annotationInfoSetting.getAnnotationPath();
-                    final String name = e.getParam().getName();
-                    if ("com.odianyun.soa.annotation.SoaServiceRegister".equals(path) && "interfaceClass".equals(name)) {
-                        isSoaServiceRegister.set(true);
-                        final String[] split = e.getValue().split("\\.");
-                        final String url = CharSequenceUtil.addPrefixIfNot(StringUtil.lowerFirst(split[split.length - 1]), "/");
-                        classUrls.add(url);
-                    }
-                    if ("com.odianyun.soa.client.annotation.SoaServiceClient".equals(path) && "interfaceName".equals(name)) {
-                        final String[] split = e.getValue().split("\\.");
-                        final String url = CharSequenceUtil.addPrefixIfNot(StringUtil.lowerFirst(split[split.length - 1]), "/");
-                        isSoaServiceClient.set(true);
-                        classUrls.add(url);
-                    }
-                    if ("org.springframework.web.bind.annotation.RequestMapping".equals(path) && ("value".equals(name) || "null".equals(name))) {
-                        final String url = CharSequenceUtil.addPrefixIfNot(StringUtil.lowerFirst(e.getValue()), "/");
-                        classUrls.add(url);
-                    }
-                });
-                List<BambooMethod> bambooMethodList = bambooClass.getMethods();
-                bambooMethodList.forEach(bambooMethod -> {
-                    List<BambooApiModel> methodModels = new ArrayList<>();
-                    classUrls.forEach(classUrl -> {
-                        if (isSoaServiceClient.get()) {
-                            BambooApiModel methodModel = new BambooApiModel();
-                            methodModel.setUrl(classUrl + CharSequenceUtil.addPrefixIfNot(bambooMethod.getMethodName(), "/"));
-                            methodModel.setDesc(bambooMethod.getDescription());
-                            methodModels.add(methodModel);
-                        } else if (isSoaServiceRegister.get()) {
-                            BambooApiModel methodModel = new BambooApiModel();
-                            methodModel.setUrl(classUrl + CharSequenceUtil.addPrefixIfNot(bambooMethod.getMethodName(), "/"));
-                            methodModel.setDesc(bambooMethod.getDescription());
-
-                            methodModels.add(methodModel);
-                        } else {
-                            BambooApiModel methodModel = new BambooApiModel();
-                            methodModel.setDesc(bambooMethod.getDescription());
-
-                            bambooMethod.getAnnotationInfos().forEach(bambooAnnotationInfo -> {
-
-                                final AnnotationInfoSetting annotationInfoSetting = bambooAnnotationInfo.getAnnotationInfoSetting();
-                                String path = annotationInfoSetting.getAnnotationPath();
-                                final String name = bambooAnnotationInfo.getParam().getName();
-                                if ("org.springframework.web.bind.annotation.RequestMapping".equals(path)) {
-                                    if ("value".equals(name) || "null".equals(name) || "path".equals(name)) {
-                                        methodModel.setUrl(classUrl + CharSequenceUtil.addPrefixIfNot(bambooAnnotationInfo.getValue(), "/"));
-                                    }
-                                    if ("method".equals(name)) {
-                                        if (StringUtil.isEmpty(methodModel.getRequestType())) {
-                                            if ("org.springframework.web.bind.annotation.PostMapping".equals(path)) {
-                                                methodModel.setRequestType(RequestMethod.POST.getCode());
-                                            } else if ("org.springframework.web.bind.annotation.GetMapping".equals(path)) {
-                                                methodModel.setRequestType(RequestMethod.POST.getCode());
-                                            } else {
-                                                methodModel.setRequestType(bambooAnnotationInfo.getValue());
-                                            }
-                                        } else {
-                                            methodModel.setRequestType(methodModel.getRequestType() + "," + bambooAnnotationInfo.getValue());
-                                        }
-                                    }
-                                }
-                            });
-                            methodModels.add(methodModel);
-                        }
-                    });
-                    if (CollectionUtil.isNotEmpty(methodModels)) {
-//                        bambooMethod.getApis().addAll(methodModels);
-                        methodModels.parallelStream().forEach(e -> {
-                            if (StringUtil.isEmpty(e.getRequestType())) {
-                                e.setRequestType(RequestMethod.ALL.getCode());
-                            }
-                            classNode.add(new MethodNode(e));
-                        });
-                    }
-                });
-                list.add(bambooClass);
-                moduleNode.add(classNode);
+    public static void convertToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
+        Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
+        Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
+        apiMethods.stream().forEach(e -> {
+            final String modelName = e.getModelName();
+            final String className = e.getClassName();
+            ModuleNode moduleNode = new ModuleNode(modelName);
+            final ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
+            if(moduleNode1!=null){
+                moduleNode =moduleNode1 ;
             }
-            moduleNodeList.add(moduleNode);
-        }
-        moduleNodeList.sort(Comparator.comparing(ModuleNode::toString));
-        moduleNodeList.forEach(root::add);
-        return list;
-    }
-
-
-    public static void convertToOtherApi(DefaultMutableTreeNode root, Map<String, Map<String, List<BambooApiMethod>>> otherApis) {
-        List<ProjectModel> projectModels = new ArrayList<>();
-
-        for (Map.Entry<String, Map<String, List<BambooApiMethod>>> moduleEntry : otherApis.entrySet()) {
-            String projectName = moduleEntry.getKey().split("_")[0];
-            Map<String, List<BambooApiMethod>> modes = moduleEntry.getValue();
-            ProjectModel projectModel = new ProjectModel(projectName);
-            for (Map.Entry<String, List<BambooApiMethod>> entry : modes.entrySet()) {
-                String modelName = entry.getKey();
-                List<BambooApiMethod> apiMethods = entry.getValue();
-                ModuleNode moduleNode = new ModuleNode(modelName);
-                for (BambooApiMethod method : apiMethods) {
-                    BambooApiModel apiModel = new BambooApiModel();
-                    apiModel.setUrl(method.getUrl());
-                    apiModel.setDesc(method.getDescription());
-                    apiModel.setRequestType(method.getMethodType());
-                    MethodNode methodNode = new MethodNode(apiModel);
-                    moduleNode.add(methodNode);
-                }
-                projectModel.add(moduleNode);
+            ClassNode classNode = new ClassNode(className);
+            final ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className,classNode );
+            if(classNode1!=null){
+                classNode=classNode1;
             }
-            projectModels.add(projectModel);
-        }
-        projectModels.forEach(e -> {
-            root.add(e);
+            moduleNode.add(classNode);
+            classNode.add(new MethodNode(e));
         });
+        moduleNodeMap.values().parallelStream().forEach(e -> root.add(e));
     }
-
-    public static Map<String, List<BambooClass>> convertToMap(List<BambooClass> BambooClasses) {
-        Map<String, List<BambooClass>> dataMap = BambooClasses.parallelStream().collect(Collectors.groupingBy(BambooClass::getModuleName));
-        return dataMap;
+    public static void convertOtherToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
+        Map<String, ModuleNode> projectModelMap = new ConcurrentHashMap<>();
+        Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
+        Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
+        apiMethods.stream().forEach(e -> {
+            final String modelName = e.getModelName();
+            final String className = e.getClassName();
+            final String projectName = e.getProjectName();
+            ModuleNode projectModel = new ModuleNode(modelName);
+            final ModuleNode projectModel1 = projectModelMap.putIfAbsent(projectName, projectModel);
+            if(projectModel1!=null){
+                projectModel =projectModel1 ;
+            }
+            ModuleNode moduleNode = new ModuleNode(modelName);
+            final ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
+            if(moduleNode1!=null){
+                moduleNode =moduleNode1 ;
+            }
+            ClassNode classNode = new ClassNode(className);
+            final ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className,classNode );
+            if(classNode1!=null){
+                classNode=classNode1;
+            }
+            classNode.add(new MethodNode(e));
+            moduleNode.add(classNode);
+            projectModel.add(moduleNode);
+        });
+        projectModelMap.values().parallelStream().forEach(e -> root.add(e));
     }
 }

@@ -18,14 +18,15 @@ package com.bamboo.tool.components.api.view.component.tree;
 
 import com.bamboo.tool.components.api.entity.BambooApiModel;
 import com.bamboo.tool.components.api.view.component.entity.MethodModel;
+import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class MethodNode extends BaseNode<BambooApiModel> {
+public class MethodNode extends BaseNode<BambooApiMethod> {
 
-    public MethodNode(BambooApiModel apiModel) {
+    public MethodNode(BambooApiMethod apiModel) {
         super(apiModel);
     }
     @Override
@@ -35,12 +36,12 @@ public class MethodNode extends BaseNode<BambooApiModel> {
     }
     @Override
     public String toString() {
-        BambooApiModel source = this.getSource();
-        return source.getUrl()+"["+source.getRequestType()+"]";
+        BambooApiMethod source = this.getSource();
+        return source.getUrl()+source.getRequestMethods();
     }
 
     public String getToolTipText() {
-        BambooApiModel method = this.getSource();
-        return method.getDesc();
+        BambooApiMethod method = this.getSource();
+        return method.getMethodDesc();
     }
 }

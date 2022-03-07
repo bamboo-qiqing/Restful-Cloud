@@ -8,7 +8,7 @@ import com.bamboo.tool.components.api.view.component.tree.MethodNode;
 import com.bamboo.tool.components.api.view.component.tree.RootNode;
 import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.ProjectInfo;
-import com.bamboo.tool.db.entity.ClassInfo;
+import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiUtils;
 import com.intellij.icons.AllIcons;
@@ -25,10 +25,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.psi.PsiMethod;
 import com.intellij.ui.*;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
-import com.intellij.util.PsiNavigateUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -129,11 +127,11 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
         if (!(component instanceof MethodNode)) {
             return;
         }
-        MethodNode methodNode = (MethodNode) component;
-        PsiMethod psiMethod = methodNode.getSource().getPsiMethod();
-        if (psiMethod != null) {
-            PsiNavigateUtil.navigate(psiMethod);
-        }
+//        MethodNode methodNode = (MethodNode) component;
+////        PsiMethod psiMethod = methodNode.getSource().getPsiMethod();
+//        if (psiMethod != null) {
+//            PsiNavigateUtil.navigate(psiMethod);
+//        }
     }
 
 
@@ -148,10 +146,8 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                 apiTree.setModel(new DefaultTreeModel(root));
                 ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
                 BambooService.saveClass(allApiList, projectInfo);
-                final List<ClassInfo> classInfo = BambooService.getClassInfo();
-                Map<String, Map<String, List<BambooClass>>> projectsBambooClass = BambooService.getProjectsBambooClass();
-                Map<String, List<BambooClass>> stringListMap = projectsBambooClass.get(projectInfo.getProjectId());
-                List<BambooClass> classList = PsiUtils.convertToRoot(root, stringListMap);
+                final List<BambooApiMethod> allApi = BambooService.getAllApi(projectInfo.getProjectId(), null);
+                PsiUtils.convertToRoot(root, allApi);
                 NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
             }
         };

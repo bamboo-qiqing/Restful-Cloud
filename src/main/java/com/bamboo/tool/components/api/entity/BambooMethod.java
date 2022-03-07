@@ -22,5 +22,7 @@ public class BambooMethod {
     private String methodName = StringUtils.EMPTY;
     private String projectId;
     private String classId;
+    private List<String> methodUrl;
+    private List<String> requestMethods=new ArrayList<>();
     List<BambooAnnotationInfo> annotationInfos=new ArrayList<>();
 }

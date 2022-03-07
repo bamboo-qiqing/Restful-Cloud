@@ -9,21 +9,14 @@ import lombok.Data;
  */
 @Data
 public class BambooApiMethod {
-    private String projectName;
-    private String projectPath;
-    private String id;
-    private String projectId;
-    private String description;
-    private String methodName;
-    private String methodType;
-    private String contentType;
-    private String header;
-    private String params;
     private String url;
-    private String modelName;
+    private String requestMethods;
+    private String methodName;
+    private String methodDesc;
     private String className;
-    private String classPath;
-    private String classDesc;
-    private String types;
-    private String serviceName;
+    private String modelName;
+    private String projectName;
+    private String soaType;
+    private String frameworkName;
+
 }

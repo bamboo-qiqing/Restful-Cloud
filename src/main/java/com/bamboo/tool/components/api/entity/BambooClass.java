@@ -15,9 +15,11 @@ public class BambooClass {
     private String moduleName = StringUtils.EMPTY;
     private String description = StringUtils.EMPTY;
     private String classPath = StringUtils.EMPTY;
+    private String poolUrl;
+    private List<String> classUrl=new ArrayList<>();
     private String projectId;
     private List<BambooMethod> methods = new ArrayList<>();
-    private List<BambooAnnotationInfo> annotations = new ArrayList<>();
+//    private List<BambooAnnotationInfo> annotations = new ArrayList<>();
     private AnnotationInfoSetting setting;
 
 }
