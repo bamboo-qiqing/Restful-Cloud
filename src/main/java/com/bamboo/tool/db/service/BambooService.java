@@ -6,6 +6,7 @@ import com.bamboo.tool.components.api.entity.*;
 import com.bamboo.tool.components.api.enums.AnnotationScope;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.SqliteConfig;
+import com.bamboo.tool.db.entity.ClassInfo;
 import com.bamboo.tool.util.StringUtil;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ public class BambooService {
         final Map<String, SqliteMaster> masterMap = tables.stream().collect(Collectors.toMap(SqliteMaster::getName, e -> e));
         final List<String> exeSql = new ArrayList<>();
         if (masterMap.get("bamboo_class") == null) {
-            //初始化表
+
             final StringBuffer initClassTable = new StringBuffer();
             initClassTable.append("create table bamboo_class(");
             initClassTable.append("id    text not null  constraint bamboo_class_pk  primary key,");
@@ -44,7 +45,7 @@ public class BambooService {
 
             initClassTable.append(");");
             exeSql.add(initClassTable.toString());
-            //初始化索引
+
             exeSql.add("create unique index bamboo_class_id_uindex on bamboo_class (id);");
         }
         if (masterMap.get("bamboo_method") == null) {
@@ -57,7 +58,7 @@ public class BambooService {
             initApiMethodTable.append("description  text");
             initApiMethodTable.append(");");
             exeSql.add(initApiMethodTable.toString());
-            //初始化索引
+
             exeSql.add("create unique index bamboo_method_id_uindex on bamboo_method (id);");
         }
         if (masterMap.get("bamboo_annotation_info") == null) {
@@ -72,7 +73,7 @@ public class BambooService {
             initAnnotationInfoTable.append(");");
             exeSql.add(initAnnotationInfoTable.toString());
 
-            //初始化索引
+
             exeSql.add("create unique index bamboo_class_annotation_id_uindex on bamboo_annotation_info (id);");
 
 
@@ -87,7 +88,7 @@ public class BambooService {
             initParamSettingTable.append("annotation_info_setting_id integer");
             initParamSettingTable.append(");");
             exeSql.add(initParamSettingTable.toString());
-            //初始化索引
+
             exeSql.add("create unique index annotation_param_id_uindex on annotation_param_setting (id);");
 
         }
@@ -99,7 +100,7 @@ public class BambooService {
             initMethodScopeTable.append(" method_scope  text");
             initMethodScopeTable.append(");");
             exeSql.add(initMethodScopeTable.toString());
-            //初始化索引
+
             exeSql.add("create unique index annotation_method_scope_id_uindex  on annotation_method_scope (id);");
 
         }
@@ -116,9 +117,9 @@ public class BambooService {
             initMethodScopeTable.append("is_delete integer");
             initMethodScopeTable.append(");");
             exeSql.add(initMethodScopeTable.toString());
-            //初始化索引
+
             exeSql.add("create unique index annotation_info_id_uindex on annotation_info_setting (id);");
-            //初始化数据
+
             exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (1, 'org.springframework.web.bind.annotation.RestController', 'RestController', 1, 'Class', 'service', 'scann', 0);");
             exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (2, 'org.springframework.stereotype.Controller', 'Controller', 1, 'Class', 'service', 'scann', 0);");
             exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (3, 'org.springframework.web.bind.annotation.RequestMapping', 'RequestMapping', 1, 'Class', 'service', 'attribute', 0);");
@@ -554,4 +555,44 @@ public class BambooService {
         return projectMap;
     }
 
+
+    @SneakyThrows
+    public static List<ClassInfo> getClassInfo() {
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        String sql = "select bap.project_name, bc.model_name, bc.class_name, f.name frameworkName, ais.soa_type, bai.value, aps.type, bc.id from bamboo_class bc inner join annotation_info_setting ais on ais.id = bc.setting_id inner join bamboo_api_project bap on bap.project_id = bc.project_id inner join framework f on ais.framework_id = f.id left join bamboo_annotation_info bai on bai.associated_id = bc.id inner join annotation_param_setting aps on aps.id = bai.param_id inner join annotation_info_setting aisa on aisa.id = aps.annotation_info_setting_id;";
+        ResultSet resultSet = state.executeQuery(sql);
+        List<ClassInfo> classInfos = new ArrayList<>();
+        while (resultSet.next()) {
+
+            String projectName = resultSet.getString("projectName");
+            String modelName = resultSet.getString("modelName");
+            String className = resultSet.getString("className");
+            String frameworkName = resultSet.getString("frameworkName");
+            String soaType = resultSet.getString("soaType");
+            String annotationValue = resultSet.getString("annotationValue");
+            String annotationUseType = resultSet.getString("annotationUseType");
+            String classId = resultSet.getString("classId");
+
+            ClassInfo classInfo = new ClassInfo();
+            classInfo.setProjectName(projectName);
+            classInfo.setModelName(modelName);
+            classInfo.setClassName(className);
+            classInfo.setFrameworkName(frameworkName);
+            classInfo.setSoaType(soaType);
+            classInfo.setAnnotationValue(annotationValue);
+            classInfo.setAnnotationUseType(annotationUseType);
+            classInfo.setClassId(classId);
+            classInfos.add(classInfo);
+        }
+        resultSet.close();
+        state.close();
+        conn.close();
+        return classInfos;
+    }
+
+    public static void main(String[] args) {
+
+        System.out.printf("");
+    }
 }
