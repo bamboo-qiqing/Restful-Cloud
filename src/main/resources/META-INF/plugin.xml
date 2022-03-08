@@ -27,9 +27,9 @@
         <notificationGroup id="toolWindowNotificationGroup" displayType="TOOL_WINDOW"/>
 
         <searchEverywhereContributor
-                implementation="com.bamboo.tool.components.api.contributor.FastRequestGotoContributor$Factory"/>
+                implementation="com.bamboo.tool.components.api.contributor.BambooApiGotoContributor$Factory"/>
         <searchEverywhereResultsEqualityProvider
-                implementation="com.bamboo.tool.components.api.contributor.FastRequestEqualityProvider"/>
+                implementation="com.bamboo.tool.components.api.contributor.BambooApiEqualityProvider"/>
         <applicationConfigurable dynamic="true" instance="com.bamboo.tool.components.api.configurable.BambooToolConfigurable"/>
 
     </extensions>

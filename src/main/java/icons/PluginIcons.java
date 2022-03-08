@@ -10,6 +10,9 @@ import javax.swing.*;
  * Description
  */
 public interface PluginIcons {
-    Icon SOA_SERVICE = IconLoader.getIcon("/icons/soa_service.svg", PluginIcons.class);
-    Icon SOA_CLIENT = IconLoader.getIcon("/icons/soa_client.svg", PluginIcons.class);
+    Icon CLIENT = IconLoader.getIcon("/icons/bamboo_api_client.svg", PluginIcons.class);
+    Icon SERVICE = IconLoader.getIcon("/icons/bamboo_api_server.svg", PluginIcons.class);
+
+    Icon SOA_CLIENT = IconLoader.getIcon("/icons/bamboo_api_soa_client.svg", PluginIcons.class);
+    Icon SOA_SERVICE = IconLoader.getIcon("/icons/bamboo_api_soa_server.svg", PluginIcons.class);
 }

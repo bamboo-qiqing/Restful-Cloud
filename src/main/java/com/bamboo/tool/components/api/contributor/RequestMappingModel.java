@@ -1,6 +1,7 @@
 package com.bamboo.tool.components.api.contributor;
 
 import com.bamboo.tool.components.api.enums.RequestMethod;
+import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
 import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
 import com.intellij.navigation.ChooseByNameContributor;
@@ -29,8 +30,17 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
     @Override
     protected @Nullable
     RequestMethod filterValueFor(NavigationItem navigationItem) {
-        System.out.printf("````````````filterValueFor");
+
         return null;
+    }
+
+
+    @Override
+    protected boolean acceptItem(NavigationItem item) {
+         BambooApiMethod api = (BambooApiMethod) item;
+        final Collection<RequestMethod> filterItems = this.getFilterItems();
+        long count = filterItems.parallelStream().filter(e -> api.getRequestMethods().contains(e.getCode())).count();
+        return count>0;
     }
 
     @Override
@@ -68,7 +78,8 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
     }
 
     @Override
-    protected synchronized @Nullable Collection<RequestMethod> getFilterItems() {
+    protected synchronized @Nullable
+    Collection<RequestMethod> getFilterItems() {
         return super.getFilterItems();
     }
 
@@ -87,12 +98,11 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
     public boolean willOpenEditor() {
         return true;
     }
+
     @Override
     public @NotNull
     ChooseByNameItemProvider getItemProvider(@Nullable PsiElement context) {
-        System.out.printf("````````````getItemProvider");
-
-      return new RequestMappingItemProvider(this);
+        return new RequestMappingItemProvider(this);
     }
 
 }

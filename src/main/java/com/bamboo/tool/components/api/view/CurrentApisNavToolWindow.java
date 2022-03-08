@@ -25,8 +25,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.psi.PsiMethod;
 import com.intellij.ui.*;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
+import com.intellij.util.PsiNavigateUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -39,7 +41,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements Disposable {
     private final Project myProject;
@@ -94,7 +95,7 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
     }
 
     private void renderData(Project project) {
-        DumbService.getInstance(project).smartInvokeLater(() -> rendingTree());
+        DumbService.getInstance(project).smartInvokeLater(() -> rendingTree(project));
     }
 
 
@@ -127,15 +128,15 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
         if (!(component instanceof MethodNode)) {
             return;
         }
-//        MethodNode methodNode = (MethodNode) component;
-////        PsiMethod psiMethod = methodNode.getSource().getPsiMethod();
-//        if (psiMethod != null) {
-//            PsiNavigateUtil.navigate(psiMethod);
-//        }
+        MethodNode methodNode = (MethodNode) component;
+        PsiMethod psiMethod = methodNode.getSource().getPsiMethod();
+        if (psiMethod != null) {
+            PsiNavigateUtil.navigate(psiMethod);
+        }
     }
 
 
-    private void rendingTree() {
+    private void rendingTree(Project project) {
         Task.Backgroundable task = new Task.Backgroundable(myProject, "bamboo apis...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
@@ -145,8 +146,9 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                 RootNode root = new RootNode("apis");
                 apiTree.setModel(new DefaultTreeModel(root));
                 ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
+
                 BambooService.saveClass(allApiList, projectInfo);
-                final List<BambooApiMethod> allApi = BambooService.getAllApi(projectInfo.getProjectId(), null);
+                final List<BambooApiMethod> allApi = BambooService.getAllApi(projectInfo.getProjectId(), null,project);
                 PsiUtils.convertToRoot(root, allApi);
                 NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
             }

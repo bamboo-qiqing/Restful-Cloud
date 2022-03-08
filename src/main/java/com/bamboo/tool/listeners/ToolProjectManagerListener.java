@@ -42,19 +42,19 @@ public class ToolProjectManagerListener implements ProjectManagerListener {
     public void projectOpened(@NotNull Project project) {
         BambooToolConfig state = BambooToolComponent.getInstance().getState();
         ApiProjectService apiProjectService = ApplicationManager.getApplication().getService(ApiProjectService.class);
-        ProjectInfo projectInfo=null;
-        if(StringUtil.isNotEmpty(state.getProjectId())){
-            ProjectInfo   currentProject = apiProjectService.queryProject(state.getProjectId());
-           if(currentProject!=null){
-               projectInfo=currentProject;
-           }else{
-               String projectId= UUID.randomUUID().toString();
-               projectInfo=new ProjectInfo();
-               projectInfo.setProjectId(projectId);
-           }
-        }else{
-            String projectId= UUID.randomUUID().toString();
-            projectInfo=new ProjectInfo();
+        ProjectInfo projectInfo = null;
+        if (StringUtil.isNotEmpty(state.getProjectId())) {
+            ProjectInfo currentProject = apiProjectService.queryProject(project.getBasePath(),project.getName());
+            if (currentProject != null) {
+                projectInfo = currentProject;
+            } else {
+                String projectId = UUID.randomUUID().toString();
+                projectInfo = new ProjectInfo();
+                projectInfo.setProjectId(projectId);
+            }
+        } else {
+            String projectId = UUID.randomUUID().toString();
+            projectInfo = new ProjectInfo();
             projectInfo.setProjectId(projectId);
         }
         projectInfo.setProjectPath(project.getBasePath());

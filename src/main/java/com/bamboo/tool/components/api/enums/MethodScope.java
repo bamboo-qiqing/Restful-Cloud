@@ -17,13 +17,4 @@ public enum MethodScope {
         this.code = code;
     }
 
-    public static MethodScope getMethodScope(String code) {
-        for (MethodScope value : MethodScope.values()) {
-            if (value.getCode().equals(code)) {
-                return value;
-            }
-        }
-        return null;
-    }
-
 }

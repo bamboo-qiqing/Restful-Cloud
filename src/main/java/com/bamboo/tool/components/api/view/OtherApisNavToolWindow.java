@@ -76,16 +76,16 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
     }
 
     private void renderData(Project project) {
-        DumbService.getInstance(project).smartInvokeLater(() -> rendingTree());
+        DumbService.getInstance(project).smartInvokeLater(() -> rendingTree(project));
     }
 
-    private void rendingTree() {
+    private void rendingTree(Project project) {
         Task.Backgroundable task = new Task.Backgroundable(myProject, "bamboo apis...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
                 ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
-                final List<BambooApiMethod> allApi = BambooService.getAllApi(null, projectInfo.getProjectId());
+                final List<BambooApiMethod> allApi = BambooService.getAllApi(null, projectInfo.getProjectId(),project);
                 RootNode root = new RootNode("apis");
                 PsiUtils.convertOtherToRoot(root, allApi);
                 apiTree.setModel(new DefaultTreeModel(root));

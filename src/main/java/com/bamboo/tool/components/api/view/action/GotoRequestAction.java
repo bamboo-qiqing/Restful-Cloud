@@ -1,6 +1,6 @@
 package com.bamboo.tool.components.api.view.action;
 
-import com.bamboo.tool.components.api.contributor.FastRequestGotoContributor;
+import com.bamboo.tool.components.api.contributor.BambooApiGotoContributor;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.actions.SearchEverywhereBaseAction;
 import com.intellij.ide.actions.searcheverywhere.SymbolSearchEverywhereContributor;
@@ -35,7 +35,7 @@ public class GotoRequestAction extends SearchEverywhereBaseAction implements Dum
         if (!dumb || new SymbolSearchEverywhereContributor(anActionEvent).isDumbAware()) {
             String tabID = Registry.is("search.everywhere.group.contributors.by.type")
                     ? "SearchEverywhere.Project"
-                    : FastRequestGotoContributor.class.getSimpleName();
+                    : BambooApiGotoContributor.class.getSimpleName();
             showInSearchEverywherePopup(tabID, anActionEvent, true, true);
         }
     }

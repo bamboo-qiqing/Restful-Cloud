@@ -16,10 +16,9 @@
 
 package com.bamboo.tool.components.api.view.component.tree;
 
-import com.bamboo.tool.components.api.entity.BambooApiModel;
-import com.bamboo.tool.components.api.view.component.entity.MethodModel;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.intellij.icons.AllIcons;
+import icons.PluginIcons;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -32,7 +31,24 @@ public class MethodNode extends BaseNode<BambooApiMethod> {
     @Override
     public @Nullable
     Icon getIcon(boolean selected) {
-        return AllIcons.Nodes.Method;
+        BambooApiMethod source = this.getSource();
+        if (source.getFrameworkName().equals("o_dian_yun")) {
+            if (source.getSoaType().equals("service")) {
+                return PluginIcons.SOA_SERVICE;
+            }
+            if (source.getSoaType().equals("client")) {
+                return PluginIcons.SOA_CLIENT;
+            }
+        }
+        if (source.getFrameworkName().equals("Spring")) {
+            if (source.getSoaType().equals("service")) {
+                return PluginIcons.SERVICE;
+            }
+            if (source.getSoaType().equals("client")) {
+                return PluginIcons.CLIENT;
+            }
+        }
+        return null;
     }
     @Override
     public String toString() {

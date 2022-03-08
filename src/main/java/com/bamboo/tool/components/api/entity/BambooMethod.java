@@ -24,5 +24,4 @@ public class BambooMethod {
     private String classId;
     private List<String> methodUrl;
     private List<String> requestMethods=new ArrayList<>();
-    List<BambooAnnotationInfo> annotationInfos=new ArrayList<>();
 }

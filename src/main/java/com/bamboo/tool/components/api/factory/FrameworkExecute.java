@@ -72,10 +72,8 @@ public class FrameworkExecute {
                                 } else {
                                     bambooClass.getMethods().add(bambooMethod);
                                 }
-
                             }
                         }
-
                     });
                 }
                 bambooClasses.add(bambooClass);

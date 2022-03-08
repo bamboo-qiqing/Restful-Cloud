@@ -1,5 +1,6 @@
 package com.bamboo.tool.components.api.contributor;
 
+import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.intellij.ide.actions.searcheverywhere.AbstractEqualityProvider;
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereFoundElementInfo;
 import com.intellij.openapi.application.ApplicationManager;
@@ -11,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * Date 2022/2/15 11:07
  * Description
  */
-public class FastRequestEqualityProvider extends AbstractEqualityProvider {
+public class BambooApiEqualityProvider extends AbstractEqualityProvider {
     @Override
     protected boolean areEqual(@NotNull SearchEverywhereFoundElementInfo newItem, @NotNull SearchEverywhereFoundElementInfo alreadyFoundItem) {
         Object newItemElement = newItem.getElement();
@@ -19,14 +20,13 @@ public class FastRequestEqualityProvider extends AbstractEqualityProvider {
         String newItemElementString = getString(newItemElement);
         String alreadyFoundItemElementString = getString(alreadyFoundItemElement);
         return newItemElementString != null && newItemElementString.equals(alreadyFoundItemElementString);
-//        return Objects.equals(newItem,alreadyFoundItem);
     }
 
     private static String getString(Object item) {
 
         if (item == null) return null;
 
-        if (item instanceof RequestMappingNavigationItem) {
+        if (item instanceof BambooApiMethod) {
             return ApplicationManager.getApplication().runReadAction((Computable<String>) item::toString);
         }
         return null;

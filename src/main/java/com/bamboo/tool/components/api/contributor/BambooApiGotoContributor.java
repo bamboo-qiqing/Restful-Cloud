@@ -5,7 +5,6 @@ import com.bamboo.tool.components.api.configurable.BambooApiFilterConfiguration;
 import com.bamboo.tool.components.api.enums.RequestMethod;
 import com.intellij.ide.actions.searcheverywhere.*;
 import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
-import com.intellij.ide.util.gotoByName.LanguageRef;
 import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -24,13 +23,13 @@ import java.util.List;
  * Date 2022/2/15 9:53
  * Description
  */
-public class FastRequestGotoContributor extends AbstractGotoSEContributor {
+public class BambooApiGotoContributor extends AbstractGotoSEContributor {
 
     private Project myProject;
 
     private final PersistentSearchEverywhereContributorFilter<RequestMethod> myFilter;
 
-    protected FastRequestGotoContributor(@NotNull AnActionEvent event) {
+    protected BambooApiGotoContributor(@NotNull AnActionEvent event) {
         super(event);
         myProject = event.getProject();
         BambooApiFilterConfiguration instance = BambooApiFilterConfiguration.getInstance(myProject);
@@ -41,7 +40,7 @@ public class FastRequestGotoContributor extends AbstractGotoSEContributor {
     protected @NotNull
     FilteringGotoByModel<RequestMethod> createModel(@NotNull Project project) {
         RequestMappingModel requestMappingModel = new RequestMappingModel(myProject, ExtensionPointName.<ChooseByNameContributor>create("com.bamboo.requestMappingContributor").getExtensionList());
-        requestMappingModel.setFilterItems(myFilter.getAllElements());
+        requestMappingModel.setFilterItems(myFilter.getSelectedElements());
         return requestMappingModel;
     }
 
@@ -79,7 +78,7 @@ public class FastRequestGotoContributor extends AbstractGotoSEContributor {
         @Override
         public @NotNull
         SearchEverywhereContributor<Object> createContributor(@NotNull AnActionEvent initEvent) {
-            return new FastRequestGotoContributor(initEvent);
+            return new BambooApiGotoContributor(initEvent);
         }
 
 

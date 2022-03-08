@@ -1,6 +1,8 @@
 package com.bamboo.tool.components.api.contributor;
 
 
+import com.bamboo.tool.db.entity.BambooApiMethod;
+import com.intellij.framework.FrameworkType;
 import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.NlsSafe;
@@ -16,43 +18,45 @@ import javax.swing.*;
  */
 public class RequestMappingItemPresentation implements ItemPresentation {
 
-    private RequestMappingNavigationItem item;
+    private BambooApiMethod item;
 
-    public RequestMappingItemPresentation(RequestMappingNavigationItem requestMappingNavigationItem) {
-        this.item = requestMappingNavigationItem;
+    public RequestMappingItemPresentation(BambooApiMethod bambooApiMethod) {
+        this.item = bambooApiMethod;
     }
 
     @Override
     public @NlsSafe
     @Nullable
     String getPresentableText() {
-        return item.getUrlPath();
+        return item.getUrl();
     }
 
     @Override
     public @NlsSafe
     @Nullable
     String getLocationString() {
-        return item.getProjectName() + "." + item.getClassName() + ".java[" + item.getRequestMethod() + "]";
+        return item.getProjectName() + "." + item.getClassName() + ".java" + item.getRequestMethods();
     }
 
     @Override
     public @Nullable
     Icon getIcon(boolean b) {
-//        if (item.getTypes().contains(FrameworkType.O_DIAN_YUN.getCode())) {
-//            if (item.getTypes().contains(InterfaceType.SERVICE.getCode())) {
-//                return PluginIcons.SOA_SERVICE;
-//            }
-//            if (item.getTypes().contains(InterfaceType.CLIENT.getCode())) {
-//                return PluginIcons.SOA_CLIENT;
-//            }
-//        }
-//        if (item.getTypes().contains(InterfaceType.SERVICE.getCode())) {
-//            return AllIcons.Nodes.Static;
-//        }
-//        if (item.getTypes().contains(InterfaceType.CLIENT.getCode())) {
-//            return AllIcons.Nodes.Class;
-//        }
+        if (item.getFrameworkName().equals("o_dian_yun")) {
+            if (item.getSoaType().equals("service")) {
+                return PluginIcons.SOA_SERVICE;
+            }
+            if (item.getSoaType().equals("client")) {
+                return PluginIcons.SOA_CLIENT;
+            }
+        }
+        if (item.getFrameworkName().equals("Spring")) {
+            if (item.getSoaType().equals("service")) {
+                return PluginIcons.SERVICE;
+            }
+            if (item.getSoaType().equals("client")) {
+                return PluginIcons.CLIENT;
+            }
+        }
         return null;
     }
 }

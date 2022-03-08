@@ -20,9 +20,9 @@ import java.util.List;
 public class ApiProjectService {
 
     @SneakyThrows
-    public ProjectInfo queryProject(String projectId) {
+    public ProjectInfo queryProject(String  projectPath,String projectName) {
         this.createProject();
-        String sql = StringUtil.format("SELECT * FROM bamboo_api_project where project_id='{}'; ", projectId);
+        String sql = StringUtil.format("SELECT * FROM bamboo_api_project where project_path='{}' and project_name='{}' ; ",projectPath,projectName);
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         ResultSet rs = state.executeQuery(sql);
@@ -57,7 +57,7 @@ public class ApiProjectService {
 
     @SneakyThrows
     public ProjectInfo saveProject(ProjectInfo projectInfo) {
-        ProjectInfo project = this.queryProject(projectInfo.getProjectId());
+        ProjectInfo project = this.queryProject(projectInfo.getProjectPath(),projectInfo.getProjectName());
         if (project == null) {
             StringBuffer str = new StringBuffer();
             str.append("INSERT INTO bamboo_api_project (project_name, project_path,project_id) VALUES (");
@@ -68,7 +68,7 @@ public class ApiProjectService {
             Statement state = conn.createStatement();
             state.executeUpdate(str.toString());
             conn.close();
-            project = this.queryProject(projectInfo.getProjectId());
+            project = this.queryProject(projectInfo.getProjectPath(),projectInfo.getProjectName());
         }
         return project;
     }

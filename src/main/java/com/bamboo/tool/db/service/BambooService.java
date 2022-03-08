@@ -9,6 +9,7 @@ import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.SqliteConfig;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.util.StringUtil;
+import com.intellij.openapi.project.Project;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
@@ -150,18 +151,7 @@ public class BambooService {
     private List<SqliteMaster> querTables() throws SQLException {
         StringBuffer str = new StringBuffer();
         str.append("select * from ");
-        str.append("sqlite_master  where "
-                + "type='table' AND name in ( "
-                + "'bamboo_api_project',"
-                + "'framework',"
-                + "'bamboo_class',"
-                + "'bamboo_api_setting',"
-                + "'bamboo_method',"
-                + "'bamboo_api',"
-                + "'annotation_param_setting',"
-                + "'annotation_method_scope',"
-                + "'annotation_info_setting'"
-                + ");");
+        str.append("sqlite_master  where " + "type='table' AND name in ( " + "'bamboo_api_project'," + "'framework'," + "'bamboo_class'," + "'bamboo_api_setting'," + "'bamboo_method'," + "'bamboo_api'," + "'annotation_param_setting'," + "'annotation_method_scope'," + "'annotation_info_setting'" + ");");
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         ResultSet resultSet = state.executeQuery(str.toString());
@@ -224,13 +214,13 @@ public class BambooService {
             bambooClass.setId(UUID.randomUUID().toString());
             StringBuffer sql = new StringBuffer();
             sql.append("INSERT INTO bamboo_class (id,class_name, model_name, description, class_path, project_id,setting_id) VALUES (");
-            sql.append("'" + bambooClass.getId() + "',");
-            sql.append("'" + bambooClass.getClassName() + "',");
-            sql.append("'" + bambooClass.getModuleName() + "',");
-            sql.append("'" + bambooClass.getDescription() + "',");
-            sql.append("'" + bambooClass.getClassPath() + "',");
-            sql.append("'" + projectInfo.getProjectId() + "',");
-            sql.append("'" + bambooClass.getSetting().getId() + "'");
+            sql.append("'").append(bambooClass.getId()).append("',");
+            sql.append("'").append(bambooClass.getClassName()).append("',");
+            sql.append("'").append(bambooClass.getModuleName()).append("',");
+            sql.append("'").append(bambooClass.getDescription()).append("',");
+            sql.append("'").append(bambooClass.getClassPath()).append("',");
+            sql.append("'").append(projectInfo.getProjectId()).append("',");
+            sql.append("'").append(bambooClass.getSetting().getId()).append("'");
             sql.append(");");
             sqls.add(sql.toString());
             final List<BambooMethod> methods = bambooClass.getMethods();
@@ -239,11 +229,11 @@ public class BambooService {
                     method.setId(UUID.randomUUID().toString());
                     StringBuffer sqlMethod = new StringBuffer();
                     sqlMethod.append("insert into bamboo_method (id, project_id, method_name, class_id,description) VALUES(");
-                    sqlMethod.append("'" + method.getId() + "',");
-                    sqlMethod.append("'" + projectInfo.getProjectId() + "',");
-                    sqlMethod.append("'" + method.getMethodName() + "',");
-                    sqlMethod.append("'" + bambooClass.getId() + "',");
-                    sqlMethod.append("'" + method.getDescription() + "'");
+                    sqlMethod.append("'").append(method.getId()).append("',");
+                    sqlMethod.append("'").append(projectInfo.getProjectId()).append("',");
+                    sqlMethod.append("'").append(method.getMethodName()).append("',");
+                    sqlMethod.append("'").append(bambooClass.getId()).append("',");
+                    sqlMethod.append("'").append(method.getDescription()).append("'");
                     sqlMethod.append(");");
                     sqls.add(sqlMethod.toString());
                     final List<String> classUrls = bambooClass.getClassUrl();
@@ -452,7 +442,7 @@ public class BambooService {
     }
 
     @SneakyThrows
-    public static List<BambooApiMethod> getAllApi(String projectId, String notProjectId) {
+    public static List<BambooApiMethod> getAllApi(String projectId, String notProjectId, Project project) {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         StringBuilder str = new StringBuilder();
@@ -461,6 +451,7 @@ public class BambooService {
         str.append("bm.method_name     methodName,");
         str.append("bm.description     methodDesc,");
         str.append("bc.class_name      className,");
+        str.append("bc.class_path     classPath,");
         str.append("bc.model_name      modelName,");
         str.append("bc.description     classDesc,");
         str.append("bap.project_name   projectName,");
@@ -495,6 +486,7 @@ public class BambooService {
             String methodName = resultSet.getString("methodName");
             String methodDesc = resultSet.getString("methodDesc");
             String className = resultSet.getString("className");
+            String classPath = resultSet.getString("classPath");
             String modelName = resultSet.getString("modelName");
             String projectName = resultSet.getString("projectName");
             String soaType = resultSet.getString("soaType");
@@ -505,9 +497,11 @@ public class BambooService {
             api.setModelName(modelName);
             api.setMethodDesc(methodDesc);
             api.setClassName(className);
+            api.setClassPath(classPath);
             api.setProjectName(projectName);
             api.setSoaType(soaType);
             api.setFrameworkName(frameworkName);
+            api.setProject(project);
             apis.add(api);
         }
         resultSet.close();

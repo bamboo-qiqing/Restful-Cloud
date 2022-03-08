@@ -19,7 +19,6 @@ public class BambooClass {
     private List<String> classUrl=new ArrayList<>();
     private String projectId;
     private List<BambooMethod> methods = new ArrayList<>();
-//    private List<BambooAnnotationInfo> annotations = new ArrayList<>();
     private AnnotationInfoSetting setting;
 
 }
