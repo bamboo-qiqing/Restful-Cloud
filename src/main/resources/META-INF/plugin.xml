@@ -47,6 +47,7 @@
 
     </extensions>
 
+
     <projectListeners>
         <listener class="com.bamboo.tool.listeners.ToolProjectManagerListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>

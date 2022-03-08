@@ -25,10 +25,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.psi.PsiMethod;
 import com.intellij.ui.*;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
-import com.intellij.util.PsiNavigateUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -129,10 +127,8 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
             return;
         }
         MethodNode methodNode = (MethodNode) component;
-        PsiMethod psiMethod = methodNode.getSource().getPsiMethod();
-        if (psiMethod != null) {
-            PsiNavigateUtil.navigate(psiMethod);
-        }
+        final BambooApiMethod source = methodNode.getSource();
+        source.navigate(true);
     }
 
 

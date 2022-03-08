@@ -62,6 +62,11 @@ public class FrameworkExecute {
                             if (satisfyScope) {
                                 BambooMethod bambooMethod = new BambooMethod();
                                 bambooMethod.setMethodName(method.getName());
+                                if(info.getFramework().getName().equals("o_dian_yun")){
+                                    if(info.getSoaType().equals("service")){
+                                        bambooMethod.getMethodUrl().add(method.getName());
+                                    }
+                                }
                                 final AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
                                 if (annotationMethodScope != null) {
                                     final PsiAnnotation[] methodAnnotations = method.getAnnotations();

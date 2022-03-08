@@ -6,6 +6,7 @@ import com.bamboo.tool.components.api.entity.*;
 import com.bamboo.tool.components.api.enums.AnnotationScope;
 import com.bamboo.tool.components.api.enums.RequestMethod;
 import com.bamboo.tool.config.model.ProjectInfo;
+import com.bamboo.tool.db.SqlConstant;
 import com.bamboo.tool.db.SqliteConfig;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.util.StringUtil;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 public class BambooService {
 
     @SneakyThrows
-    public void initTable() {
+    public static void initTable() {
         final List<SqliteMaster> tables = querTables();
         final Map<String, SqliteMaster> masterMap = tables.stream().collect(Collectors.toMap(SqliteMaster::getName, e -> e));
         final List<String> exeSql = new ArrayList<>();
@@ -148,7 +149,7 @@ public class BambooService {
         conn.close();
     }
 
-    private List<SqliteMaster> querTables() throws SQLException {
+    private static List<SqliteMaster> querTables() throws SQLException {
         StringBuffer str = new StringBuffer();
         str.append("select * from ");
         str.append("sqlite_master  where " + "type='table' AND name in ( " + "'bamboo_api_project'," + "'framework'," + "'bamboo_class'," + "'bamboo_api_setting'," + "'bamboo_method'," + "'bamboo_api'," + "'annotation_param_setting'," + "'annotation_method_scope'," + "'annotation_info_setting'" + ");");
@@ -509,4 +510,59 @@ public class BambooService {
         conn.close();
         return apis;
     }
+
+    @SneakyThrows
+    public static ProjectInfo queryProject(String projectPath, String projectName) {
+        BambooService.createProject();
+        String sql = StringUtil.format("SELECT * FROM bamboo_api_project where project_path='{}' and project_name='{}' ; ",projectPath,projectName);
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        ResultSet rs = state.executeQuery(sql);
+        List<ProjectInfo> projectInfos = new ArrayList<>();
+        while (rs.next()) {
+            ProjectInfo projectInfo = new ProjectInfo();
+            String name = rs.getString("project_name");
+            int id = rs.getInt("id");
+            String path = rs.getString("project_path");
+            projectInfo.setProjectId(rs.getString("project_id"));
+            projectInfo.setProjectPath(path);
+            projectInfo.setProjectName(name);
+            projectInfo.setId(id);
+            projectInfos.add(projectInfo);
+        }
+        rs.close();
+        conn.close();
+        return projectInfos.size() > 0 ? projectInfos.get(0) : null;
+    }
+
+    @SneakyThrows
+    public static void createProject() {
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        ResultSet rs = state.executeQuery(SqlConstant.QUERY_PROJECT_TABLE);
+        if (!rs.next()) {
+            rs.close();
+            state.executeUpdate(SqlConstant.CREAT_PROJECT_SQL);
+        }
+        conn.close();
+    }
+
+    @SneakyThrows
+    public static ProjectInfo saveProject(ProjectInfo projectInfo) {
+        ProjectInfo project = BambooService.queryProject(projectInfo.getProjectPath(),projectInfo.getProjectName());
+        if (project == null) {
+            StringBuffer str = new StringBuffer();
+            str.append("INSERT INTO bamboo_api_project (project_name, project_path,project_id) VALUES (");
+            str.append(StringUtil.format("'{}',", projectInfo.getProjectName()));
+            str.append(StringUtil.format("'{}',", projectInfo.getProjectPath()));
+            str.append(StringUtil.format("'{}')", projectInfo.getProjectId()));
+            Connection conn = SqliteConfig.getConnection();
+            Statement state = conn.createStatement();
+            state.executeUpdate(str.toString());
+            conn.close();
+            project = BambooService.queryProject(projectInfo.getProjectPath(),projectInfo.getProjectName());
+        }
+        return project;
+    }
+
 }
