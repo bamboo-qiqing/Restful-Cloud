@@ -142,9 +142,8 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                 RootNode root = new RootNode("apis");
                 apiTree.setModel(new DefaultTreeModel(root));
                 ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
-
                 BambooService.saveClass(allApiList, projectInfo);
-                final List<BambooApiMethod> allApi = BambooService.getAllApi(projectInfo.getProjectId(), null,project);
+                final List<BambooApiMethod> allApi = BambooService.getAllApi(projectInfo.getProjectId(), null, project);
                 PsiUtils.convertToRoot(root, allApi);
                 NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
             }
@@ -157,7 +156,6 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
         group.add(new RefreshApiAction());
         group.add(CommonActionsManager.getInstance().createExpandAllAction(apiTree, apiTree));
         group.add(CommonActionsManager.getInstance().createCollapseAllAction(apiTree, apiTree));
-//        GotoRequestAction gotoFastRequestAction = (GotoRequestAction) ActionManager.getInstance().getAction("bambooApi.goToBambooApiRequest");
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, group, true);
         actionToolbar.setTargetComponent(panel);
         JComponent toolbarComponent = actionToolbar.getComponent();
