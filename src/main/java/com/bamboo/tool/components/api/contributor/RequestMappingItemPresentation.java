@@ -35,7 +35,7 @@ public class RequestMappingItemPresentation implements ItemPresentation {
     public @NlsSafe
     @Nullable
     String getLocationString() {
-        return item.getProjectName() + "." + item.getClassName() + ".java" + item.getRequestMethods();
+        return item.getProjectName() + "." + item.getClassName() + item.getRequestMethods();
     }
 
     @Override

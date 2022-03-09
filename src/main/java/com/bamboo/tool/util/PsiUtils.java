@@ -65,7 +65,7 @@ public class PsiUtils {
             moduleNode.add(classNode);
             classNode.add(new MethodNode(e));
         });
-        moduleNodeMap.values().parallelStream().forEach(e -> root.add(e));
+        moduleNodeMap.values().stream().forEach(e -> root.add(e));
     }
     public static void convertOtherToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
         Map<String, ModuleNode> projectModelMap = new ConcurrentHashMap<>();

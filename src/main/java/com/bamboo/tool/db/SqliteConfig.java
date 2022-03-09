@@ -53,14 +53,5 @@ public class SqliteConfig {
         return false;
     }
 
-    public static void main(String[] args) throws SQLException {
-        ResultSet projectTableInfo = SqliteConfig.exeQuerySql(SqlConstant.QUERY_PROJECT_TABLE);
-        if (!projectTableInfo.next()) {
-            boolean b = SqliteConfig.exeQueryUpdateSql(SqlConstant.CREAT_PROJECT_SQL);
-        }
-        ResultSet methodTableInfo = SqliteConfig.exeQuerySql(SqlConstant.QUERY_METHOD_TABLE);
-        if (!methodTableInfo.next()) {
-            boolean b = SqliteConfig.exeQueryUpdateSql(SqlConstant.CREAT_METHOD_SQL);
-        }
-    }
+
 }

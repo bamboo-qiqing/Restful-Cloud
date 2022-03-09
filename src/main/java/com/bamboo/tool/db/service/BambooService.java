@@ -76,8 +76,6 @@ public class BambooService {
             initAnnotationInfoTable.append(");");
             exeSql.add(initAnnotationInfoTable.toString());
             exeSql.add("create unique index bamboo_api_id_uindex on bamboo_api (id);");
-
-
         }
         if (masterMap.get("annotation_param_setting") == null) {
             final StringBuffer initParamSettingTable = new StringBuffer();
@@ -92,6 +90,19 @@ public class BambooService {
 
             exeSql.add("create unique index annotation_param_id_uindex on annotation_param_setting (id);");
 
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (1, 'value', 'classUrl', null, 3);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (2, 'name', 'poolUrl', null, 10);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (3, 'interfaceName', 'classUrl', null, 10);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (4, 'interfaceClass', 'classUrl', null, 11);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (5, 'value', 'methodUrl', null, 12);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (6, 'null', 'methodUrl', null, 12);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (7, 'null', 'classUrl', null, 3);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (8, 'method', 'requestMethod', null, 12);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (9, 'null', 'methodUrl', null, 5);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (10, 'value', 'methodUrl', null, 5);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (11, 'path', 'methodUrl', null, 5);");
+
+
         }
         if (masterMap.get("annotation_method_scope") == null) {
             final StringBuffer initMethodScopeTable = new StringBuffer();
@@ -104,7 +115,27 @@ public class BambooService {
 
             exeSql.add("create unique index annotation_method_scope_id_uindex  on annotation_method_scope (id);");
 
+            exeSql.add("INSERT INTO annotation_method_scope (id, annotation_id, method_scope) VALUES (1, 11, 'public');");
+            exeSql.add("INSERT INTO annotation_method_scope (id, annotation_id, method_scope) VALUES (2, 10, 'public');");
+            exeSql.add("INSERT INTO annotation_method_scope (id, annotation_id, method_scope) VALUES (3, 1, 'annotation');");
+            exeSql.add("INSERT INTO annotation_method_scope (id, annotation_id, method_scope) VALUES (4, 2, 'annotation');");
+            exeSql.add("INSERT INTO annotation_method_scope (id, annotation_id, method_scope) VALUES (5, 5, 'annotation');");
         }
+        if (masterMap.get("framework") == null) {
+            final StringBuffer initMethodScopeTable = new StringBuffer();
+            initMethodScopeTable.append("create table framework(");
+            initMethodScopeTable.append("id       integer not null  constraint framework_pk  primary key autoincrement,");
+            initMethodScopeTable.append(" name     text,");
+            initMethodScopeTable.append(" describe text");
+            initMethodScopeTable.append(");");
+            exeSql.add(initMethodScopeTable.toString());
+
+            exeSql.add("create unique index framework_id_uindex  on framework (id);");
+            exeSql.add("INSERT INTO framework (id, name, describe) VALUES (1, 'Spring', 'Spring');");
+            exeSql.add("INSERT INTO framework (id, name, describe) VALUES (2, 'o_dian_yun', 'o_dian_yun');");
+        }
+
+
         if (masterMap.get("annotation_info_setting") == null) {
             final StringBuffer initMethodScopeTable = new StringBuffer();
             initMethodScopeTable.append(" create table annotation_info_setting(");
@@ -152,7 +183,7 @@ public class BambooService {
     private static List<SqliteMaster> querTables() throws SQLException {
         StringBuffer str = new StringBuffer();
         str.append("select * from ");
-        str.append("sqlite_master  where " + "type='table' AND name in ( " + "'bamboo_api_project'," + "'framework'," + "'bamboo_class'," + "'bamboo_api_setting'," + "'bamboo_method'," + "'bamboo_api'," + "'annotation_param_setting'," + "'annotation_method_scope'," + "'annotation_info_setting'" + ");");
+        str.append("sqlite_master  where " + "type='table' AND name in ( ").append("'bamboo_api_project',").append("'framework',").append("'bamboo_class',").append("'bamboo_method',").append("'bamboo_api',").append("'annotation_param_setting',").append("'annotation_method_scope',").append("'annotation_info_setting'").append(");");
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         ResultSet resultSet = state.executeQuery(str.toString());
@@ -514,7 +545,7 @@ public class BambooService {
     @SneakyThrows
     public static ProjectInfo queryProject(String projectPath, String projectName) {
         BambooService.createProject();
-        String sql = StringUtil.format("SELECT * FROM bamboo_api_project where project_path='{}' and project_name='{}' ; ",projectPath,projectName);
+        String sql = StringUtil.format("SELECT * FROM bamboo_api_project where project_path='{}' and project_name='{}' ; ", projectPath, projectName);
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         ResultSet rs = state.executeQuery(sql);
@@ -549,7 +580,7 @@ public class BambooService {
 
     @SneakyThrows
     public static ProjectInfo saveProject(ProjectInfo projectInfo) {
-        ProjectInfo project = BambooService.queryProject(projectInfo.getProjectPath(),projectInfo.getProjectName());
+        ProjectInfo project = BambooService.queryProject(projectInfo.getProjectPath(), projectInfo.getProjectName());
         if (project == null) {
             StringBuffer str = new StringBuffer();
             str.append("INSERT INTO bamboo_api_project (project_name, project_path,project_id) VALUES (");
@@ -560,7 +591,7 @@ public class BambooService {
             Statement state = conn.createStatement();
             state.executeUpdate(str.toString());
             conn.close();
-            project = BambooService.queryProject(projectInfo.getProjectPath(),projectInfo.getProjectName());
+            project = BambooService.queryProject(projectInfo.getProjectPath(), projectInfo.getProjectName());
         }
         return project;
     }

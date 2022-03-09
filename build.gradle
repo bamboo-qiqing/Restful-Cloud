@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.bamboo'
-version '1.0-SNAPSHOT'
+version '1.0.0'
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 repositories {
@@ -20,9 +20,7 @@ dependencies {
     implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.36.0.3'
     implementation group: 'cn.hutool', name: 'hutool-all', version: '5.7.19'
     compileOnly 'org.projectlombok:lombok:1.18.22'
-
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
-
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
 

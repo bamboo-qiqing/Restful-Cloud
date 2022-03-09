@@ -35,7 +35,7 @@ public class PsiAnnotationMemberUtil {
         }
         if (name.contains("PsiClassObjectAccessExpression")) {
             PsiClassObjectAccessExpression classObject = (PsiClassObjectAccessExpression) value;
-            values.add(classObject.getOperand().getType().getCanonicalText());
+            values.add(classObject.getOperand().getType().getPresentableText());
         }
         if (name.contains("PsiReferenceExpression")) {
             PsiReferenceExpression reference = (PsiReferenceExpression) value;
