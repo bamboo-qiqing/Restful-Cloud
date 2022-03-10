@@ -22,6 +22,11 @@ public class BambooMethod {
     private String methodName = StringUtils.EMPTY;
     private String projectId;
     private String classId;
-    private List<String> methodUrl=new ArrayList<>();
-    private List<String> requestMethods=new ArrayList<>();
+    private String returnType;
+    private String consumes= StringUtils.EMPTY;
+    private String params= StringUtils.EMPTY;
+    private String headers= StringUtils.EMPTY;
+    private String produces= StringUtils.EMPTY;
+    private List<String> methodUrl = new ArrayList<>();
+    private List<String> requestMethods = new ArrayList<>();
 }

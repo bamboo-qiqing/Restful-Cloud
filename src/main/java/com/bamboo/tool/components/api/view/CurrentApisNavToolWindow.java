@@ -16,6 +16,7 @@ import com.intellij.ide.CommonActionsManager;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -137,15 +138,18 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
-                allApiList = FrameworkExecute.buildApiMethod(myProject);
-                indicator.setText("Rendering");
-                RootNode root = new RootNode("apis");
-                apiTree.setModel(new DefaultTreeModel(root));
-                ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
-                BambooService.saveClass(allApiList, projectInfo);
-                final List<BambooApiMethod> allApi = BambooService.getAllApi(projectInfo.getProjectId(), null, project);
-                PsiUtils.convertToRoot(root, allApi);
-                NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
+                ApplicationManager.getApplication().runReadAction(() -> {
+                    allApiList = FrameworkExecute.buildApiMethod(myProject);
+                    indicator.setText("Rendering");
+                    RootNode root = new RootNode("apis");
+                    apiTree.setModel(new DefaultTreeModel(root));
+                    ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
+                    BambooService.saveClass(allApiList, projectInfo);
+                    final List<BambooApiMethod> allApi = BambooService.getAllApi(projectInfo.getProjectId(), null, project);
+                    PsiUtils.convertToRoot(root, allApi);
+                    NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
+                });
+
             }
         };
         ProgressManager.getInstance().runProcessWithProgressAsynchronously(task, new BackgroundableProcessIndicator(task));

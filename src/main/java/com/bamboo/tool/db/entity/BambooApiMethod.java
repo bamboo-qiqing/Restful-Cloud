@@ -7,6 +7,7 @@ import com.intellij.ide.lightEdit.LightEditService;
 import com.intellij.ide.util.PsiNavigationSupport;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsSafe;
@@ -14,6 +15,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.util.PsiUtil;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
@@ -60,12 +62,14 @@ public class BambooApiMethod implements NavigationItem {
     public void navigate(boolean requestFocus) {
         VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByPath(classPath);
 
-        if (file != null && file.isValid()) {
-            openFile(file, project, methodName);
-        }
-        if (navigationElement != null) {
-            navigationElement.navigate(requestFocus);
-        }
+        ApplicationManager.getApplication().runReadAction(() -> {
+            if (file != null && file.isValid()) {
+                openFile(file, project, methodName);
+            }
+            if (navigationElement != null) {
+                navigationElement.navigate(requestFocus);
+            }
+        });
     }
 
     @Override
@@ -94,11 +98,9 @@ public class BambooApiMethod implements NavigationItem {
         } else {
             PsiFile psiFile = PsiUtil.getPsiFile(project, file);
             if (psiFile instanceof PsiJavaFile) {
-                PsiJavaFile javaFile = (PsiJavaFile) psiFile;
-                PsiClass[] classes = javaFile.getClasses();
-                if (classes.length > 0) {
-                    PsiClass aClass = classes[0];
-                    PsiElement psiElement = Arrays.stream(aClass.getMethods()).filter(e -> e.getName().equals(methodName)).map(e -> e.getNavigationElement()).findFirst().get();
+                final PsiClass childClass = ((PsiJavaFileImpl) psiFile).findChildByClass(PsiClass.class);
+                if (childClass!=null) {
+                    PsiElement psiElement = Arrays.stream(childClass.getMethods()).filter(e -> e.getName().equals(methodName)).map(e -> e.getNavigationElement()).findFirst().get();
                     Navigatable navigatable = (Navigatable) psiElement;
                     navigatable.navigate(true);
                 } else {

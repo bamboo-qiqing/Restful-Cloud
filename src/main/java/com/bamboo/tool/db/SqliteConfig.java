@@ -14,6 +14,7 @@ public class SqliteConfig {
 
     @SneakyThrows
     public static Connection getConnection() {
+
         Class.forName("org.sqlite.JDBC");
         String db = FileUtil.getUserHomePath() + "\\bambooTool\\bambooApi.db";
         Connection conn = DriverManager.getConnection("jdbc:sqlite:" + db);

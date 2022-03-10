@@ -7,7 +7,7 @@ import lombok.Getter;
  * request类型
  */
 @Getter
-public enum RequestMethod  {
+public enum RequestMethod {
     GET("GET"),
     HEAD("HEAD"),
     POST("POST"),

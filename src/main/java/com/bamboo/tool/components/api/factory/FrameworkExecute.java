@@ -1,7 +1,6 @@
 package com.bamboo.tool.components.api.factory;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.StrUtil;
 import com.bamboo.tool.components.api.entity.*;
 import com.bamboo.tool.components.api.enums.AnnotationScope;
 import com.bamboo.tool.components.api.enums.MethodScope;
@@ -14,6 +13,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+import com.intellij.psi.javadoc.PsiDocComment;
+import com.intellij.psi.javadoc.PsiDocToken;
 import com.intellij.psi.util.PsiUtil;
 
 import java.util.*;
@@ -63,6 +64,7 @@ public class FrameworkExecute {
                             if (satisfyScope) {
                                 BambooMethod bambooMethod = new BambooMethod();
                                 bambooMethod.setMethodName(method.getName());
+                                bambooMethod.setDescription(FrameworkExecute.getMethodDescription(method));
                                 final AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
                                 if (annotationMethodScope != null) {
                                     final PsiAnnotation[] methodAnnotations = method.getAnnotations();
@@ -116,7 +118,6 @@ public class FrameworkExecute {
     private static void buildAnnotations(BambooClass bambooClass, BambooMethod bambooMethod, Map<String, AnnotationInfoSetting> infoSettingMap, PsiAnnotation[] annotations, AnnotationInfoSetting info) {
 
         Arrays.stream(annotations).forEach(annotation -> {
-            Arrays.stream(annotation.getChildren()).collect(Collectors.toMap(e->e.getNode().getElementType().getDebugName(),e->e));
             AnnotationInfoSetting annotationInfoSetting = infoSettingMap.get(annotation.getNameReferenceElement().getCanonicalText());
             if (!Objects.isNull(annotationInfoSetting)) {
                 Map<String, AnnotationParam> params = annotationInfoSetting.getParams().stream().collect(Collectors.toMap(AnnotationParam::getName, param -> param));
@@ -134,16 +135,13 @@ public class FrameworkExecute {
                             final String type = annotationParam.getType();
                             if ("poolUrl".equals(type)) {
                                 if (info.getFramework().getName().equals("o_dian_yun")) {
-
                                     if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
-                                        bambooClass.setPoolUrl(values.get(0)+"/cloud");
+                                        bambooClass.setPoolUrl(values.get(0) + "/cloud");
                                     }
-                                }else{
+                                } else {
                                     bambooClass.setPoolUrl(values.get(0));
                                 }
-
-                            }
-                            if ("classUrl".equals(type)) {
+                            } else if ("classUrl".equals(type)) {
                                 if (info.getFramework().getName().equals("o_dian_yun")) {
                                     if (info.getSoaType().equals("service") && CollectionUtil.isNotEmpty(values)) {
                                         values = values.stream().map(e -> StringUtil.lowerFirst(e)).collect(Collectors.toList());
@@ -151,22 +149,42 @@ public class FrameworkExecute {
                                     if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
                                         values = values.stream().map(e -> {
                                             String[] split = e.split("\\.");
-                                            return StringUtil.lowerFirst(split[split.length-1]);
+                                            return StringUtil.lowerFirst(split[split.length - 1]);
                                         }).collect(Collectors.toList());
                                     }
                                 }
                                 bambooClass.setClassUrl(values);
-                            }
-                            if ("methodUrl".equals(type)) {
+                            } else if ("methodUrl".equals(type)) {
                                 bambooMethod.setMethodUrl(values);
-                            }
-                            if ("requestMethod".equals(type)) {
+                            } else if ("requestMethod".equals(type)) {
                                 bambooMethod.setRequestMethods(values);
+                            } else if ("consumes".equals(type)) {
+                                bambooMethod.setConsumes(values.toString());
+                            } else if ("params".equals(type)) {
+                                bambooMethod.setParams(values.toString());
+                            } else if ("headers".equals(type)) {
+                                bambooMethod.setHeaders(values.toString());
+                            } else if ("produces".equals(type)) {
+                                bambooMethod.setProduces(values.toString());
                             }
                         }
                     }
                 }
             }
         });
+    }
+    public static String getMethodDescription(PsiMethod psiMethod) {
+        //javadoc中获取
+        PsiDocComment docComment = psiMethod.getDocComment();
+        StringBuilder commentStringBuilder = new StringBuilder();
+        if (docComment != null) {
+            PsiElement[] descriptionElements = docComment.getDescriptionElements();
+            for (PsiElement descriptionElement : descriptionElements) {
+                if (descriptionElement instanceof PsiDocToken) {
+                    commentStringBuilder.append(descriptionElement.getText());
+                }
+            }
+        }
+        return commentStringBuilder.toString().trim();
     }
 }

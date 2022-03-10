@@ -17,7 +17,6 @@
 package com.bamboo.tool.components.api.view.component.tree;
 
 import com.bamboo.tool.db.entity.BambooApiMethod;
-import com.intellij.icons.AllIcons;
 import icons.PluginIcons;
 import org.jetbrains.annotations.Nullable;
 

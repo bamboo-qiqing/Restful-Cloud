@@ -72,7 +72,11 @@ public class BambooService {
             initAnnotationInfoTable.append("method_id  text,");
             initAnnotationInfoTable.append("url    text,");
             initAnnotationInfoTable.append("request_methods   text,");
-            initAnnotationInfoTable.append("project_id   text");
+            initAnnotationInfoTable.append("project_id   text,");
+            initAnnotationInfoTable.append("params   text,");
+            initAnnotationInfoTable.append("headers   text,");
+            initAnnotationInfoTable.append("consumes   text,");
+            initAnnotationInfoTable.append("produces   text");
             initAnnotationInfoTable.append(");");
             exeSql.add(initAnnotationInfoTable.toString());
             exeSql.add("create unique index bamboo_api_id_uindex on bamboo_api (id);");
@@ -101,6 +105,10 @@ public class BambooService {
             exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (9, 'null', 'methodUrl', null, 5);");
             exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (10, 'value', 'methodUrl', null, 5);");
             exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (11, 'path', 'methodUrl', null, 5);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (12, 'consumes', 'consumes', null, 12);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (13, 'params', 'params', null, 12);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (14, 'headers', 'headers', null, 12);");
+            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (15, 'produces', 'produces', null, 12);");
 
 
         }
@@ -183,7 +191,16 @@ public class BambooService {
     private static List<SqliteMaster> querTables() throws SQLException {
         StringBuffer str = new StringBuffer();
         str.append("select * from ");
-        str.append("sqlite_master  where " + "type='table' AND name in ( ").append("'bamboo_api_project',").append("'framework',").append("'bamboo_class',").append("'bamboo_method',").append("'bamboo_api',").append("'annotation_param_setting',").append("'annotation_method_scope',").append("'annotation_info_setting'").append(");");
+        str.append("sqlite_master  where " + "type='table' AND name in ( ");
+        str.append("'bamboo_api_project',");
+        str.append("'framework',");
+        str.append("'bamboo_class',");
+        str.append("'bamboo_method',");
+        str.append("'bamboo_api',");
+        str.append("'annotation_param_setting',");
+        str.append("'annotation_method_scope',");
+        str.append("'annotation_info_setting'");
+        str.append(");");
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         ResultSet resultSet = state.executeQuery(str.toString());
@@ -303,12 +320,17 @@ public class BambooService {
                 if (CollectionUtil.isEmpty(requestMethods)) {
                     requestMethods.add(RequestMethod.ALL.getCode());
                 }
-                api.append("insert into bamboo_api (id, method_id, url, request_methods,project_id) VALUES(");
+
+                api.append("insert into bamboo_api (id, method_id, url, request_methods,project_id,consumes,params,headers,produces) VALUES(");
                 api.append("'" + UUID.randomUUID() + "',");
                 api.append("'" + method.getId() + "',");
                 api.append("'" + poolUrl + classUrl + StringUtil.addPrefixIfNot(methodUrl, "/") + "',");
                 api.append("'" + requestMethods + "',");
-                api.append("'" + projectInfo.getProjectId() + "'");
+                api.append("'" + projectInfo.getProjectId() + "',");
+                api.append("'" + method.getConsumes() + "',");
+                api.append("'" + method.getParams() + "',");
+                api.append("'" + method.getHeaders() + "',");
+                api.append("'" + method.getProduces() + "'");
                 api.append(");");
                 sqls.add(api.toString());
             });

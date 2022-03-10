@@ -1,5 +1,6 @@
 package com.bamboo.tool.listeners;
 
+import cn.hutool.core.io.FileUtil;
 import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.BambooToolConfig;
 import com.bamboo.tool.config.model.ProjectInfo;
@@ -20,6 +21,11 @@ public class ToolProjectManagerListener implements ProjectManagerListener {
 
     @Override
     public void projectOpened(@NotNull Project project) {
+        String db = FileUtil.getUserHomePath() + "\\bambooTool\\bambooApi.db";
+        final boolean exist = FileUtil.exist(db);
+        if(!exist){
+            FileUtil.touch(db);
+        }
         BambooToolConfig state = BambooToolComponent.getInstance().getState();
         ProjectInfo projectInfo = null;
         if (StringUtil.isNotEmpty(state.getProjectId())) {
