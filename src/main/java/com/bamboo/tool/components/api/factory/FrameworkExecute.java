@@ -181,7 +181,7 @@ public class FrameworkExecute {
             PsiElement[] descriptionElements = docComment.getDescriptionElements();
             for (PsiElement descriptionElement : descriptionElements) {
                 if (descriptionElement instanceof PsiDocToken) {
-                    commentStringBuilder.append(descriptionElement.getText());
+                    commentStringBuilder.append(StringUtil.replace(descriptionElement.getText(),"'","‘")+"\n");
                 }
             }
         }
