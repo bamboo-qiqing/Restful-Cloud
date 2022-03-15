@@ -32,6 +32,10 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
@@ -59,7 +63,23 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
 
         Disposer.register(myProject, this);
         apiTree.setCellRenderer(new MyCellRenderer());
-
+        apiTree.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                super.keyPressed(e);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    navigateToMethod();
+                }
+            }
+        });
+        apiTree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event) {
+                if (event.getClickCount() == 2 && event.getButton() == MouseEvent.BUTTON1) {
+                    navigateToMethod();
+                }
+            }
+        });
         TreeSpeedSearch treeSpeedSearch = new TreeSpeedSearch(apiTree, path -> {
             BaseNode node = (BaseNode) path.getLastPathComponent();
             Object object = node.getUserObject();
@@ -138,5 +158,18 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
             }
             SpeedSearchUtil.applySpeedSearchHighlighting(this, this, false, true);
         }
+    }
+
+    private void navigateToMethod() {
+        if (!apiTree.isEnabled()) {
+            return;
+        }
+        Object component = apiTree.getLastSelectedPathComponent();
+        if (!(component instanceof MethodNode)) {
+            return;
+        }
+        MethodNode methodNode = (MethodNode) component;
+        final BambooApiMethod source = methodNode.getSource();
+        source.navigate(true);
     }
 }

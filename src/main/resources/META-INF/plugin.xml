@@ -1,10 +1,12 @@
 <idea-plugin>
     <id>com.bamboo</id>
-    <name>cloud-apis</name>
+    <name>Restful Cloud</name>
     <vendor email="760560079@qq.com" url="http://baidu.com">bamboo</vendor>
 
     <description><![CDATA[
-        Restful Fast Request is a powerful restful api toolkit plugin(http client)
+        Restful Cloud是一个强大的restful api工具包插件 (http客户端)，致力于restful api多个项目的管理。
+        该插件产生的是由于微服务的普遍化，平时开发时不得不搜索所有的项目，以及不同项目之间SOA接口调用，插件缓存了已经打开过项目的所有restful api接口。
+        在打开一个项目的时候，可以搜索到所有已经打开过的项目的restful api。
         ]]>
     </description>
 
@@ -20,7 +22,7 @@
         <projectService serviceImplementation="com.bamboo.tool.components.api.configurable.BambooApiFilterConfiguration" order="first"/>
         <applicationService serviceImplementation="com.bamboo.tool.db.service.BambooService"/>
 
-        <toolWindow id="tool api" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
+        <toolWindow id="Restful Cloud" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
                     secondary="false"/>
         <!--兼容性处理code-->
         <notificationGroup id="toolWindowNotificationGroup" displayType="TOOL_WINDOW"/>

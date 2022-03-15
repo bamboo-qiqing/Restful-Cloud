@@ -1,5 +1,6 @@
 package com.bamboo.tool.components.api.entity;
 
+import com.bamboo.tool.components.api.enums.MethodAccessLevel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intellij.psi.PsiMethod;
 import lombok.Data;
@@ -23,10 +24,11 @@ public class BambooMethod {
     private String projectId;
     private String classId;
     private String returnType;
-    private String consumes= StringUtils.EMPTY;
-    private String params= StringUtils.EMPTY;
-    private String headers= StringUtils.EMPTY;
-    private String produces= StringUtils.EMPTY;
+    private int accessLevel;
+    private String consumes = StringUtils.EMPTY;
+    private String params = StringUtils.EMPTY;
+    private String headers = StringUtils.EMPTY;
+    private String produces = StringUtils.EMPTY;
     private List<String> methodUrl = new ArrayList<>();
     private List<String> requestMethods = new ArrayList<>();
 }

@@ -35,8 +35,9 @@ intellij {
 }
 patchPluginXml {
     changeNotes = """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      支持框架:<br>
+      <em>Spring</em>
+      <em>欧电云</em>"""
 }
 test {
     useJUnitPlatform()

@@ -30,12 +30,8 @@ public class FrameworkExecute {
 
     /**
      * 构建当前项目 api集合
-     *
-     * @param project
-     * @return
      */
     public static List<BambooClass> buildApiMethod(Project project) {
-
         List<AnnotationInfoSetting> annotationInfoSettings = BambooService.selectAllAnnotationInfoSetting();
         Map<String, AnnotationInfoSetting> infoSettingClassMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.CLASS.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
         Map<String, AnnotationInfoSetting> infoSettingMethodMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
@@ -48,7 +44,7 @@ public class FrameworkExecute {
             if (module != null) {
                 BambooClass bambooClass = new BambooClass();
                 bambooClass.setClassName(psiClass.getName());
-                bambooClass.setClassPath(PsiUtil.getVirtualFile(psiClass).getPath());
+                bambooClass.setClassPath(Objects.requireNonNull(PsiUtil.getVirtualFile(psiClass)).getPath());
                 bambooClass.setModuleName(module.getName());
                 bambooClass.setSetting(info);
                 PsiAnnotation[] annotations = psiClass.getAnnotations();
@@ -64,6 +60,8 @@ public class FrameworkExecute {
                             if (satisfyScope) {
                                 BambooMethod bambooMethod = new BambooMethod();
                                 bambooMethod.setMethodName(method.getName());
+                                bambooMethod.setAccessLevel(PsiUtil.getAccessLevel(method.getModifierList()));
+                                bambooMethod.setReturnType(Objects.requireNonNull(method.getReturnType()).getCanonicalText());
                                 bambooMethod.setDescription(FrameworkExecute.getMethodDescription(method));
                                 final AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
                                 if (annotationMethodScope != null) {
@@ -98,19 +96,11 @@ public class FrameworkExecute {
         final int accessLevel = PsiUtil.getAccessLevel(method.getModifierList());
         final AnnotationMethodScope privateScope = methodScopes.get(MethodScope.PRIVATE.getCode());
         if (privateScope != null) {
-            if (accessLevel == PsiUtil.ACCESS_LEVEL_PRIVATE) {
-                return true;
-            } else {
-                return false;
-            }
+            return accessLevel == PsiUtil.ACCESS_LEVEL_PRIVATE;
         }
         final AnnotationMethodScope publicScope = methodScopes.get(MethodScope.PUBLIC.getCode());
         if (publicScope != null) {
-            if (accessLevel == PsiUtil.ACCESS_LEVEL_PUBLIC) {
-                return true;
-            } else {
-                return false;
-            }
+            return accessLevel == PsiUtil.ACCESS_LEVEL_PUBLIC;
         }
         return true;
     }
@@ -118,17 +108,19 @@ public class FrameworkExecute {
     private static void buildAnnotations(BambooClass bambooClass, BambooMethod bambooMethod, Map<String, AnnotationInfoSetting> infoSettingMap, PsiAnnotation[] annotations, AnnotationInfoSetting info) {
 
         Arrays.stream(annotations).forEach(annotation -> {
-            AnnotationInfoSetting annotationInfoSetting = infoSettingMap.get(annotation.getNameReferenceElement().getCanonicalText());
+
+            AnnotationInfoSetting annotationInfoSetting = infoSettingMap.get(Objects.requireNonNull(annotation.getNameReferenceElement()).getCanonicalText());
             if (!Objects.isNull(annotationInfoSetting)) {
+                final String requestMethod = RequestMethodUtil.REQUEST_METHOD.get(annotationInfoSetting.getAnnotationPath());
+                if (StringUtil.isNotEmpty(requestMethod)) {
+                    bambooMethod.getRequestMethods().add(requestMethod);
+                }
                 Map<String, AnnotationParam> params = annotationInfoSetting.getParams().stream().collect(Collectors.toMap(AnnotationParam::getName, param -> param));
                 if (CollectionUtil.isNotEmpty(params)) {
                     PsiNameValuePair[] attributes = annotation.getParameterList().getAttributes();
                     for (PsiNameValuePair attribute : attributes) {
                         PsiAnnotationMemberValue value = attribute.getValue();
-                        String name = attribute.getName();
-                        if (StringUtil.isEmpty(name)) {
-                            name = "null";
-                        }
+                        String name = StringUtil.isEmpty(attribute.getName()) ? "null" : attribute.getName();
                         AnnotationParam annotationParam = params.get(name);
                         if (!Objects.isNull(annotationParam)) {
                             List<String> values = PsiAnnotationMemberUtil.getValue(value);
@@ -144,7 +136,7 @@ public class FrameworkExecute {
                             } else if ("classUrl".equals(type)) {
                                 if (info.getFramework().getName().equals("o_dian_yun")) {
                                     if (info.getSoaType().equals("service") && CollectionUtil.isNotEmpty(values)) {
-                                        values = values.stream().map(e -> StringUtil.lowerFirst(e)).collect(Collectors.toList());
+                                        values = values.stream().map(StringUtil::lowerFirst).collect(Collectors.toList());
                                     }
                                     if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
                                         values = values.stream().map(e -> {
@@ -157,7 +149,7 @@ public class FrameworkExecute {
                             } else if ("methodUrl".equals(type)) {
                                 bambooMethod.setMethodUrl(values);
                             } else if ("requestMethod".equals(type)) {
-                                bambooMethod.setRequestMethods(values);
+                                bambooMethod.getRequestMethods().addAll(values);
                             } else if ("consumes".equals(type)) {
                                 bambooMethod.setConsumes(values.toString());
                             } else if ("params".equals(type)) {
@@ -173,6 +165,7 @@ public class FrameworkExecute {
             }
         });
     }
+
     public static String getMethodDescription(PsiMethod psiMethod) {
         //javadoc中获取
         PsiDocComment docComment = psiMethod.getDocComment();
@@ -181,7 +174,7 @@ public class FrameworkExecute {
             PsiElement[] descriptionElements = docComment.getDescriptionElements();
             for (PsiElement descriptionElement : descriptionElements) {
                 if (descriptionElement instanceof PsiDocToken) {
-                    commentStringBuilder.append(StringUtil.replace(descriptionElement.getText(),"'","‘")+"\n");
+                    commentStringBuilder.append(StringUtil.replace(descriptionElement.getText(), "'", "‘")).append("\n");
                 }
             }
         }
