@@ -8,6 +8,7 @@ import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiAnnotationMemberUtil;
 import com.bamboo.tool.util.PsiUtils;
+import com.bamboo.tool.util.RequestMethodUtil;
 import com.bamboo.tool.util.StringUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
@@ -47,6 +48,7 @@ public class FrameworkExecute {
                 bambooClass.setClassPath(Objects.requireNonNull(PsiUtil.getVirtualFile(psiClass)).getPath());
                 bambooClass.setModuleName(module.getName());
                 bambooClass.setSetting(info);
+                bambooClass.setDescription(FrameworkExecute.getClassDescription(psiClass));
                 PsiAnnotation[] annotations = psiClass.getAnnotations();
                 if (annotations.length > 0) {
                     buildAnnotations(bambooClass, null, infoSettingClassMap, annotations, info);
@@ -91,6 +93,9 @@ public class FrameworkExecute {
         return bambooClasses;
     }
 
+    /**
+     * 判断方法范围
+     */
     private static boolean methodLevel(Map<String, AnnotationMethodScope> methodScopes, PsiMethod method) {
 
         final int accessLevel = PsiUtil.getAccessLevel(method.getModifierList());
@@ -105,6 +110,15 @@ public class FrameworkExecute {
         return true;
     }
 
+    /**
+     * 构建注释
+     *
+     * @param bambooClass
+     * @param bambooMethod
+     * @param infoSettingMap
+     * @param annotations
+     * @param info
+     */
     private static void buildAnnotations(BambooClass bambooClass, BambooMethod bambooMethod, Map<String, AnnotationInfoSetting> infoSettingMap, PsiAnnotation[] annotations, AnnotationInfoSetting info) {
 
         Arrays.stream(annotations).forEach(annotation -> {
@@ -167,14 +181,27 @@ public class FrameworkExecute {
     }
 
     public static String getMethodDescription(PsiMethod psiMethod) {
-        //javadoc中获取
         PsiDocComment docComment = psiMethod.getDocComment();
         StringBuilder commentStringBuilder = new StringBuilder();
         if (docComment != null) {
             PsiElement[] descriptionElements = docComment.getDescriptionElements();
             for (PsiElement descriptionElement : descriptionElements) {
                 if (descriptionElement instanceof PsiDocToken) {
-                    commentStringBuilder.append(StringUtil.replace(descriptionElement.getText(), "'", "‘")).append("\n");
+                    commentStringBuilder.append(StringUtil.replace(descriptionElement.getText(),"'","`")).append("\n");
+                }
+            }
+        }
+        return commentStringBuilder.toString().trim();
+    }
+
+    public static String getClassDescription(PsiClass psiClass) {
+        PsiDocComment docComment = psiClass.getDocComment();
+        StringBuilder commentStringBuilder = new StringBuilder();
+        if (docComment != null) {
+            PsiElement[] descriptionElements = docComment.getDescriptionElements();
+            for (PsiElement descriptionElement : descriptionElements) {
+                if (descriptionElement instanceof PsiDocToken) {
+                    commentStringBuilder.append(StringUtil.replace(descriptionElement.getText(),"'","`")).append("\n");
                 }
             }
         }

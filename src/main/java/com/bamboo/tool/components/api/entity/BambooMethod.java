@@ -1,8 +1,5 @@
 package com.bamboo.tool.components.api.entity;
 
-import com.bamboo.tool.components.api.enums.MethodAccessLevel;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.intellij.psi.PsiMethod;
 import lombok.Data;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;

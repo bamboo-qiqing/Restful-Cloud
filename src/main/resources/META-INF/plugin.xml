@@ -19,7 +19,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <projectService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
-        <projectService serviceImplementation="com.bamboo.tool.components.api.configurable.BambooApiFilterConfiguration" order="first"/>
+        <projectService serviceImplementation="com.bamboo.tool.components.api.configurable.BambooApiFilterConfiguration"
+                        order="first"/>
         <applicationService serviceImplementation="com.bamboo.tool.db.service.BambooService"/>
 
         <toolWindow id="Restful Cloud" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
@@ -31,8 +32,8 @@
                 implementation="com.bamboo.tool.components.api.contributor.BambooApiGotoContributor$Factory"/>
         <searchEverywhereResultsEqualityProvider
                 implementation="com.bamboo.tool.components.api.contributor.BambooApiEqualityProvider"/>
-        <applicationConfigurable dynamic="true" instance="com.bamboo.tool.components.api.configurable.BambooToolConfigurable"/>
-
+        <applicationConfigurable dynamic="true" displayName="Restful Cloud"
+                                 instance="com.bamboo.tool.components.api.configurable.BambooToolConfigurable"/>
     </extensions>
     <extensions defaultExtensionNs="com.intellij.searchEverywhereContributor">
 

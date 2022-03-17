@@ -1,6 +1,5 @@
 package com.bamboo.tool.components.api.contributor;
 
-import com.bamboo.tool.components.api.configurable.ApiSearchEverywhereFiltersAction;
 import com.bamboo.tool.components.api.configurable.BambooApiFilterConfiguration;
 import com.bamboo.tool.components.api.enums.RequestMethod;
 import com.intellij.ide.actions.searcheverywhere.*;
@@ -61,7 +60,7 @@ public class BambooApiGotoContributor extends AbstractGotoSEContributor {
     List<AnAction> getActions(@NotNull Runnable onChanged) {
         BambooApiFilterConfiguration instance = BambooApiFilterConfiguration.getInstance(myProject);
         List<AnAction> actions = new ArrayList<>();
-        actions.add(new ApiSearchEverywhereFiltersAction(new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null), onChanged));
+        actions.add(new SearchEverywhereFiltersAction(new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null), onChanged));
         return actions;
     }
 

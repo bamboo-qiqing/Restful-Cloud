@@ -1,4 +1,4 @@
-package com.bamboo.tool.components.api.factory;
+package com.bamboo.tool.util;
 
 import com.bamboo.tool.components.api.enums.RequestMethod;
 

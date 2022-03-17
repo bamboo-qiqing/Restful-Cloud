@@ -18,8 +18,4 @@ public class ProjectInfo {
      * 项目地址
      */
     private String projectPath;
-    /**
-     * 项目id
-     */
-    private String projectId;
 }

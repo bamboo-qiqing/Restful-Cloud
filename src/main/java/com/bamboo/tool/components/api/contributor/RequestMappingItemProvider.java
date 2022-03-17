@@ -16,7 +16,6 @@
 
 package com.bamboo.tool.components.api.contributor;
 
-import com.bamboo.tool.components.api.enums.RequestMethod;
 import com.intellij.ide.util.gotoByName.*;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;

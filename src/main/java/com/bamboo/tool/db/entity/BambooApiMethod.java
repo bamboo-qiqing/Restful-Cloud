@@ -38,6 +38,7 @@ public class BambooApiMethod implements NavigationItem {
     private String methodDesc;
     private String className;
     private String classPath;
+    private String classDesc;
     private String modelName;
     private String projectName;
     private String soaType;
@@ -99,7 +100,7 @@ public class BambooApiMethod implements NavigationItem {
             PsiFile psiFile = PsiUtil.getPsiFile(project, file);
             if (psiFile instanceof PsiJavaFile) {
                 final PsiClass childClass = ((PsiJavaFileImpl) psiFile).findChildByClass(PsiClass.class);
-                if (childClass!=null) {
+                if (childClass != null) {
                     PsiElement psiElement = Arrays.stream(childClass.getMethods()).filter(e -> e.getName().equals(methodName)).map(e -> e.getNavigationElement()).findFirst().get();
                     Navigatable navigatable = (Navigatable) psiElement;
                     navigatable.navigate(true);

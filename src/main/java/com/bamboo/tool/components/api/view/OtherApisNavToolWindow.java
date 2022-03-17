@@ -4,8 +4,6 @@ import com.bamboo.tool.components.api.view.component.tree.ApiTree;
 import com.bamboo.tool.components.api.view.component.tree.BaseNode;
 import com.bamboo.tool.components.api.view.component.tree.MethodNode;
 import com.bamboo.tool.components.api.view.component.tree.RootNode;
-
-import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
@@ -44,8 +42,6 @@ import java.util.List;
  * Description
  */
 public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Disposable {
-
-
     private final Project myProject;
     private JPanel panel;
     private ApiTree apiTree;
@@ -57,11 +53,9 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
         panel.setLayout(new BorderLayout());
         this.setContent(panel);
         setLayout(new BorderLayout());
-        apiTree = new ApiTree();
+
         initActionBar();
-
-
-        Disposer.register(myProject, this);
+        apiTree = new ApiTree();
         apiTree.setCellRenderer(new MyCellRenderer());
         apiTree.addKeyListener(new KeyAdapter() {
             @Override
@@ -87,6 +81,8 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
         }, true);
         JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(treeSpeedSearch.getComponent());
         panel.add(scrollPane);
+
+        Disposer.register(myProject, this);
         renderData(myProject);
     }
 
@@ -96,6 +92,7 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
     }
 
     private void renderData(Project project) {
+
         DumbService.getInstance(project).smartInvokeLater(() -> rendingTree(project));
     }
 
@@ -104,10 +101,11 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
-                ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
-                final List<BambooApiMethod> allApi = BambooService.getAllApi(null, projectInfo.getProjectId(),project);
+                ProjectInfo currentProject = BambooService.queryProject(project.getBasePath(), project.getName());
+                final List<BambooApiMethod> allApi = BambooService.getAllApi(null, currentProject.getId().toString(), project);
                 RootNode root = new RootNode("apis");
                 PsiUtils.convertOtherToRoot(root, allApi);
+
                 apiTree.setModel(new DefaultTreeModel(root));
                 NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
             }

@@ -6,7 +6,6 @@ import com.bamboo.tool.components.api.view.component.tree.ApiTree;
 import com.bamboo.tool.components.api.view.component.tree.BaseNode;
 import com.bamboo.tool.components.api.view.component.tree.MethodNode;
 import com.bamboo.tool.components.api.view.component.tree.RootNode;
-import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
@@ -134,7 +133,7 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
 
 
     private void rendingTree(Project project) {
-        Task.Backgroundable task = new Task.Backgroundable(myProject, "bamboo apis...") {
+        Task.Backgroundable task = new Task.Backgroundable(myProject, "Restful Cloud...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
@@ -143,9 +142,9 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                     indicator.setText("Rendering");
                     RootNode root = new RootNode("apis");
                     apiTree.setModel(new DefaultTreeModel(root));
-                    ProjectInfo projectInfo = BambooToolComponent.getInstance().getState().getProjectInfo();
-                    BambooService.saveClass(allApiList, projectInfo);
-                    final List<BambooApiMethod> allApi = BambooService.getAllApi(projectInfo.getProjectId(), null, project);
+                    ProjectInfo currentProject = BambooService.queryProject(project.getBasePath(), project.getName());
+                    BambooService.saveClass(allApiList, currentProject);
+                    final List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, project);
                     PsiUtils.convertToRoot(root, allApi);
                     NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
                 });

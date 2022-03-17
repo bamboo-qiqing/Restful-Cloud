@@ -1,9 +1,6 @@
 package com.bamboo.tool.config.model;
 
-import com.bamboo.tool.components.api.entity.BambooMethod;
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * Create by GuoQing
@@ -13,7 +10,6 @@ import java.util.List;
 @Data
 public class BambooToolConfig {
 
-    private String projectId;
 
     private ProjectInfo projectInfo;
 

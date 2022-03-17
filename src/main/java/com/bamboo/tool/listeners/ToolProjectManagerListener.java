@@ -1,16 +1,11 @@
 package com.bamboo.tool.listeners;
 
 import cn.hutool.core.io.FileUtil;
-import com.bamboo.tool.config.BambooToolComponent;
-import com.bamboo.tool.config.model.BambooToolConfig;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.service.BambooService;
-import com.bamboo.tool.util.StringUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManagerListener;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 /**
  * Create by GuoQing
@@ -23,32 +18,18 @@ public class ToolProjectManagerListener implements ProjectManagerListener {
     public void projectOpened(@NotNull Project project) {
         String db = FileUtil.getUserHomePath() + "\\bambooTool\\bambooApi.db";
         final boolean exist = FileUtil.exist(db);
-        if(!exist){
+        if (!exist) {
             FileUtil.touch(db);
         }
-        BambooToolConfig state = BambooToolComponent.getInstance().getState();
-        ProjectInfo projectInfo = null;
-        if (StringUtil.isNotEmpty(state.getProjectId())) {
-            ProjectInfo currentProject = BambooService.queryProject(project.getBasePath(),project.getName());
-            if (currentProject != null) {
-                projectInfo = currentProject;
-            } else {
-                String projectId = UUID.randomUUID().toString();
-                projectInfo = new ProjectInfo();
-                projectInfo.setProjectId(projectId);
-            }
-        } else {
-            String projectId = UUID.randomUUID().toString();
-            projectInfo = new ProjectInfo();
-            projectInfo.setProjectId(projectId);
-        }
-        projectInfo.setProjectPath(project.getBasePath());
-        projectInfo.setProjectName(project.getName());
-        projectInfo = BambooService.saveProject(projectInfo);
-        state.setProjectInfo(projectInfo);
-        state.setProjectId(projectInfo.getProjectId());
-
         BambooService.initTable();
+        ProjectInfo currentProject = BambooService.queryProject(project.getBasePath(), project.getName());
+        if (currentProject == null) {
+            currentProject = new ProjectInfo();
+            currentProject.setProjectPath(project.getBasePath());
+            currentProject.setProjectName(project.getName());
+        }
+        BambooService.saveProject(currentProject);
+
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.tree.TreeNode;
 
 public class ClassNode extends BaseNode<String> {
     public ClassNode(String className) {
@@ -15,4 +16,5 @@ public class ClassNode extends BaseNode<String> {
     Icon getIcon(boolean selected) {
         return AllIcons.Nodes.Class;
     }
+
 }

@@ -54,46 +54,38 @@ public class PsiUtils {
             final String className = e.getClassName();
             ModuleNode moduleNode = new ModuleNode(modelName);
             final ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
-            if(moduleNode1!=null){
-                moduleNode =moduleNode1 ;
+            if (moduleNode1 != null) {
+                moduleNode = moduleNode1;
             }
             ClassNode classNode = new ClassNode(className);
-            final ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className,classNode );
-            if(classNode1!=null){
-                classNode=classNode1;
+            final ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
+            if (classNode1 != null) {
+                classNode = classNode1;
             }
             moduleNode.add(classNode);
             classNode.add(new MethodNode(e));
         });
         moduleNodeMap.values().stream().forEach(e -> root.add(e));
     }
+
     public static void convertOtherToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
-        Map<String, ModuleNode> projectModelMap = new ConcurrentHashMap<>();
-        Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
-        Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
-        apiMethods.stream().forEach(e -> {
-            final String modelName = e.getModelName();
-            final String className = e.getClassName();
-            final String projectName = e.getProjectName();
-            ModuleNode projectModel = new ModuleNode(modelName);
-            final ModuleNode projectModel1 = projectModelMap.putIfAbsent(projectName, projectModel);
-            if(projectModel1!=null){
-                projectModel =projectModel1 ;
-            }
-            ModuleNode moduleNode = new ModuleNode(modelName);
-            final ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
-            if(moduleNode1!=null){
-                moduleNode =moduleNode1 ;
-            }
-            ClassNode classNode = new ClassNode(className);
-            final ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className,classNode );
-            if(classNode1!=null){
-                classNode=classNode1;
-            }
-            classNode.add(new MethodNode(e));
-            moduleNode.add(classNode);
-            projectModel.add(moduleNode);
-        });
-        projectModelMap.values().parallelStream().forEach(e -> root.add(e));
+
+        Map<String, Map<String, Map<String, List<BambooApiMethod>>>> methodGroup = apiMethods.parallelStream().collect(Collectors.groupingBy(e -> e.getProjectName(), Collectors.groupingBy(e -> e.getModelName(), Collectors.groupingBy(e -> e.getClassName(), Collectors.toList()))));
+
+        methodGroup.forEach((key, value) -> {
+                    ModuleNode projectModel = new ModuleNode(key);
+                    value.forEach((modelKey, modelValue) -> {
+                        ModuleNode model = new ModuleNode(modelKey);
+                        modelValue.forEach((classKey, classValue) -> {
+                            ClassNode classNode = new ClassNode(classKey);
+                            classValue.parallelStream().forEach(e -> classNode.add(new MethodNode(e)));
+                            model.add(classNode);
+                        });
+                        projectModel.add(model);
+                    });
+                    root.add(projectModel);
+                }
+        );
+
     }
 }

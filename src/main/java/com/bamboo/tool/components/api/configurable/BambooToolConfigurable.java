@@ -36,8 +36,7 @@ public class BambooToolConfigurable implements Configurable, Configurable.Compos
 
     @Override
     public Configurable[] getConfigurables() {
-        Configurable[] result = new Configurable[4];
-        result[0] = new AnnotationInfoSetting();
+
 
         return new Configurable[0];
     }

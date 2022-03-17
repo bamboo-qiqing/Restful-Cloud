@@ -17,6 +17,7 @@
 package com.bamboo.tool.components.api.view.component.tree;
 
 import com.bamboo.tool.db.entity.BambooApiMethod;
+import com.bamboo.tool.util.StringUtil;
 import icons.PluginIcons;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +28,7 @@ public class MethodNode extends BaseNode<BambooApiMethod> {
     public MethodNode(BambooApiMethod apiModel) {
         super(apiModel);
     }
+
     @Override
     public @Nullable
     Icon getIcon(boolean selected) {
@@ -49,10 +51,11 @@ public class MethodNode extends BaseNode<BambooApiMethod> {
         }
         return null;
     }
+
     @Override
     public String toString() {
         BambooApiMethod source = this.getSource();
-        return source.getUrl()+source.getRequestMethods();
+        return StringUtil.isNotBlank(source.getMethodDesc()) ? source.getMethodDesc() + source.getRequestMethods() : source.getUrl() + source.getRequestMethods();
     }
 
     public String getToolTipText() {

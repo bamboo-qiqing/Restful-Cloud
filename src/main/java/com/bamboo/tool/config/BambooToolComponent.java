@@ -33,11 +33,6 @@ public class BambooToolComponent implements PersistentStateComponent<BambooToolC
         if (Objects.isNull(toolConfig)) {
             toolConfig = new BambooToolConfig();
         }
-
-        if(toolConfig.getProjectInfo()==null){
-            toolConfig.setProjectInfo(new ProjectInfo());
-        }
-
         return toolConfig;
     }
 
@@ -47,8 +42,5 @@ public class BambooToolComponent implements PersistentStateComponent<BambooToolC
     }
 
 
-    public static BambooToolComponent getInstance() {
-        return ProjectManager.getInstance().getDefaultProject().getService(BambooToolComponent.class);
-    }
 
 }
