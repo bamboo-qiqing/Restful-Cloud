@@ -2,6 +2,10 @@ package com.bamboo.tool.db.service;
 
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.bamboo.tool.components.api.entity.*;
 import com.bamboo.tool.components.api.enums.AnnotationScope;
 import com.bamboo.tool.components.api.enums.RequestMethod;
@@ -34,174 +38,32 @@ public class BambooService {
         final Map<String, SqliteMaster> masterMap = tables.stream().collect(Collectors.toMap(SqliteMaster::getName, e -> e));
         final List<String> exeSql = new ArrayList<>();
 
-
-        if (masterMap.get("bamboo_project") == null) {
-            final StringBuffer initProjectTable = new StringBuffer();
-            initProjectTable.append("create table bamboo_project(");
-            initProjectTable.append(" id integer not null   constraint bamboo_project_pk   primary key autoincrement,");
-            initProjectTable.append("project_name  text,");
-            initProjectTable.append("project_path  text");
-            initProjectTable.append(");");
-            exeSql.add(initProjectTable.toString());
-            exeSql.add("create unique index bamboo_project_id_uindex on bamboo_project (id);");
-        }
-        if (masterMap.get("bamboo_class") == null) {
-
-            final StringBuffer initClassTable = new StringBuffer();
-            initClassTable.append("create table bamboo_class(");
-            initClassTable.append("id    text not null  constraint bamboo_class_pk  primary key,");
-            initClassTable.append("class_name  text,");
-            initClassTable.append("model_name  text,");
-            initClassTable.append("description text,");
-            initClassTable.append("class_path  text,");
-            initClassTable.append("project_id  text,");
-            initClassTable.append("setting_id  text");
-
-            initClassTable.append(");");
-            exeSql.add(initClassTable.toString());
-
-            exeSql.add("create unique index bamboo_class_id_uindex on bamboo_class (id);");
-        }
-        if (masterMap.get("bamboo_method") == null) {
-            final StringBuffer initApiMethodTable = new StringBuffer();
-            initApiMethodTable.append("create table bamboo_method(");
-            initApiMethodTable.append("id  text not null constraint bamboo_api_method_pk  primary key,");
-            initApiMethodTable.append("project_id  text not null,");
-            initApiMethodTable.append("method_name text,");
-            initApiMethodTable.append("class_id  text,");
-            initApiMethodTable.append("description  text");
-            initApiMethodTable.append(");");
-            exeSql.add(initApiMethodTable.toString());
-
-            exeSql.add("create unique index bamboo_method_id_uindex on bamboo_method (id);");
-        }
-
-
-        if (masterMap.get("bamboo_api") == null) {
-            final StringBuffer initAnnotationInfoTable = new StringBuffer();
-            initAnnotationInfoTable.append("create table bamboo_api(");
-            initAnnotationInfoTable.append("id  text not null constraint bamboo_api_pk primary key,");
-            initAnnotationInfoTable.append("method_id  text,");
-            initAnnotationInfoTable.append("url    text,");
-            initAnnotationInfoTable.append("request_methods   text,");
-            initAnnotationInfoTable.append("project_id   text,");
-            initAnnotationInfoTable.append("params   text,");
-            initAnnotationInfoTable.append("headers   text,");
-            initAnnotationInfoTable.append("consumes   text,");
-            initAnnotationInfoTable.append("produces   text");
-            initAnnotationInfoTable.append(");");
-            exeSql.add(initAnnotationInfoTable.toString());
-            exeSql.add("create unique index bamboo_api_id_uindex on bamboo_api (id);");
-        }
-        if (masterMap.get("annotation_param_setting") == null) {
-            final StringBuffer initParamSettingTable = new StringBuffer();
-            initParamSettingTable.append("create table annotation_param_setting(");
-            initParamSettingTable.append("id  integer not null constraint annotation_param_pk primary key autoincrement,");
-            initParamSettingTable.append("name        text,");
-            initParamSettingTable.append("type        text,");
-            initParamSettingTable.append("describe    text,");
-            initParamSettingTable.append("annotation_info_setting_id integer");
-            initParamSettingTable.append(");");
-            exeSql.add(initParamSettingTable.toString());
-
-            exeSql.add("create unique index annotation_param_id_uindex on annotation_param_setting (id);");
-
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (1, 'value', 'classUrl', null, 3);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (2, 'name', 'poolUrl', null, 10);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (3, 'interfaceName', 'classUrl', null, 10);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (4, 'interfaceClass', 'classUrl', null, 11);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (5, 'value', 'methodUrl', null, 12);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (6, 'null', 'methodUrl', null, 12);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (7, 'null', 'classUrl', null, 3);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (8, 'method', 'requestMethod', null, 12);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (9, 'null', 'methodUrl', null, 5);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (10, 'value', 'methodUrl', null, 5);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (11, 'path', 'methodUrl', null, 5);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (12, 'consumes', 'consumes', null, 12);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (13, 'params', 'params', null, 12);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (14, 'headers', 'headers', null, 12);");
-            exeSql.add("INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (15, 'produces', 'produces', null, 12);");
-
-        }
-        if (masterMap.get("annotation_method_scope") == null) {
-            final StringBuffer initMethodScopeTable = new StringBuffer();
-            initMethodScopeTable.append("create table annotation_method_scope(");
-            initMethodScopeTable.append("id   integer not null constraint annotation_method_scope_pk primary key autoincrement,");
-            initMethodScopeTable.append("annotation_id integer,");
-            initMethodScopeTable.append(" method_scope  text");
-            initMethodScopeTable.append(");");
-            exeSql.add(initMethodScopeTable.toString());
-
-            exeSql.add("create unique index annotation_method_scope_id_uindex  on annotation_method_scope (id);");
-
-            exeSql.add("INSERT INTO annotation_method_scope (id, annotation_id, method_scope) VALUES (1, 11, 'public');");
-            exeSql.add("INSERT INTO annotation_method_scope (id, annotation_id, method_scope) VALUES (2, 10, 'public');");
-            exeSql.add("INSERT INTO annotation_method_scope (id, annotation_id, method_scope) VALUES (3, 1, 'annotation');");
-            exeSql.add("INSERT INTO annotation_method_scope (id, annotation_id, method_scope) VALUES (4, 2, 'annotation');");
-            exeSql.add("INSERT INTO annotation_method_scope (id, annotation_id, method_scope) VALUES (5, 5, 'annotation');");
-        }
-        if (masterMap.get("framework") == null) {
-            final StringBuffer initMethodScopeTable = new StringBuffer();
-            initMethodScopeTable.append("create table framework(");
-            initMethodScopeTable.append("id       integer not null  constraint framework_pk  primary key autoincrement,");
-            initMethodScopeTable.append(" name     text,");
-            initMethodScopeTable.append(" describe text");
-            initMethodScopeTable.append(");");
-            exeSql.add(initMethodScopeTable.toString());
-
-            exeSql.add("create unique index framework_id_uindex  on framework (id);");
-            exeSql.add("INSERT INTO framework (id, name, describe) VALUES (1, 'Spring', 'Spring');");
-            exeSql.add("INSERT INTO framework (id, name, describe) VALUES (2, 'o_dian_yun', 'o_dian_yun');");
-        }
-
-
-        if (masterMap.get("annotation_info_setting") == null) {
-            final StringBuffer initMethodScopeTable = new StringBuffer();
-            initMethodScopeTable.append(" create table annotation_info_setting(");
-            initMethodScopeTable.append("id     integer not null constraint annotation_info_pk primary key autoincrement,");
-            initMethodScopeTable.append("class_path       text,");
-            initMethodScopeTable.append("class_short_name text,");
-            initMethodScopeTable.append("framework_id  integer,");
-            initMethodScopeTable.append("scope   text,");
-            initMethodScopeTable.append("soa_type  text,");
-            initMethodScopeTable.append("effect  text,");
-            initMethodScopeTable.append("is_delete integer");
-            initMethodScopeTable.append(");");
-            exeSql.add(initMethodScopeTable.toString());
-
-            exeSql.add("create unique index annotation_info_id_uindex on annotation_info_setting (id);");
-
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (1, 'org.springframework.web.bind.annotation.RestController', 'RestController', 1, 'Class', 'service', 'scann', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (2, 'org.springframework.stereotype.Controller', 'Controller', 1, 'Class', 'service', 'scann', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (3, 'org.springframework.web.bind.annotation.RequestMapping', 'RequestMapping', 1, 'Class', 'service', 'attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (4, 'org.springframework.web.bind.annotation.GetMapping', 'GetMapping', 1, 'Method', 'service', 'scann,attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (5, 'org.springframework.web.bind.annotation.PostMapping', 'PostMapping', 1, 'Method', 'service', 'scann,attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (6, 'org.springframework.web.bind.annotation.DeleteMapping', 'DeleteMapping', 1, 'Method', 'service', 'scann,attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (7, 'org.springframework.web.bind.annotation.PutMapping', 'PutMapping', 1, 'Method', 'service', 'scann,attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (8, 'org.springframework.web.bind.annotation.PatchMapping', 'PatchMapping', 1, 'Method', 'service', 'scann,attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (9, 'com.odianyun.soa.annotation.SoaMethodRegister', 'SoaMethodRegister', 2, 'Method', 'service', 'scann,attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (10, 'com.odianyun.soa.client.annotation.SoaServiceClient', 'SoaServiceClient', 2, 'Class', 'client', 'scann,attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (11, 'com.odianyun.soa.annotation.SoaServiceRegister', 'SoaServiceRegister', 2, 'Class', 'service', 'scann,attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (12, 'org.springframework.web.bind.annotation.RequestMapping', 'RequestMapping', 1, 'Method', 'service', 'scann,attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (14, 'org.springframework.web.bind.annotation.PostMapping', 'PostMapping', 1, 'Method', 'service', 'attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (15, 'org.springframework.web.bind.annotation.GetMapping', 'GetMapping', 1, 'Method', 'service', 'attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (16, 'org.springframework.web.bind.annotation.PatchMapping', 'PatchMapping', 1, 'Method', 'service', 'attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (17, 'org.springframework.web.bind.annotation.DeleteMapping', 'DeleteMapping', 1, 'Method', 'service', 'attribute', 0);");
-            exeSql.add("INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (18, 'org.springframework.web.bind.annotation.PutMapping', 'PutMapping', 1, 'Method', 'service', 'attribute', 0);");
-
-        }
-        Connection conn = SqliteConfig.getConnection();
-        Statement state = conn.createStatement();
-        exeSql.stream().forEach(e -> {
-            try {
-                state.addBatch(e);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+        final String tableSetting = HttpUtil.get("http://liangkezaoshu.space/usr/uploads/2022/03/1936383359.json");
+        final JSONArray objects = JSONUtil.parseArray(tableSetting);
+        final List<TableInit> inits = Arrays.stream(objects.toArray()).map(e -> (JSONObject) e).map(e -> JSONUtil.toBean(e, TableInit.class)).collect(Collectors.toList());
+        inits.parallelStream().filter(e -> masterMap.get(e.getTableName()) == null).forEach(e -> {
+            exeSql.add(e.getCreatSql());
+            if (CollectionUtil.isNotEmpty(e.getIndex())) {
+                exeSql.addAll(e.getIndex());
+            }
+            if (CollectionUtil.isNotEmpty(e.getDatas())) {
+                exeSql.addAll(e.getDatas());
             }
         });
-        state.executeBatch();
-        state.close();
-        conn.close();
+        if (CollectionUtil.isNotEmpty(exeSql)) {
+            Connection conn = SqliteConfig.getConnection();
+            Statement state = conn.createStatement();
+            exeSql.stream().forEach(e -> {
+                try {
+                    state.addBatch(e);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
+            state.executeBatch();
+            state.close();
+            conn.close();
+        }
     }
 
     private static List<SqliteMaster> querTables() throws SQLException {
