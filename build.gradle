@@ -25,7 +25,7 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version = '2021.3.2'
-    localPath = "E:\\install\\tool\\idea\\IntelliJ IDEA 2021.3.2"
+    localPath = "D:\\install\\tools\\Idea\\IntelliJ IDEA 2021.3"
     plugins = ['java']
 
 }

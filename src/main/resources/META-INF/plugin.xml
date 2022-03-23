@@ -32,8 +32,8 @@
                 implementation="com.bamboo.tool.components.api.contributor.BambooApiGotoContributor$Factory"/>
         <searchEverywhereResultsEqualityProvider
                 implementation="com.bamboo.tool.components.api.contributor.BambooApiEqualityProvider"/>
-        <applicationConfigurable dynamic="true" displayName="Restful Cloud"
-                                 instance="com.bamboo.tool.components.api.configurable.BambooToolConfigurable"/>
+<!--        <applicationConfigurable dynamic="true" displayName="Restful Cloud"-->
+<!--                                 instance="com.bamboo.tool.components.api.configurable.RestfulCloudConfigurable"/>-->
     </extensions>
     <extensions defaultExtensionNs="com.intellij.searchEverywhereContributor">
 
