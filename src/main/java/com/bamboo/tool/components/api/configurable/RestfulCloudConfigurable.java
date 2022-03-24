@@ -3,11 +3,9 @@ package com.bamboo.tool.components.api.configurable;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.NlsContexts;
-import lombok.Builder;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 
 /**
  * Create by GuoQing
@@ -15,8 +13,9 @@ import javax.swing.table.DefaultTableModel;
  * Description
  */
 public class RestfulCloudConfigurable implements Configurable {
-    private JTable frameworkTable;
+
     private JPanel mainPanel;
+    private JTextField textField1;
 
     @Override
     public @NlsContexts.ConfigurableName String getDisplayName() {
@@ -27,7 +26,6 @@ public class RestfulCloudConfigurable implements Configurable {
     @Override
     public @Nullable
     JComponent createComponent() {
-        initTable();
         return mainPanel;
     }
 
@@ -38,13 +36,5 @@ public class RestfulCloudConfigurable implements Configurable {
 
     @Override
     public void apply() throws ConfigurationException {
-
-    }
-
-    private void initTable() {
-        final DefaultTableModel defaultTableModel = new DefaultTableModel();
-        defaultTableModel.addColumn("framework");
-        defaultTableModel.addColumn("description");
-        frameworkTable.setModel(defaultTableModel);
     }
 }

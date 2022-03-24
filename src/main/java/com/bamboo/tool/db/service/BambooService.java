@@ -68,17 +68,7 @@ public class BambooService {
 
     private static List<SqliteMaster> querTables() throws SQLException {
         StringBuffer str = new StringBuffer();
-        str.append("select * from ");
-        str.append("sqlite_master  where " + "type='table' AND name in ( ");
-        str.append("'bamboo_project',");
-        str.append("'framework',");
-        str.append("'bamboo_class',");
-        str.append("'bamboo_method',");
-        str.append("'bamboo_api',");
-        str.append("'annotation_param_setting',");
-        str.append("'annotation_method_scope',");
-        str.append("'annotation_info_setting'");
-        str.append(");");
+        str.append("select * from sqlite_master  where  type='table';");
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         ResultSet resultSet = state.executeQuery(str.toString());
