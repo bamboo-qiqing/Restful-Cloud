@@ -1,5 +1,7 @@
 package com.bamboo.tool.components.api.entity;
 
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiParameterList;
 import lombok.Data;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +22,6 @@ public class BambooMethod {
     private String methodName = StringUtils.EMPTY;
     private String projectId;
     private String classId;
-    private String returnType;
     private int accessLevel;
     private String consumes = StringUtils.EMPTY;
     private String params = StringUtils.EMPTY;
@@ -28,4 +29,19 @@ public class BambooMethod {
     private String produces = StringUtils.EMPTY;
     private List<String> methodUrl = new ArrayList<>();
     private List<String> requestMethods = new ArrayList<>();
+    private MethodReturnType returnType = new MethodReturnType();
+    private List<MethodParam> methodParams = new ArrayList<>();
+
+
+    public void buildMethodParams(PsiParameterList psiParameterList) {
+        int parametersCount = psiParameterList.getParametersCount();
+        if (parametersCount > 0) {
+            for (int i = 0; i < parametersCount; i++) {
+                PsiParameter parameter = psiParameterList.getParameter(i);
+                final MethodParam methodParam = new MethodParam();
+                methodParam.buildMethodParam(parameter, i);
+                methodParams.add(methodParam);
+            }
+        }
+    }
 }

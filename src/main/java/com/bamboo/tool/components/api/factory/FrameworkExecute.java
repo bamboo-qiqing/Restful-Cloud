@@ -63,8 +63,9 @@ public class FrameworkExecute {
                                 BambooMethod bambooMethod = new BambooMethod();
                                 bambooMethod.setMethodName(method.getName());
                                 bambooMethod.setAccessLevel(PsiUtil.getAccessLevel(method.getModifierList()));
-                                bambooMethod.setReturnType(Objects.requireNonNull(method.getReturnType()).getCanonicalText());
+                                bambooMethod.getReturnType().buildReturnType(method.getReturnType());
                                 bambooMethod.setDescription(FrameworkExecute.getMethodDescription(method));
+                                bambooMethod.buildMethodParams(method.getParameterList());
                                 final AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
                                 if (annotationMethodScope != null) {
                                     final PsiAnnotation[] methodAnnotations = method.getAnnotations();
