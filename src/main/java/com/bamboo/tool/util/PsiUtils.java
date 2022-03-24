@@ -2,6 +2,7 @@ package com.bamboo.tool.util;
 
 
 import com.bamboo.tool.components.api.entity.AnnotationInfoSetting;
+import com.bamboo.tool.components.api.entity.MethodParam;
 import com.bamboo.tool.components.api.enums.AnnotationScope;
 import com.bamboo.tool.components.api.view.component.tree.ClassNode;
 import com.bamboo.tool.components.api.view.component.tree.MethodNode;
@@ -9,34 +10,41 @@ import com.bamboo.tool.components.api.view.component.tree.ModuleNode;
 import com.bamboo.tool.components.api.view.component.tree.ProjectModel;
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.db.entity.BambooApiMethod;
+import com.bamboo.tool.db.service.BambooService;
+import com.intellij.ide.lightEdit.LightEdit;
+import com.intellij.ide.lightEdit.LightEditFeatureUsagesUtil;
+import com.intellij.ide.lightEdit.LightEditService;
+import com.intellij.ide.util.PsiNavigationSupport;
 import com.intellij.openapi.externalSystem.view.ProjectNode;
+import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiClass;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.pom.Navigatable;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.Query;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class PsiUtils {
 
 
-    public static final List<PsiClassCache> getALLPsiClass(Project project, List<AnnotationInfoSetting> annotationInfoSettings) {
-        final List<AnnotationInfoSetting> infos = annotationInfoSettings.stream().filter(e -> AnnotationScope.CLASS.equals(e.getScope())).filter(e -> e.getEffect().contains("scann")).collect(Collectors.toList());
-        final Map<String, AnnotationInfoSetting> infoMap = infos.stream().collect(Collectors.toMap(e -> e.getAnnotationPath(), e -> e));
+    public static List<PsiClassCache> getALLPsiClass(Project project, List<AnnotationInfoSetting> annotationInfoSettings) {
+        List<AnnotationInfoSetting> infos = annotationInfoSettings.stream().filter(e -> AnnotationScope.CLASS.equals(e.getScope())).filter(e -> e.getEffect().contains("scann")).collect(Collectors.toList());
+        Map<String, AnnotationInfoSetting> infoMap = infos.stream().collect(Collectors.toMap(e -> e.getAnnotationPath(), e -> e));
         Query<PsiClass> query = AllClassesSearch.search(ProjectScope.getContentScope(project), project);
-        final List<PsiClassCache> caches = new ArrayList<>();
+        List<PsiClassCache> caches = new ArrayList<>();
         query.allowParallelProcessing().forEachAsync(e -> {
-            final PsiAnnotation[] annotations = e.getAnnotations();
+            PsiAnnotation[] annotations = e.getAnnotations();
             Arrays.stream(annotations).forEach(annotation -> {
-                final AnnotationInfoSetting annotationInfoSetting = infoMap.get(annotation.getQualifiedName());
+                AnnotationInfoSetting annotationInfoSetting = infoMap.get(annotation.getQualifiedName());
                 if (annotationInfoSetting != null) {
                     caches.add(new PsiClassCache(annotationInfoSetting, e));
                 }
@@ -50,15 +58,15 @@ public class PsiUtils {
         Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
         Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
         apiMethods.stream().forEach(e -> {
-            final String modelName = e.getModelName();
-            final String className = e.getClassName();
+            String modelName = e.getModelName();
+            String className = e.getClassName();
             ModuleNode moduleNode = new ModuleNode(modelName);
-            final ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
+            ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
             if (moduleNode1 != null) {
                 moduleNode = moduleNode1;
             }
             ClassNode classNode = new ClassNode(className);
-            final ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
+            ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
             if (classNode1 != null) {
                 classNode = classNode1;
             }
@@ -73,19 +81,60 @@ public class PsiUtils {
         Map<String, Map<String, Map<String, List<BambooApiMethod>>>> methodGroup = apiMethods.parallelStream().collect(Collectors.groupingBy(e -> e.getProjectName(), Collectors.groupingBy(e -> e.getModelName(), Collectors.groupingBy(e -> e.getClassName(), Collectors.toList()))));
 
         methodGroup.forEach((key, value) -> {
-                    ModuleNode projectModel = new ModuleNode(key);
-                    value.forEach((modelKey, modelValue) -> {
-                        ModuleNode model = new ModuleNode(modelKey);
-                        modelValue.forEach((classKey, classValue) -> {
-                            ClassNode classNode = new ClassNode(classKey);
-                            classValue.parallelStream().forEach(e -> classNode.add(new MethodNode(e)));
-                            model.add(classNode);
-                        });
-                        projectModel.add(model);
-                    });
-                    root.add(projectModel);
+            ModuleNode projectModel = new ModuleNode(key);
+            value.forEach((modelKey, modelValue) -> {
+                ModuleNode model = new ModuleNode(modelKey);
+                modelValue.forEach((classKey, classValue) -> {
+                    ClassNode classNode = new ClassNode(classKey);
+                    classValue.parallelStream().forEach(e -> classNode.add(new MethodNode(e)));
+                    model.add(classNode);
+                });
+                projectModel.add(model);
+            });
+            root.add(projectModel);
+        });
+
+    }
+
+
+    public static void openFile(@NotNull VirtualFile file, @NotNull Project project, String methodName, String methodId) {
+        if (file == null) {
+            return;
+        }
+
+        if (project == null) {
+            return;
+        }
+        Map<String, List<MethodParam>> api = BambooService.getApi(methodId);
+        NonProjectFileWritingAccessProvider.allowWriting(Collections.singletonList(file));
+        if (LightEdit.owns(project)) {
+            LightEditService.getInstance().openFile(file);
+            LightEditFeatureUsagesUtil.logFileOpen(project, LightEditFeatureUsagesUtil.OpenPlace.LightEditOpenAction);
+        } else {
+            PsiFile psiFile = PsiUtil.getPsiFile(project, file);
+            if (psiFile instanceof PsiJavaFile) {
+                PsiClass childClass = ((PsiJavaFileImpl) psiFile).findChildByClass(PsiClass.class);
+                if (childClass != null) {
+                    PsiElement psiElement = Arrays.stream(childClass.getMethods()).filter(e -> e.getName().equals(methodName)).filter(e -> {
+                        List<MethodParam> methodParams = api.get(e.getReturnType().getPresentableText());
+                        List<String> paramTypePaths = methodParams.parallelStream().map(type -> type.getParamType()).collect(Collectors.toList());
+                        if (methodParams != null) {
+                            PsiParameterList parameters = e.getParameterList();
+                            long count = Arrays.stream(parameters.getParameters()).filter(a -> !paramTypePaths.contains(a.getType().getPresentableText())).count();
+                            return count==0;
+                        }
+                        return false;
+                    }).map(e -> e.getNavigationElement()).findFirst().get();
+                    Navigatable navigatable = (Navigatable) psiElement;
+                    navigatable.navigate(true);
+                } else {
+                    PsiNavigationSupport.getInstance().createNavigatable(project, file, -1).navigate(true);
                 }
-        );
+            } else {
+                PsiNavigationSupport.getInstance().createNavigatable(project, file, -1).navigate(true);
+            }
+
+        }
 
     }
 }

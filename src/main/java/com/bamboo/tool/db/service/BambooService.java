@@ -41,7 +41,7 @@ public class BambooService {
         final String tableSetting = HttpUtil.get("http://liangkezaoshu.space/usr/uploads/2022/03/1936383359.json");
         final JSONArray objects = JSONUtil.parseArray(tableSetting);
         final List<TableInit> inits = Arrays.stream(objects.toArray()).map(e -> (JSONObject) e).map(e -> JSONUtil.toBean(e, TableInit.class)).collect(Collectors.toList());
-        inits.parallelStream().filter(e -> masterMap.get(e.getTableName()) == null).forEach(e -> {
+        inits.stream().filter(e -> masterMap.get(e.getTableName()) == null).forEach(e -> {
             exeSql.add(e.getCreatSql());
             if (CollectionUtil.isNotEmpty(e.getIndex())) {
                 exeSql.addAll(e.getIndex());
@@ -125,6 +125,8 @@ public class BambooService {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         if (!Objects.isNull(projectId)) {
+            state.addBatch(StringUtil.format("delete from bamboo_method_return_type where method_id in (select id from bamboo_method where project_id='{}');", projectId));
+            state.addBatch(StringUtil.format("delete from bamboo_method_param where method_id in (select id from bamboo_method where project_id='{}');", projectId));
             state.addBatch(StringUtil.format("delete from bamboo_class WHERE project_id = '{}';", projectId));
             state.addBatch(StringUtil.format("delete from bamboo_method WHERE project_id = '{}';", projectId));
             state.addBatch(StringUtil.format("delete from bamboo_api WHERE project_id = '{}';", projectId));
@@ -163,6 +165,9 @@ public class BambooService {
                     sqlMethod.append("'").append(method.getDescription()).append("'");
                     sqlMethod.append(");");
                     sqls.add(sqlMethod.toString());
+                    sqls.add(method.getReturnType().toSql(method.getId()));
+                    List<String> methodParamsSql = method.getMethodParams().parallelStream().map(e -> e.toSql(method.getId())).collect(Collectors.toList());
+                    sqls.addAll(methodParamsSql);
                     final List<String> classUrls = bambooClass.getClassUrl();
                     if (CollectionUtil.isNotEmpty(classUrls)) {
                         classUrls.parallelStream().forEach(e -> {
@@ -374,12 +379,47 @@ public class BambooService {
     }
 
     @SneakyThrows
+    public static Map<String, List<MethodParam>> getApi(String methodId) {
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        String sql = "select bmrt.return_type, bmp.param_type, bmp.param_type_path, bmp.param_name, bmp.param_index from bamboo_api ba inner join bamboo_method_return_type bmrt on bmrt.method_id = ba.method_id left join bamboo_method_param bmp on bmp.method_id = ba.method_id where ba.method_id='" + methodId + "' order by bmp.method_id, bmp.param_index ";
+        final ResultSet resultSet = state.executeQuery(sql);
+        Map<String, List<MethodParam>> methodParamMap = new HashMap<>();
+        while (resultSet.next()) {
+            String returnType = resultSet.getString("return_type");
+            String paramType = resultSet.getString("param_type");
+            String paramTypePath = resultSet.getString("param_type_path");
+            String paramName = resultSet.getString("param_name");
+            int paramIndex = resultSet.getInt("param_index");
+            final MethodParam methodParam = new MethodParam();
+            methodParam.setParamIndex(paramIndex);
+            methodParam.setParamName(paramName);
+            methodParam.setParamType(paramType);
+            methodParam.setParamTypePath(paramTypePath);
+            List<MethodParam> methodParams = methodParamMap.get(returnType);
+            if (CollectionUtil.isEmpty(methodParams)) {
+                methodParams = new ArrayList<>();
+                if(StringUtil.isNotBlank(paramType)){
+                    methodParams.add(methodParam);
+                }
+                methodParamMap.put(returnType, methodParams);
+            } else {
+                if(StringUtil.isNotBlank(paramType)){
+                    methodParams.add(methodParam);
+                }
+            }
+        }
+        return methodParamMap;
+    }
+
+    @SneakyThrows
     public static List<BambooApiMethod> getAllApi(String projectId, String notProjectId, Project project) {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         StringBuilder str = new StringBuilder();
         str.append("select ba.url,");
         str.append("ba.request_methods requestMethods,");
+        str.append("ba.method_id  methodId,");
         str.append("bm.method_name     methodName,");
         str.append("bm.description     methodDesc,");
         str.append("bc.class_name      className,");
@@ -425,6 +465,7 @@ public class BambooService {
             String projectName = resultSet.getString("projectName");
             String soaType = resultSet.getString("soaType");
             String frameworkName = resultSet.getString("frameworkName");
+            String methodId = resultSet.getString("methodId");
             api.setUrl(url);
             api.setRequestMethods(requestMethods);
             api.setMethodName(methodName);
@@ -437,6 +478,7 @@ public class BambooService {
             api.setFrameworkName(frameworkName);
             api.setProject(project);
             api.setClassDesc(classDesc);
+            api.setMethodId(methodId);
             apis.add(api);
         }
         resultSet.close();

@@ -1,6 +1,9 @@
 package com.bamboo.tool.db.entity;
 
 import com.bamboo.tool.components.api.contributor.RequestMappingItemPresentation;
+import com.bamboo.tool.components.api.entity.MethodParam;
+import com.bamboo.tool.db.service.BambooService;
+import com.bamboo.tool.util.PsiUtils;
 import com.intellij.ide.lightEdit.LightEdit;
 import com.intellij.ide.lightEdit.LightEditFeatureUsagesUtil;
 import com.intellij.ide.lightEdit.LightEditService;
@@ -23,6 +26,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Create by GuoQing
@@ -43,8 +49,8 @@ public class BambooApiMethod implements NavigationItem {
     private String projectName;
     private String soaType;
     private String frameworkName;
+    private String methodId;
     private Project project;
-    private PsiMethod PsiMethod;
 
     @Override
     public @Nullable
@@ -65,7 +71,7 @@ public class BambooApiMethod implements NavigationItem {
 
         ApplicationManager.getApplication().runReadAction(() -> {
             if (file != null && file.isValid()) {
-                openFile(file, project, methodName);
+                PsiUtils.openFile(file, project, methodName, methodId);
             }
             if (navigationElement != null) {
                 navigationElement.navigate(requestFocus);
@@ -83,35 +89,4 @@ public class BambooApiMethod implements NavigationItem {
         return true;
     }
 
-    public static void openFile(@NotNull VirtualFile file, @NotNull Project project, String methodName) {
-        if (file == null) {
-            return;
-        }
-
-        if (project == null) {
-            return;
-        }
-
-        NonProjectFileWritingAccessProvider.allowWriting(Collections.singletonList(file));
-        if (LightEdit.owns(project)) {
-            LightEditService.getInstance().openFile(file);
-            LightEditFeatureUsagesUtil.logFileOpen(project, LightEditFeatureUsagesUtil.OpenPlace.LightEditOpenAction);
-        } else {
-            PsiFile psiFile = PsiUtil.getPsiFile(project, file);
-            if (psiFile instanceof PsiJavaFile) {
-                final PsiClass childClass = ((PsiJavaFileImpl) psiFile).findChildByClass(PsiClass.class);
-                if (childClass != null) {
-                    PsiElement psiElement = Arrays.stream(childClass.getMethods()).filter(e -> e.getName().equals(methodName)).map(e -> e.getNavigationElement()).findFirst().get();
-                    Navigatable navigatable = (Navigatable) psiElement;
-                    navigatable.navigate(true);
-                } else {
-                    PsiNavigationSupport.getInstance().createNavigatable(project, file, -1).navigate(true);
-                }
-            } else {
-                PsiNavigationSupport.getInstance().createNavigatable(project, file, -1).navigate(true);
-            }
-
-        }
-
-    }
 }

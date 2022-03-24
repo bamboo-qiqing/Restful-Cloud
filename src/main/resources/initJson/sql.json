@@ -55,7 +55,7 @@
     "tableName": "annotation_method_scope",
     "creatSql": "create table annotation_method_scope(id   integer not null constraint annotation_method_scope_pk primary key autoincrement,annotation_id integer,method_scope  text);",
     "index": [
-      "create unique index bamboo_method_id_uindex on bamboo_method (id);"
+      "create unique index annotation_method_scope_id_uindex on annotation_method_scope (id);"
     ],
     "datas": [
       "INSERT INTO annotation_method_scope (id, annotation_id, method_scope) VALUES (1, 11, 'public');",
@@ -96,5 +96,36 @@
       "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (11, 'com.odianyun.soa.annotation.SoaServiceRegister', 'SoaServiceRegister', 2, 'Class', 'service', 'scann,attribute', 0);",
       "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (12, 'org.springframework.web.bind.annotation.RequestMapping', 'RequestMapping', 1, 'Method', 'service', 'scann,attribute', 0);"
     ]
+  },
+  {
+    "tableName": "bamboo_method_return_type",
+    "creatSql": "create table bamboo_method_return_type( id text not null constraint bamboo_method_return_type_pk primary key, return_type   text, return_type_path text, method_id   text);",
+    "index": [
+      "create unique index bamboo_method_return_type_id_uindex on bamboo_method_return_type (id);",
+      "create index bamboo_method_return_type_method_id_index on bamboo_method_return_type (method_id);"
+    ],
+    "datas": [
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (1, 'org.springframework.web.bind.annotation.RestController', 'RestController', 1, 'Class', 'service', 'scann', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (2, 'org.springframework.stereotype.Controller', 'Controller', 1, 'Class', 'service', 'scann', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (3, 'org.springframework.web.bind.annotation.RequestMapping', 'RequestMapping', 1, 'Class', 'service', 'attribute', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (4, 'org.springframework.web.bind.annotation.GetMapping', 'GetMapping', 1, 'Method', 'service', 'scann,attribute', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (5, 'org.springframework.web.bind.annotation.PostMapping', 'PostMapping', 1, 'Method', 'service', 'scann,attribute', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (6, 'org.springframework.web.bind.annotation.DeleteMapping', 'DeleteMapping', 1, 'Method', 'service', 'scann,attribute', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (7, 'org.springframework.web.bind.annotation.PutMapping', 'PutMapping', 1, 'Method', 'service', 'scann,attribute', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (8, 'org.springframework.web.bind.annotation.PatchMapping', 'PatchMapping', 1, 'Method', 'service', 'scann,attribute', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (9, 'com.odianyun.soa.annotation.SoaMethodRegister', 'SoaMethodRegister', 2, 'Method', 'service', 'scann,attribute', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (10, 'com.odianyun.soa.client.annotation.SoaServiceClient', 'SoaServiceClient', 2, 'Class', 'client', 'scann,attribute', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (11, 'com.odianyun.soa.annotation.SoaServiceRegister', 'SoaServiceRegister', 2, 'Class', 'service', 'scann,attribute', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (12, 'org.springframework.web.bind.annotation.RequestMapping', 'RequestMapping', 1, 'Method', 'service', 'scann,attribute', 0);"
+    ]
+  },
+  {
+    "tableName": "bamboo_method_param",
+    "creatSql": "create table bamboo_method_param( id   text not null constraint bamboo_method_param_pk primary key, param_type param_type_path text, param_name text, param_index  integer, method_id  text not null);",
+    "index": [
+      "create unique index bamboo_method_param_id_uindex on bamboo_method_param (id);",
+      "create index bamboo_method_param_method_id_index on bamboo_method_param (method_id);"
+    ],
+    "datas": []
   }
 ]

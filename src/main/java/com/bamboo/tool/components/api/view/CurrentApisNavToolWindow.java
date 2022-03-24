@@ -1,6 +1,7 @@
 package com.bamboo.tool.components.api.view;
 
 import com.bamboo.tool.components.api.entity.BambooClass;
+import com.bamboo.tool.components.api.entity.MethodParam;
 import com.bamboo.tool.components.api.factory.FrameworkExecute;
 import com.bamboo.tool.components.api.view.component.tree.ApiTree;
 import com.bamboo.tool.components.api.view.component.tree.BaseNode;
@@ -39,6 +40,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements Disposable {
     private final Project myProject;
@@ -128,6 +130,7 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
         }
         MethodNode methodNode = (MethodNode) component;
         final BambooApiMethod source = methodNode.getSource();
+
         source.navigate(true);
     }
 
