@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.bamboo</id>
     <name>Restful Cloud</name>
-    <vendor email="760560079@qq.com" url="http://baidu.com">bamboo</vendor>
+    <vendor email="760560079@qq.com" url="http://liangkezaoshu.space/index.php/6.html">Restful Cloud</vendor>
 
     <description><![CDATA[
         Restful Cloud是一个强大的restful api工具包插件 (http客户端)，致力于restful api多个项目的管理。
