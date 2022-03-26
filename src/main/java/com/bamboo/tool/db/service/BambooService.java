@@ -32,13 +32,14 @@ import java.util.stream.Collectors;
  */
 public class BambooService {
 
+    public static String initDataUrl= "http://liangkezaoshu.space/usr/uploads/2022/03/1936383359.json";
     @SneakyThrows
     public static void initTable() {
         final List<SqliteMaster> tables = querTables();
         final Map<String, SqliteMaster> masterMap = tables.stream().collect(Collectors.toMap(SqliteMaster::getName, e -> e));
         final List<String> exeSql = new ArrayList<>();
 
-        final String tableSetting = HttpUtil.get("http://liangkezaoshu.space/usr/uploads/2022/03/1936383359.json");
+        final String tableSetting = HttpUtil.get(initDataUrl);
         final JSONArray objects = JSONUtil.parseArray(tableSetting);
         final List<TableInit> inits = Arrays.stream(objects.toArray()).map(e -> (JSONObject) e).map(e -> JSONUtil.toBean(e, TableInit.class)).collect(Collectors.toList());
         inits.stream().filter(e -> masterMap.get(e.getTableName()) == null).forEach(e -> {
