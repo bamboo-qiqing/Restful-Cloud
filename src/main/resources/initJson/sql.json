@@ -114,5 +114,24 @@
       "create index bamboo_method_param_method_id_index on bamboo_method_param (method_id);"
     ],
     "datas": []
-  }
+  },
+
+  create table bamboo_desc_framework
+  (
+  framework      text,
+  id             text not null
+  constraint bamboo_desc_framework_pk
+  primary key,
+  framework_code text,
+  describe       text,
+  sequence       integer
+  );
+
+  create unique index bamboo_desc_framework_id_uindex
+  on bamboo_desc_framework (id),
+
+  INSERT INTO bamboo_desc_framework (id, framework, framework_code, describe, sequence) VALUES ('1', '欧典云', 'o_dian_yun', null, 2);
+  INSERT INTO bamboo_desc_framework (id, framework, framework_code, describe, sequence) VALUES ('2', 'javadoc', 'javadoc', null, 3);
+  INSERT INTO bamboo_desc_framework (id, framework, framework_code, describe, sequence) VALUES ('3', 'swagger', 'swagger', null, 1),;
+
 ]
