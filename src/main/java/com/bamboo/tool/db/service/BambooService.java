@@ -32,7 +32,8 @@ import java.util.stream.Collectors;
  */
 public class BambooService {
 
-    public static String initDataUrl= "http://liangkezaoshu.space/usr/uploads/2022/03/1936383359.json";
+    public static String initDataUrl = "http://liangkezaoshu.space/usr/uploads/2022/03/1936383359.json";
+
     @SneakyThrows
     public static void initTable() {
         final List<SqliteMaster> tables = querTables();
@@ -390,12 +391,12 @@ public class BambooService {
             List<MethodParam> methodParams = methodParamMap.get(returnType);
             if (CollectionUtil.isEmpty(methodParams)) {
                 methodParams = new ArrayList<>();
-                if(StringUtil.isNotBlank(paramType)){
+                if (StringUtil.isNotBlank(paramType)) {
                     methodParams.add(methodParam);
                 }
                 methodParamMap.put(returnType, methodParams);
             } else {
-                if(StringUtil.isNotBlank(paramType)){
+                if (StringUtil.isNotBlank(paramType)) {
                     methodParams.add(methodParam);
                 }
             }
@@ -531,4 +532,31 @@ public class BambooService {
         return project;
     }
 
+    @SneakyThrows
+    public static List<DescFramework> selectAllDescFramework() {
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        String sql = "select * from bamboo_desc_framework order by sequence; ";
+
+        ResultSet resultSet = state.executeQuery(sql);
+        List<DescFramework> descFrameworks = new ArrayList<>();
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            String framework = resultSet.getString("framework");
+            String frameworkCode = resultSet.getString("framework_code");
+            String describe = resultSet.getString("describe");
+            int sequence = resultSet.getInt("sequence");
+            DescFramework descFramework = new DescFramework();
+            descFramework.setId(id);
+            descFramework.setDescribe(describe);
+            descFramework.setFramework(framework);
+            descFramework.setFrameworkCode(frameworkCode);
+            descFramework.setSequence(sequence);
+            descFrameworks.add(descFramework);
+        }
+        resultSet.close();
+        state.close();
+        conn.close();
+        return descFrameworks;
+    }
 }
