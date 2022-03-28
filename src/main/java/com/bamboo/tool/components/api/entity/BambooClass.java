@@ -16,9 +16,9 @@ public class BambooClass {
     private String description = StringUtils.EMPTY;
     private String classPath = StringUtils.EMPTY;
     private String poolUrl;
-    private List<String> classUrl=new ArrayList<>();
+    private List<String> classUrl = new ArrayList<>();
     private String projectId;
     private List<BambooMethod> methods = new ArrayList<>();
     private AnnotationInfoSetting setting;
-
+    private List<BambooDesc> descs=new ArrayList<>();
 }

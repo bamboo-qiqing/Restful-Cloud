@@ -144,6 +144,8 @@ public class BambooService {
             sql.append("'").append(bambooClass.getSetting().getId()).append("'");
             sql.append(");");
             sqls.add(sql.toString());
+            bambooClass.getDescs().stream().map(e -> e.toSql(bambooClass.getId())).forEach(e -> sqls.add(e));
+
             final List<BambooMethod> methods = bambooClass.getMethods();
             if (CollectionUtil.isNotEmpty(methods)) {
                 methods.forEach(method -> {
@@ -159,6 +161,7 @@ public class BambooService {
                     sqls.add(sqlMethod.toString());
                     sqls.add(method.getReturnType().toSql(method.getId()));
                     List<String> methodParamsSql = method.getMethodParams().parallelStream().map(e -> e.toSql(method.getId())).collect(Collectors.toList());
+                    method.getDescs().stream().map(e -> e.toSql(method.getId())).forEach(e -> sqls.add(e));
                     sqls.addAll(methodParamsSql);
                     final List<String> classUrls = bambooClass.getClassUrl();
                     if (CollectionUtil.isNotEmpty(classUrls)) {
@@ -422,13 +425,18 @@ public class BambooService {
         str.append("bap.project_name   projectName,");
         str.append("bap.id     projectId,");
         str.append("ais.soa_type       soaType,");
-        str.append("f.name             frameworkName");
+        str.append("f.name             frameworkName,");
+        str.append("iif(ifnull(bd.frameword_code,'')=='',null,json_group_object(bd.frameword_code, bd.describe)) as classDescribe,");
+        str.append("iif(ifnull(bdm.frameword_code,'')=='',null,json_group_object(bdm.frameword_code, bdm.describe)) as methodDescribe");
         str.append(" from bamboo_api ba");
         str.append(" inner join bamboo_method bm on ba.method_id = bm.id");
         str.append(" inner join bamboo_class bc on bm.class_id = bc.id");
         str.append(" inner join bamboo_project bap on bc.project_id = bap.id ");
         str.append(" inner join annotation_info_setting ais on bc.setting_id = ais.id");
         str.append(" inner join framework f on f.id = ais.framework_id");
+        str.append(" left join bamboo_desc bd on bc.id = bd.association_id");
+        str.append(" left join bamboo_desc bdm on bm.id = bdm.association_id");
+
         if (StringUtil.isNotEmpty(projectId)) {
             str.append(" where ba.project_id =");
             str.append("'");
@@ -441,6 +449,7 @@ public class BambooService {
             str.append(notProjectId);
             str.append("'");
         }
+        str.append("group by ba.url, ba.request_methods, ba.method_id, bm.method_name, bm.description, bc.class_name, bc.class_path, bc.description, bc.model_name, bc.description, bap.project_name, bap.id, ais.soa_type, f.name");
         str.append(";");
         List<BambooApiMethod> apis = new ArrayList<>();
         final ResultSet resultSet = state.executeQuery(str.toString());
@@ -458,19 +467,29 @@ public class BambooService {
             String soaType = resultSet.getString("soaType");
             String frameworkName = resultSet.getString("frameworkName");
             String methodId = resultSet.getString("methodId");
+            String classDescribe = resultSet.getString("classDescribe");
+            String methodDescribe = resultSet.getString("methodDescribe");
             api.setUrl(url);
             api.setRequestMethods(requestMethods);
             api.setMethodName(methodName);
             api.setModelName(modelName);
-            api.setMethodDesc(methodDesc);
             api.setClassName(className);
             api.setClassPath(classPath);
             api.setProjectName(projectName);
             api.setSoaType(soaType);
             api.setFrameworkName(frameworkName);
             api.setProject(project);
-            api.setClassDesc(classDesc);
             api.setMethodId(methodId);
+            api.getMethodDescHashMap().put("javadoc", methodDesc);
+            api.getClassDescHashMap().put("javadoc", classDesc);
+            if (StringUtil.isNotBlank(classDescribe)) {
+                HashMap otherDesc = JSONUtil.toBean(classDescribe, HashMap.class);
+                api.getClassDescHashMap().putAll(otherDesc);
+            }
+            if (StringUtil.isNotBlank(methodDescribe)) {
+                HashMap otherDesc = JSONUtil.toBean(methodDescribe, HashMap.class);
+                api.getMethodDescHashMap().putAll(otherDesc);
+            }
             apis.add(api);
         }
         resultSet.close();

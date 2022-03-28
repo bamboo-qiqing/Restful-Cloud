@@ -31,7 +31,7 @@ public class BambooMethod {
     private List<String> requestMethods = new ArrayList<>();
     private MethodReturnType returnType = new MethodReturnType();
     private List<MethodParam> methodParams = new ArrayList<>();
-
+    private List<BambooDesc> descs=new ArrayList<>();
 
     public void buildMethodParams(PsiParameterList psiParameterList) {
         int parametersCount = psiParameterList.getParametersCount();

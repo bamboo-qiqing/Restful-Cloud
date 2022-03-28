@@ -55,11 +55,11 @@ public class MethodNode extends BaseNode<BambooApiMethod> {
     @Override
     public String toString() {
         BambooApiMethod source = this.getSource();
-        return StringUtil.isNotBlank(source.getMethodDesc()) ? source.getMethodDesc() + source.getRequestMethods() : source.getUrl() + source.getRequestMethods();
+        return source.getUrl() + source.getRequestMethods();
     }
 
     public String getToolTipText() {
         BambooApiMethod method = this.getSource();
-        return method.getMethodDesc();
+        return method.getMethodDescHashMap().get("javadoc");
     }
 }

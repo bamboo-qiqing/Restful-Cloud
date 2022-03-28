@@ -13,4 +13,5 @@ public class BambooToolConfig {
 
     private ProjectInfo projectInfo;
 
+    private Boolean isShowDesc;
 }

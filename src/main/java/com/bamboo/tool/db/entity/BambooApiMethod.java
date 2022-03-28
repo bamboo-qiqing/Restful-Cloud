@@ -24,10 +24,7 @@ import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,10 +38,10 @@ public class BambooApiMethod implements NavigationItem {
     private String url;
     private String requestMethods;
     private String methodName;
-    private String methodDesc;
     private String className;
     private String classPath;
-    private String classDesc;
+    private Map<String, String> classDescHashMap = new HashMap<>();
+    private Map<String, String> methodDescHashMap = new HashMap<>();
     private String modelName;
     private String projectName;
     private String soaType;

@@ -33,6 +33,7 @@ public class FrameworkExecute {
      * 构建当前项目 api集合
      */
     public static List<BambooClass> buildApiMethod(Project project) {
+
         List<AnnotationInfoSetting> annotationInfoSettings = BambooService.selectAllAnnotationInfoSetting();
         Map<String, AnnotationInfoSetting> infoSettingClassMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.CLASS.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
         Map<String, AnnotationInfoSetting> infoSettingMethodMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
@@ -173,6 +174,17 @@ public class FrameworkExecute {
                                 bambooMethod.setHeaders(values.toString());
                             } else if ("produces".equals(type)) {
                                 bambooMethod.setProduces(values.toString());
+                            } else if ("desc".equals(type)) {
+                                final BambooDesc bambooDesc = new BambooDesc();
+                                final String frameworkName = annotationInfoSetting.getFramework().getName();
+                                bambooDesc.setFramewordCode(frameworkName);
+                                bambooDesc.setDescribe(values.get(0));
+                                if (bambooClass != null) {
+                                    bambooClass.getDescs().add(bambooDesc);
+                                }
+                                if (bambooMethod != null) {
+                                    bambooMethod.getDescs().add(bambooDesc);
+                                }
                             }
                         }
                     }
@@ -188,7 +200,7 @@ public class FrameworkExecute {
             PsiElement[] descriptionElements = docComment.getDescriptionElements();
             for (PsiElement descriptionElement : descriptionElements) {
                 if (descriptionElement instanceof PsiDocToken) {
-                    commentStringBuilder.append(StringUtil.replace(descriptionElement.getText(),"'","`")).append("\n");
+                    commentStringBuilder.append(StringUtil.replace(descriptionElement.getText(), "'", "`")).append("\n");
                 }
             }
         }
@@ -202,7 +214,7 @@ public class FrameworkExecute {
             PsiElement[] descriptionElements = docComment.getDescriptionElements();
             for (PsiElement descriptionElement : descriptionElements) {
                 if (descriptionElement instanceof PsiDocToken) {
-                    commentStringBuilder.append(StringUtil.replace(descriptionElement.getText(),"'","`")).append("\n");
+                    commentStringBuilder.append(StringUtil.replace(descriptionElement.getText(), "'", "`")).append("\n");
                 }
             }
         }

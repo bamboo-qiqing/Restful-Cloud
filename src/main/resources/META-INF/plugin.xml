@@ -18,11 +18,9 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <projectService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
+        <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
         <projectService serviceImplementation="com.bamboo.tool.components.api.configurable.BambooApiFilterConfiguration"
                         order="first"/>
-        <applicationService serviceImplementation="com.bamboo.tool.db.service.BambooService"/>
-
         <toolWindow id="Restful Cloud" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
                     secondary="false"/>
         <!--兼容性处理code-->

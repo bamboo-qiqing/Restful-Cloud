@@ -6,6 +6,7 @@ import com.bamboo.tool.config.model.BambooToolConfig;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.ProjectManager;
@@ -32,6 +33,7 @@ public class BambooToolComponent implements PersistentStateComponent<BambooToolC
     BambooToolConfig getState() {
         if (Objects.isNull(toolConfig)) {
             toolConfig = new BambooToolConfig();
+            toolConfig.setIsShowDesc(true);
         }
         return toolConfig;
     }
@@ -41,6 +43,8 @@ public class BambooToolComponent implements PersistentStateComponent<BambooToolC
         XmlSerializerUtil.copyBean(state, Objects.requireNonNull(getState()));
     }
 
-
+    public static BambooToolComponent getInstance() {
+        return ApplicationManager.getApplication().getService(BambooToolComponent.class);
+    }
 
 }

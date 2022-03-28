@@ -7,7 +7,8 @@ import com.bamboo.tool.components.api.enums.AnnotationScope;
 import com.bamboo.tool.components.api.view.component.tree.ClassNode;
 import com.bamboo.tool.components.api.view.component.tree.MethodNode;
 import com.bamboo.tool.components.api.view.component.tree.ModuleNode;
-import com.bamboo.tool.components.api.view.component.tree.ProjectModel;
+import com.bamboo.tool.components.api.view.component.tree.ProjectNode;
+import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
@@ -15,7 +16,6 @@ import com.intellij.ide.lightEdit.LightEdit;
 import com.intellij.ide.lightEdit.LightEditFeatureUsagesUtil;
 import com.intellij.ide.lightEdit.LightEditService;
 import com.intellij.ide.util.PsiNavigationSupport;
-import com.intellij.openapi.externalSystem.view.ProjectNode;
 import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -55,17 +55,19 @@ public class PsiUtils {
     }
 
     public static void convertToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
+        final Boolean isShowDesc = BambooToolComponent.getInstance().getState().getIsShowDesc();
         Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
         Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
         apiMethods.stream().forEach(e -> {
             String modelName = e.getModelName();
             String className = e.getClassName();
+
             ModuleNode moduleNode = new ModuleNode(modelName);
             ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
             if (moduleNode1 != null) {
                 moduleNode = moduleNode1;
             }
-            ClassNode classNode = new ClassNode(className);
+            ClassNode classNode = new ClassNode(className, isShowDesc, e.getClassDescHashMap());
             ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
             if (classNode1 != null) {
                 classNode = classNode1;
@@ -77,23 +79,35 @@ public class PsiUtils {
     }
 
     public static void convertOtherToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
-
+        final Boolean isShowDesc = BambooToolComponent.getInstance().getState().getIsShowDesc();
         Map<String, Map<String, Map<String, List<BambooApiMethod>>>> methodGroup = apiMethods.parallelStream().collect(Collectors.groupingBy(e -> e.getProjectName(), Collectors.groupingBy(e -> e.getModelName(), Collectors.groupingBy(e -> e.getClassName(), Collectors.toList()))));
+        Map<String, ProjectNode> projectNodeMap = new ConcurrentHashMap<>();
+        Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
 
-        methodGroup.forEach((key, value) -> {
-            ModuleNode projectModel = new ModuleNode(key);
-            value.forEach((modelKey, modelValue) -> {
-                ModuleNode model = new ModuleNode(modelKey);
-                modelValue.forEach((classKey, classValue) -> {
-                    ClassNode classNode = new ClassNode(classKey);
-                    classValue.parallelStream().forEach(e -> classNode.add(new MethodNode(e)));
-                    model.add(classNode);
-                });
-                projectModel.add(model);
-            });
-            root.add(projectModel);
+        Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
+
+        apiMethods.stream().forEach(e -> {
+            String modelName = e.getModelName();
+            String className = e.getClassName();
+            String projectName = e.getProjectName();
+            ModuleNode moduleNode = new ModuleNode(modelName);
+            ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
+            if (moduleNode1 != null) {
+                moduleNode = moduleNode1;
+            }
+            ClassNode classNode = new ClassNode(className, isShowDesc, e.getClassDescHashMap());
+            ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
+            if (classNode1 != null) {
+                classNode = classNode1;
+            }
+            moduleNode.add(classNode);
+            classNode.add(new MethodNode(e));
+
+            ProjectNode projectNode = new ProjectNode(projectName);
+            ProjectNode projectNode1 = projectNodeMap.putIfAbsent(projectName, projectNode);
+            projectNode1.add(moduleNode);
         });
-
+        projectNodeMap.values().stream().forEach(e -> root.add(e));
     }
 
 
@@ -121,7 +135,7 @@ public class PsiUtils {
                         if (methodParams != null) {
                             PsiParameterList parameters = e.getParameterList();
                             long count = Arrays.stream(parameters.getParameters()).filter(a -> !paramTypePaths.contains(a.getType().getPresentableText())).count();
-                            return count==0;
+                            return count == 0;
                         }
                         return false;
                     }).map(e -> e.getNavigationElement()).findFirst().get();
