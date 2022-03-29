@@ -4,9 +4,11 @@
     <vendor email="760560079@qq.com" url="http://liangkezaoshu.space/index.php/6.html">Restful Cloud</vendor>
 
     <description><![CDATA[
-        Restful Cloud是一个强大的restful api工具包插件 (http客户端)，致力于restful api多个项目的管理。
+        Restful Cloud是一个restful api工具包插件 (http客户端).
+        致力于restful api多个项目的管理。
         该插件产生的是由于微服务的普遍化，平时开发时不得不搜索所有的项目，以及不同项目之间SOA接口调用，插件缓存了已经打开过项目的所有restful api接口。
         在打开一个项目的时候，可以搜索到所有已经打开过的项目的restful api。
+        <a href="http://liangkezaoshu.space/index.php/6.html">文档地址</a>
         ]]>
     </description>
 

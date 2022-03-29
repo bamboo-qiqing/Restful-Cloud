@@ -119,6 +119,8 @@ public class BambooService {
         if (!Objects.isNull(projectId)) {
             state.addBatch(StringUtil.format("delete from bamboo_method_return_type where method_id in (select id from bamboo_method where project_id='{}');", projectId));
             state.addBatch(StringUtil.format("delete from bamboo_method_param where method_id in (select id from bamboo_method where project_id='{}');", projectId));
+            state.addBatch(StringUtil.format("delete from bamboo_desc where association_id in (select id from bamboo_method where project_id = '{}');", projectId));
+            state.addBatch(StringUtil.format("delete from bamboo_desc where association_id in (select id from bamboo_class where project_id = '{}');", projectId));
             state.addBatch(StringUtil.format("delete from bamboo_class WHERE project_id = '{}';", projectId));
             state.addBatch(StringUtil.format("delete from bamboo_method WHERE project_id = '{}';", projectId));
             state.addBatch(StringUtil.format("delete from bamboo_api WHERE project_id = '{}';", projectId));

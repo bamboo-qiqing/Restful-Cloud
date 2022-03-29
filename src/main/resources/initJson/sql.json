@@ -48,7 +48,11 @@
       "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (12, 'consumes', 'consumes', null, 12);",
       "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (13, 'params', 'params', null, 12);",
       "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (14, 'headers', 'headers', null, 12);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (15, 'produces', 'produces', null, 12);"
+      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (15, 'produces', 'produces', null, 12);",
+      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (16, 'tags', 'desc', null, 13);",
+      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (17, 'description', 'desc', null, 13);",
+      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (18, 'value', 'desc', null, 14);",
+      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (19, 'null', 'desc', null, 14);"
     ]
   },
   {
@@ -73,7 +77,8 @@
     ],
     "datas": [
       "INSERT INTO framework (id, name, describe) VALUES (1, 'Spring', 'Spring');",
-      "INSERT INTO framework (id, name, describe) VALUES (2, 'o_dian_yun', 'o_dian_yun');"
+      "INSERT INTO framework (id, name, describe) VALUES (2, 'o_dian_yun', 'o_dian_yun');",
+      "INSERT INTO framework (id, name, describe) VALUES (3, 'swagger', 'swagger');"
     ]
   },
   {
@@ -94,7 +99,9 @@
       "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (9, 'com.odianyun.soa.annotation.SoaMethodRegister', 'SoaMethodRegister', 2, 'Method', 'service', 'scann,attribute', 0);",
       "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (10, 'com.odianyun.soa.client.annotation.SoaServiceClient', 'SoaServiceClient', 2, 'Class', 'client', 'scann,attribute', 0);",
       "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (11, 'com.odianyun.soa.annotation.SoaServiceRegister', 'SoaServiceRegister', 2, 'Class', 'service', 'scann,attribute', 0);",
-      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (12, 'org.springframework.web.bind.annotation.RequestMapping', 'RequestMapping', 1, 'Method', 'service', 'scann,attribute', 0);"
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (12, 'org.springframework.web.bind.annotation.RequestMapping', 'RequestMapping', 1, 'Method', 'service', 'scann,attribute', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (13, 'io.swagger.annotations.Api', 'Api', 3, 'Class', null, 'attribute', 0);",
+      "INSERT INTO annotation_info_setting (id, class_path, class_short_name, framework_id, scope, soa_type, effect, is_delete) VALUES (14, 'io.swagger.annotations.ApiOperation', 'ApiOperation', 3, 'Method', null, 'attribute', 0);"
     ]
   },
   {
@@ -134,6 +141,7 @@
       "create unique index bamboo_dict_id_uindex on bamboo_dict (id);"
     ],
     "datas": [
+      "INSERT INTO bamboo_dict (id, key, value, description) VALUES ('1', 'isShowDesc', 'true', '是否开启描述');"
     ]
   },
   {

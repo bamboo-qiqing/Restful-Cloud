@@ -19,6 +19,7 @@ import com.intellij.psi.javadoc.PsiDocToken;
 import com.intellij.psi.util.PsiUtil;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +52,9 @@ public class FrameworkExecute {
                 bambooClass.setSetting(info);
                 bambooClass.setDescription(FrameworkExecute.getClassDescription(psiClass));
                 PsiAnnotation[] annotations = psiClass.getAnnotations();
+                if (bambooClass != null && "CacheController".equals(bambooClass.getClassName())) {
+                    System.out.printf("");
+                }
                 if (annotations.length > 0) {
                     buildAnnotations(bambooClass, null, infoSettingClassMap, annotations, info);
                 }
@@ -64,18 +68,25 @@ public class FrameworkExecute {
                                 BambooMethod bambooMethod = new BambooMethod();
                                 bambooMethod.setMethodName(method.getName());
                                 bambooMethod.setAccessLevel(PsiUtil.getAccessLevel(method.getModifierList()));
-                                bambooMethod.getReturnType().buildReturnType(method.getReturnType());
-                                bambooMethod.setDescription(FrameworkExecute.getMethodDescription(method));
-                                bambooMethod.buildMethodParams(method.getParameterList());
+
                                 final AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
                                 if (annotationMethodScope != null) {
                                     final PsiAnnotation[] methodAnnotations = method.getAnnotations();
                                     if (methodAnnotations.length > 0) {
-                                        buildAnnotations(null, bambooMethod, infoSettingMethodMap, methodAnnotations, info);
-                                        bambooClass.getMethods().add(bambooMethod);
+                                        final boolean annotations1 = buildAnnotations(null, bambooMethod, infoSettingMethodMap, methodAnnotations, info);
+                                        if (annotations1) {
+                                            bambooMethod.getReturnType().buildReturnType(method.getReturnType());
+                                            bambooMethod.setDescription(FrameworkExecute.getMethodDescription(method));
+                                            bambooMethod.buildMethodParams(method.getParameterList());
+                                            bambooClass.getMethods().add(bambooMethod);
+                                        }
+
                                     }
                                 } else {
                                     if (info.getFramework().getName().equals("o_dian_yun")) {
+                                        bambooMethod.getReturnType().buildReturnType(method.getReturnType());
+                                        bambooMethod.setDescription(FrameworkExecute.getMethodDescription(method));
+                                        bambooMethod.buildMethodParams(method.getParameterList());
                                         if (info.getSoaType().equals("service")) {
                                             bambooMethod.getMethodUrl().add(method.getName());
                                         }
@@ -121,12 +132,14 @@ public class FrameworkExecute {
      * @param annotations
      * @param info
      */
-    private static void buildAnnotations(BambooClass bambooClass, BambooMethod bambooMethod, Map<String, AnnotationInfoSetting> infoSettingMap, PsiAnnotation[] annotations, AnnotationInfoSetting info) {
+    private static boolean buildAnnotations(BambooClass bambooClass, BambooMethod bambooMethod, Map<String, AnnotationInfoSetting> infoSettingMap, PsiAnnotation[] annotations, AnnotationInfoSetting info) {
 
+        AtomicBoolean results = new AtomicBoolean(false);
         Arrays.stream(annotations).forEach(annotation -> {
 
             AnnotationInfoSetting annotationInfoSetting = infoSettingMap.get(Objects.requireNonNull(annotation.getNameReferenceElement()).getCanonicalText());
             if (!Objects.isNull(annotationInfoSetting)) {
+                results.set(true);
                 final String requestMethod = RequestMethodUtil.REQUEST_METHOD.get(annotationInfoSetting.getAnnotationPath());
                 if (StringUtil.isNotEmpty(requestMethod)) {
                     bambooMethod.getRequestMethods().add(requestMethod);
@@ -134,63 +147,75 @@ public class FrameworkExecute {
                 Map<String, AnnotationParam> params = annotationInfoSetting.getParams().stream().collect(Collectors.toMap(AnnotationParam::getName, param -> param));
                 if (CollectionUtil.isNotEmpty(params)) {
                     PsiNameValuePair[] attributes = annotation.getParameterList().getAttributes();
-                    for (PsiNameValuePair attribute : attributes) {
-                        PsiAnnotationMemberValue value = attribute.getValue();
-                        String name = StringUtil.isEmpty(attribute.getName()) ? "null" : attribute.getName();
-                        AnnotationParam annotationParam = params.get(name);
-                        if (!Objects.isNull(annotationParam)) {
-                            List<String> values = PsiAnnotationMemberUtil.getValue(value);
-                            final String type = annotationParam.getType();
-                            if ("poolUrl".equals(type)) {
-                                if (info.getFramework().getName().equals("o_dian_yun")) {
-                                    if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
-                                        bambooClass.setPoolUrl(values.get(0) + "/cloud");
-                                    }
-                                } else {
-                                    bambooClass.setPoolUrl(values.get(0));
-                                }
-                            } else if ("classUrl".equals(type)) {
-                                if (info.getFramework().getName().equals("o_dian_yun")) {
-                                    if (info.getSoaType().equals("service") && CollectionUtil.isNotEmpty(values)) {
-                                        values = values.stream().map(StringUtil::lowerFirst).collect(Collectors.toList());
-                                    }
-                                    if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
-                                        values = values.stream().map(e -> {
-                                            String[] split = e.split("\\.");
-                                            return StringUtil.lowerFirst(split[split.length - 1]);
-                                        }).collect(Collectors.toList());
-                                    }
-                                }
-                                bambooClass.setClassUrl(values);
-                            } else if ("methodUrl".equals(type)) {
-                                bambooMethod.setMethodUrl(values);
-                            } else if ("requestMethod".equals(type)) {
-                                bambooMethod.getRequestMethods().addAll(values);
-                            } else if ("consumes".equals(type)) {
-                                bambooMethod.setConsumes(values.toString());
-                            } else if ("params".equals(type)) {
-                                bambooMethod.setParams(values.toString());
-                            } else if ("headers".equals(type)) {
-                                bambooMethod.setHeaders(values.toString());
-                            } else if ("produces".equals(type)) {
-                                bambooMethod.setProduces(values.toString());
-                            } else if ("desc".equals(type)) {
-                                final BambooDesc bambooDesc = new BambooDesc();
-                                final String frameworkName = annotationInfoSetting.getFramework().getName();
-                                bambooDesc.setFramewordCode(frameworkName);
-                                bambooDesc.setDescribe(values.get(0));
-                                if (bambooClass != null) {
-                                    bambooClass.getDescs().add(bambooDesc);
-                                }
-                                if (bambooMethod != null) {
-                                    bambooMethod.getDescs().add(bambooDesc);
-                                }
-                            }
-                        }
+                    if (attributes.length > 0) {
+                        buildAttributes(bambooClass, bambooMethod, info, annotationInfoSetting, params, attributes);
+                    } else {
+                     if(StringUtil.isNotBlank(requestMethod)){
+                         bambooMethod.getMethodUrl().add("");
+                     }
                     }
+
                 }
             }
         });
+        return results.get();
+    }
+
+    private static void buildAttributes(BambooClass bambooClass, BambooMethod bambooMethod, AnnotationInfoSetting info, AnnotationInfoSetting annotationInfoSetting, Map<String, AnnotationParam> params, PsiNameValuePair[] attributes) {
+        for (PsiNameValuePair attribute : attributes) {
+            PsiAnnotationMemberValue value = attribute.getValue();
+            String name = StringUtil.isEmpty(attribute.getName()) ? "null" : attribute.getName();
+            AnnotationParam annotationParam = params.get(name);
+            if (!Objects.isNull(annotationParam)) {
+                List<String> values = PsiAnnotationMemberUtil.getValue(value);
+                final String type = annotationParam.getType();
+                if ("poolUrl".equals(type)) {
+                    if (info.getFramework().getName().equals("o_dian_yun")) {
+                        if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
+                            bambooClass.setPoolUrl(values.get(0) + "/cloud");
+                        }
+                    } else {
+                        bambooClass.setPoolUrl(values.get(0));
+                    }
+                } else if ("classUrl".equals(type)) {
+                    if (info.getFramework().getName().equals("o_dian_yun")) {
+                        if (info.getSoaType().equals("service") && CollectionUtil.isNotEmpty(values)) {
+                            values = values.stream().map(StringUtil::lowerFirst).collect(Collectors.toList());
+                        }
+                        if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
+                            values = values.stream().map(e -> {
+                                String[] split = e.split("\\.");
+                                return StringUtil.lowerFirst(split[split.length - 1]);
+                            }).collect(Collectors.toList());
+                        }
+                    }
+                    bambooClass.setClassUrl(values);
+                } else if ("methodUrl".equals(type)) {
+                    bambooMethod.setMethodUrl(values);
+                } else if ("requestMethod".equals(type)) {
+                    bambooMethod.getRequestMethods().addAll(values);
+                } else if ("consumes".equals(type)) {
+                    bambooMethod.setConsumes(values.toString());
+                } else if ("params".equals(type)) {
+                    bambooMethod.setParams(values.toString());
+                } else if ("headers".equals(type)) {
+                    bambooMethod.setHeaders(values.toString());
+                } else if ("produces".equals(type)) {
+                    bambooMethod.setProduces(values.toString());
+                } else if ("desc".equals(type)) {
+                    final BambooDesc bambooDesc = new BambooDesc();
+                    final String frameworkName = annotationInfoSetting.getFramework().getName();
+                    bambooDesc.setFramewordCode(frameworkName);
+                    bambooDesc.setDescribe(values.get(0));
+                    if (bambooClass != null) {
+                        bambooClass.getDescs().add(bambooDesc);
+                    }
+                    if (bambooMethod != null) {
+                        bambooMethod.getDescs().add(bambooDesc);
+                    }
+                }
+            }
+        }
     }
 
     public static String getMethodDescription(PsiMethod psiMethod) {
