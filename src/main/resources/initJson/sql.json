@@ -126,5 +126,23 @@
       "INSERT INTO bamboo_desc_framework (id, framework, framework_code, describe, sequence) VALUES ('2', 'javadoc', 'javadoc', null, 3);",
       "INSERT INTO bamboo_desc_framework (id, framework, framework_code, describe, sequence) VALUES ('3', 'swagger', 'swagger', null, 1);"
     ]
+  },
+  {
+    "tableName": "bamboo_dict",
+    "creatSql": "create table bamboo_dict ( id text not null constraint bamboo_dict_pk primary key, key text, value text, description text );",
+    "index": [
+      "create unique index bamboo_dict_id_uindex on bamboo_dict (id);"
+    ],
+    "datas": [
+    ]
+  },
+  {
+    "tableName": "bamboo_desc",
+    "creatSql": "create table bamboo_desc ( id text not null constraint bamboo_desc_pk primary key, describe text, frameword_code text, association_id text );",
+    "index": [
+      "create unique index bamboo_desc_id_uindex on bamboo_desc (id);"
+    ],
+    "datas": [
+    ]
   }
 ]
