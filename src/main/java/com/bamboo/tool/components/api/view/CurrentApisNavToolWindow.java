@@ -6,6 +6,7 @@ import com.bamboo.tool.components.api.view.component.tree.ApiTree;
 import com.bamboo.tool.components.api.view.component.tree.BaseNode;
 import com.bamboo.tool.components.api.view.component.tree.MethodNode;
 import com.bamboo.tool.components.api.view.component.tree.RootNode;
+import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
@@ -108,6 +109,7 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
             if (node == null) {
                 return;
             }
+
             append(node.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
             setIcon(node.getIcon(true));
             if (target instanceof MethodNode) {

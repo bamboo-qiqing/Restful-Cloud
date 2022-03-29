@@ -1,5 +1,8 @@
 package com.bamboo.tool.components.api.view.component.tree;
 
+import com.bamboo.tool.components.api.entity.DescFramework;
+import com.bamboo.tool.components.api.entity.NoteData;
+import com.bamboo.tool.util.StringUtil;
 import com.intellij.icons.AllIcons;
 import lombok.Data;
 import lombok.Getter;
@@ -9,18 +12,17 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Getter
-public class ClassNode extends DefaultMutableTreeNode {
-    private String className;
-    private Boolean isShowDesc;
-    private Map<String,String> descMap;
+public class ClassNode extends BaseNode<NoteData> {
 
-    public ClassNode(String className, Boolean isShowDesc, Map<String,String> descMap) {
-        this.className=className;
-        this.isShowDesc=isShowDesc;
-        this.descMap=descMap;
+
+    public ClassNode(NoteData noteData) {
+        super(noteData);
     }
 
 
@@ -31,6 +33,27 @@ public class ClassNode extends DefaultMutableTreeNode {
 
     @Override
     public String toString() {
-        return isShowDesc?;
+        final NoteData source = this.getSource();
+        final Map<String, String> descMap = source.getDescMap();
+        if (source.getIsShowDesc()) {
+            final List<DescFramework> descFrameworks = source.getDescFrameworks();
+            final Optional<String> first = descFrameworks.stream().filter(e -> {
+                final String desc = descMap.get(e.getFrameworkCode());
+                if (desc != null && StringUtil.isNotBlank(desc.trim())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }).map(e -> descMap.get(e.getFrameworkCode())).findFirst();
+
+            if (first.isPresent()) {
+                return first.get();
+            } else {
+                return source.getName();
+            }
+        } else {
+            return source.getName();
+        }
+
     }
 }

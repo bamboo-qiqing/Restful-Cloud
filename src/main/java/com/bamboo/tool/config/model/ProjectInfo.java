@@ -18,4 +18,6 @@ public class ProjectInfo {
      * 项目地址
      */
     private String projectPath;
+
+    private Boolean isShowDesc;
 }

@@ -16,12 +16,17 @@
 
 package com.bamboo.tool.components.api.view.component.tree;
 
+import com.bamboo.tool.components.api.entity.DescFramework;
+import com.bamboo.tool.components.api.entity.NoteData;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.util.StringUtil;
 import icons.PluginIcons;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class MethodNode extends BaseNode<BambooApiMethod> {
 
@@ -55,7 +60,27 @@ public class MethodNode extends BaseNode<BambooApiMethod> {
     @Override
     public String toString() {
         BambooApiMethod source = this.getSource();
-        return source.getUrl() + source.getRequestMethods();
+        final Map<String, String> descMap = source.getMethodDescHashMap();
+        if (source.getIsShowDesc()) {
+            final List<DescFramework> descFrameworks = source.getDescFrameworks();
+            final Optional<String> first = descFrameworks.stream().filter(e -> {
+                final String desc = descMap.get(e.getFrameworkCode());
+                if (desc != null && StringUtil.isNotBlank(desc.trim())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }).map(e -> descMap.get(e.getFrameworkCode())).findFirst();
+
+            if (first.isPresent()) {
+                return first.get() + source.getRequestMethods();
+            } else {
+                return source.getUrl() + source.getRequestMethods();
+            }
+        } else {
+            return source.getUrl() + source.getRequestMethods();
+        }
+
     }
 
     public String getToolTipText() {

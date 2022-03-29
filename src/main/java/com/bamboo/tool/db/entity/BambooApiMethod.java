@@ -1,6 +1,7 @@
 package com.bamboo.tool.db.entity;
 
 import com.bamboo.tool.components.api.contributor.RequestMappingItemPresentation;
+import com.bamboo.tool.components.api.entity.DescFramework;
 import com.bamboo.tool.components.api.entity.MethodParam;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiUtils;
@@ -48,6 +49,8 @@ public class BambooApiMethod implements NavigationItem {
     private String frameworkName;
     private String methodId;
     private Project project;
+    private Boolean IsShowDesc;
+    private List<DescFramework> descFrameworks;
 
     @Override
     public @Nullable

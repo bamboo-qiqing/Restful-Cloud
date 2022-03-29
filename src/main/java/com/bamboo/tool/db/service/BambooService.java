@@ -578,4 +578,49 @@ public class BambooService {
         conn.close();
         return descFrameworks;
     }
+
+    @SneakyThrows
+    public static List<BambooDict> selectAllDictByCode(String code) {
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        String sql = "select *  from bamboo_dict where key='" + code + "'; ";
+
+        ResultSet resultSet = state.executeQuery(sql);
+        List<BambooDict> dicts = new ArrayList<>();
+        while (resultSet.next()) {
+
+            String id = resultSet.getString("id");
+            String key = resultSet.getString("key");
+            String value = resultSet.getString("value");
+            String description = resultSet.getString("description");
+            BambooDict bambooDict = new BambooDict();
+            bambooDict.setId(id);
+            bambooDict.setKey(key);
+            bambooDict.setDescription(description);
+            bambooDict.setValue(value);
+            dicts.add(bambooDict);
+        }
+        resultSet.close();
+        state.close();
+        conn.close();
+        return dicts;
+    }
+
+    public static BambooDict selectOneDictByCode(String code) {
+        final List<BambooDict> dicts = BambooService.selectAllDictByCode(code);
+        if (CollectionUtil.isNotEmpty(dicts)) {
+            return dicts.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    public static boolean selectIsShowDesc() {
+        final BambooDict isShowDesc = BambooService.selectOneDictByCode("isShowDesc");
+        if (isShowDesc == null) {
+            return true;
+        } else {
+            return isShowDesc.getValue().equals("true");
+        }
+    }
 }

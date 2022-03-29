@@ -22,7 +22,7 @@
         <projectService serviceImplementation="com.bamboo.tool.components.api.configurable.BambooApiFilterConfiguration"
                         order="first"/>
         <toolWindow id="Restful Cloud" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
-                    secondary="false"/>
+                    secondary="false"  icon="PluginIcons.LOGO" />
         <!--兼容性处理code-->
         <notificationGroup id="toolWindowNotificationGroup" displayType="TOOL_WINDOW"/>
 

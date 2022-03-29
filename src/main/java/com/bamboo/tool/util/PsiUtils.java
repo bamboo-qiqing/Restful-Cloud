@@ -2,7 +2,9 @@ package com.bamboo.tool.util;
 
 
 import com.bamboo.tool.components.api.entity.AnnotationInfoSetting;
+import com.bamboo.tool.components.api.entity.DescFramework;
 import com.bamboo.tool.components.api.entity.MethodParam;
+import com.bamboo.tool.components.api.entity.NoteData;
 import com.bamboo.tool.components.api.enums.AnnotationScope;
 import com.bamboo.tool.components.api.view.component.tree.ClassNode;
 import com.bamboo.tool.components.api.view.component.tree.MethodNode;
@@ -55,7 +57,8 @@ public class PsiUtils {
     }
 
     public static void convertToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
-        final Boolean isShowDesc = BambooToolComponent.getInstance().getState().getIsShowDesc();
+        boolean isShowDesc = BambooService.selectIsShowDesc();
+        final List<DescFramework> descFrameworks = BambooService.selectAllDescFramework();
         Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
         Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
         apiMethods.stream().forEach(e -> {
@@ -67,20 +70,27 @@ public class PsiUtils {
             if (moduleNode1 != null) {
                 moduleNode = moduleNode1;
             }
-            ClassNode classNode = new ClassNode(className, isShowDesc, e.getClassDescHashMap());
+            final NoteData noteData = new NoteData();
+            noteData.setIsShowDesc(isShowDesc);
+            noteData.setDescMap(e.getClassDescHashMap());
+            noteData.setDescFrameworks(descFrameworks);
+            noteData.setName(className);
+            ClassNode classNode = new ClassNode(noteData);
             ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
             if (classNode1 != null) {
                 classNode = classNode1;
             }
             moduleNode.add(classNode);
+            e.setIsShowDesc(isShowDesc);
+            e.setDescFrameworks(descFrameworks);
             classNode.add(new MethodNode(e));
         });
         moduleNodeMap.values().stream().forEach(e -> root.add(e));
     }
 
     public static void convertOtherToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
-        final Boolean isShowDesc = BambooToolComponent.getInstance().getState().getIsShowDesc();
-        Map<String, Map<String, Map<String, List<BambooApiMethod>>>> methodGroup = apiMethods.parallelStream().collect(Collectors.groupingBy(e -> e.getProjectName(), Collectors.groupingBy(e -> e.getModelName(), Collectors.groupingBy(e -> e.getClassName(), Collectors.toList()))));
+        boolean isShowDesc = BambooService.selectIsShowDesc();
+        final List<DescFramework> descFrameworks = BambooService.selectAllDescFramework();
         Map<String, ProjectNode> projectNodeMap = new ConcurrentHashMap<>();
         Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
 
@@ -95,17 +105,27 @@ public class PsiUtils {
             if (moduleNode1 != null) {
                 moduleNode = moduleNode1;
             }
-            ClassNode classNode = new ClassNode(className, isShowDesc, e.getClassDescHashMap());
+            final NoteData noteData = new NoteData();
+            noteData.setIsShowDesc(isShowDesc);
+            noteData.setDescMap(e.getClassDescHashMap());
+            noteData.setDescFrameworks(descFrameworks);
+            noteData.setName(className);
+            ClassNode classNode = new ClassNode(noteData);
             ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
             if (classNode1 != null) {
                 classNode = classNode1;
             }
             moduleNode.add(classNode);
+            e.setIsShowDesc(isShowDesc);
+            e.setDescFrameworks(descFrameworks);
             classNode.add(new MethodNode(e));
 
             ProjectNode projectNode = new ProjectNode(projectName);
             ProjectNode projectNode1 = projectNodeMap.putIfAbsent(projectName, projectNode);
-            projectNode1.add(moduleNode);
+            if (projectNode1 != null) {
+                projectNode = projectNode1;
+            }
+            projectNode.add(moduleNode);
         });
         projectNodeMap.values().stream().forEach(e -> root.add(e));
     }
