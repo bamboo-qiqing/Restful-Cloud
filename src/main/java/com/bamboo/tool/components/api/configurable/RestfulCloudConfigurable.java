@@ -1,10 +1,7 @@
 package com.bamboo.tool.components.api.configurable;
 
-import com.bamboo.tool.components.api.entity.BambooDict;
 import com.bamboo.tool.components.api.entity.DescFramework;
 import com.bamboo.tool.components.api.ui.component.DescFrameWorkTableModel;
-import com.bamboo.tool.config.BambooToolComponent;
-import com.bamboo.tool.config.model.BambooToolConfig;
 import com.bamboo.tool.db.service.BambooService;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -33,6 +30,7 @@ public class RestfulCloudConfigurable implements Configurable {
     private DescFrameWorkTableModel defaultTableModel;
     private @NotNull
     JPanel descFrameWorkPane;
+    List<DescFramework> descFrameworks;
 
     @Override
     public @NlsContexts.ConfigurableName String getDisplayName() {
@@ -52,9 +50,11 @@ public class RestfulCloudConfigurable implements Configurable {
         descFrameWorkPanel.setBorder(IdeBorderFactory.createTitledBorder("接口描述框架设置", true));
         descFrameWorkLable.setText("该配置用于设置左侧工具栏显示接口，启用接口描述后支持的框架优先级配置");
         descFrameWorkTable = new JBTable();
-        defaultTableModel = new DescFrameWorkTableModel();
+
+        descFrameworks = BambooService.selectAllDescFramework();
+        defaultTableModel = new DescFrameWorkTableModel(descFrameworks);
         defaultTableModel.addColumn("框架");
-        final List<DescFramework> descFrameworks = BambooService.selectAllDescFramework();
+
         for (DescFramework descFramework : descFrameworks) {
             defaultTableModel.addRow(descFramework.getStrings());
         }
@@ -70,7 +70,12 @@ public class RestfulCloudConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        if (defaultTableModel.getModified()) {
+        if (defaultTableModel.isModified()) {
+            return true;
+        }
+        boolean isShowDesc = BambooService.selectIsShowDesc();
+        boolean selected = descriptionBox.isSelected();
+        if (isShowDesc != selected) {
             return true;
         }
         return false;
@@ -78,6 +83,7 @@ public class RestfulCloudConfigurable implements Configurable {
 
     @Override
     public void apply() throws ConfigurationException {
+
 
     }
 }

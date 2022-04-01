@@ -34,25 +34,65 @@
       "create unique index annotation_param_id_uindex on annotation_param_setting (id);"
     ],
     "datas": [
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (1, 'value', 'classUrl', null, 3);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (2, 'name', 'poolUrl', null, 10);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (3, 'interfaceName', 'classUrl', null, 10);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (4, 'interfaceClass', 'classUrl', null, 11);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (5, 'value', 'methodUrl', null, 12);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (6, 'null', 'methodUrl', null, 12);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (7, 'null', 'classUrl', null, 3);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (8, 'method', 'requestMethod', null, 12);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (9, 'null', 'methodUrl', null, 5);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (10, 'value', 'methodUrl', null, 5);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (11, 'path', 'methodUrl', null, 5);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (12, 'consumes', 'consumes', null, 12);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (13, 'params', 'params', null, 12);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (14, 'headers', 'headers', null, 12);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (15, 'produces', 'produces', null, 12);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (16, 'tags', 'desc', null, 13);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (17, 'description', 'desc', null, 13);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (18, 'value', 'desc', null, 14);",
-      "INSERT INTO annotation_param_setting (id, name, type, describe, annotation_info_setting_id) VALUES (19, 'null', 'desc', null, 14);"
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('consumes', 'consumes', null, 5);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('params', 'params', null, 5);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('headers', 'headers', null, 5);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('produces', 'produces', null, 5);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('consumes', 'consumes', null, 6);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('params', 'params', null, 6);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('headers', 'headers', null, 6);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('produces', 'produces', null, 6);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('consumes', 'consumes', null, 7);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('params', 'params', null, 7);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('headers', 'headers', null, 7);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('produces', 'produces', null, 7);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('consumes', 'consumes', null, 8);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('params', 'params', null, 8);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('headers', 'headers', null, 8);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('produces', 'produces', null, 8);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('value', 'methodUrl', null, 8);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('null', 'methodUrl', null, 8);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('path', 'methodUrl', null, 8);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('value', 'desc', null, 13);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('null', 'desc', null, 13);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('consumes', 'consumes', null, 3);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('params', 'params', null, 3);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('headers', 'headers', null, 3);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('produces', 'produces', null, 3);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('value', 'classUrl', null, 3);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('path', 'classUrl', null, 3);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('null', 'classUrl', null, 3);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('value', 'methodUrl', null, 12);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('path', 'methodUrl', null, 12);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('null', 'methodUrl', null, 12);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('consumes', 'consumes', null, 12);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('params', 'params', null, 12);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('headers', 'headers', null, 12);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('produces', 'produces', null, 12);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('value', 'methodUrl', null, 5);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('path', 'methodUrl', null, 5);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('null', 'methodUrl', null, 5);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('value', 'methodUrl', null, 6);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('path', 'methodUrl', null, 6);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('null', 'methodUrl', null, 6);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('value', 'methodUrl', null, 7);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('path', 'methodUrl', null, 7);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('null', 'methodUrl', null, 7);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('consumes', 'consumes', null, 4);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('params', 'params', null, 4);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('headers', 'headers', null, 4);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('produces', 'produces', null, 4);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('value', 'methodUrl', null, 4);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('path', 'methodUrl', null, 4);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('null', 'methodUrl', null, 4);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('name', 'poolUrl', null, 10);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('interfaceName', 'classUrl', null, 10);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('interfaceClass', 'classUrl', null, 11);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('desc', 'desc', null, 11);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('description', 'desc', null, 13);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('value', 'desc', null, 14);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('null', 'desc', null, 14);
+      INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('tags', 'desc', null, 13),;
     ]
   },
   {
