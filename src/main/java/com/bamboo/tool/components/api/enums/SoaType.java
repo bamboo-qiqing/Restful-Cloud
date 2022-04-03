@@ -9,7 +9,7 @@ public enum SoaType {
     SERVICE("service"),
     CLIENT("client"),;
 
-    private String code;
+    private final String code;
 
     SoaType(String code) {
         this.code = code;

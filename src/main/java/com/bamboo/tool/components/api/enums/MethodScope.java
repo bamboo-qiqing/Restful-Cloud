@@ -11,7 +11,7 @@ import lombok.Getter;
 public enum MethodScope {
     All("all"), PUBLIC("public"), PRIVATE("private"), ANNOTATION("annotation");
 
-    private String code;
+    private final String code;
 
     MethodScope(String code) {
         this.code = code;

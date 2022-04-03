@@ -2,8 +2,6 @@ package com.bamboo.tool.components.api.contributor;
 
 
 import com.bamboo.tool.db.entity.BambooApiMethod;
-import com.intellij.framework.FrameworkType;
-import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.NlsSafe;
 import icons.PluginIcons;
@@ -41,7 +39,7 @@ public class RequestMappingItemPresentation implements ItemPresentation {
     @Override
     public @Nullable
     Icon getIcon(boolean b) {
-        if (item.getFrameworkName().equals("o_dian_yun")) {
+        if (item.getFrameworkName().equals("o_dian_yun")||item.getFrameworkName().equals("spring_cloud")) {
             if (item.getSoaType().equals("service")) {
                 return PluginIcons.SOA_SERVICE;
             }

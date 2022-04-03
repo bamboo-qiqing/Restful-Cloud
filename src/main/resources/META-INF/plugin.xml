@@ -11,7 +11,7 @@
         <a href="http://liangkezaoshu.space/index.php/6.html">文档地址</a>
         ]]>
     </description>
-
+    <idea-version since-build="191"/>
     <!-- 插件版本号 -->
     <version>1.0</version>
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
@@ -24,17 +24,30 @@
         <projectService serviceImplementation="com.bamboo.tool.components.api.configurable.BambooApiFilterConfiguration"
                         order="first"/>
         <toolWindow id="Restful Cloud" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
-                    secondary="false"  icon="PluginIcons.LOGO" />
+                    secondary="false" icon="PluginIcons.LOGO"/>
         <!--兼容性处理code-->
         <notificationGroup id="toolWindowNotificationGroup" displayType="TOOL_WINDOW"/>
 
         <searchEverywhereContributor
-                implementation="com.bamboo.tool.components.api.contributor.BambooApiGotoContributor$Factory"/>
+                implementation="com.bamboo.tool.components.api.contributor.BambooApiGotoContributor$Factory">
+        </searchEverywhereContributor>
         <searchEverywhereResultsEqualityProvider
                 implementation="com.bamboo.tool.components.api.contributor.BambooApiEqualityProvider"/>
         <applicationConfigurable dynamic="true" displayName="Restful Cloud"
                                  instance="com.bamboo.tool.components.api.configurable.RestfulCloudConfigurable"/>
     </extensions>
+
+
+
+    <actions>
+        <action id="restfulCloud.search"
+                class="com.bamboo.tool.components.api.view.component.actions.RestfulCloudSearchAction">
+            <keyboard-shortcut first-keystroke="alt q" keymap="$default"/>
+        </action>
+    </actions>
+
+
+
     <extensions defaultExtensionNs="com.intellij.searchEverywhereContributor">
 
     </extensions>
@@ -43,6 +56,7 @@
         <extensionPoint name="requestMappingContributor" interface="com.intellij.navigation.ChooseByNameContributor"
                         dynamic="true"/>
     </extensionPoints>
+
     <extensions defaultExtensionNs="com.bamboo">
         <requestMappingContributor
                 implementation="com.bamboo.tool.components.api.contributor.RequestMappingByNameContributor"/>

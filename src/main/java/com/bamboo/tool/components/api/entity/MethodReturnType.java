@@ -1,7 +1,6 @@
 package com.bamboo.tool.components.api.entity;
 
 import com.intellij.psi.PsiType;
-import com.intellij.psi.PsiTypeElement;
 import lombok.Data;
 
 import java.util.UUID;

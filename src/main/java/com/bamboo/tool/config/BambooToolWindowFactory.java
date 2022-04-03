@@ -17,22 +17,18 @@ import org.jetbrains.annotations.NotNull;
  */
 public class BambooToolWindowFactory implements ToolWindowFactory, DumbAware {
 
-    private CurrentApisNavToolWindow currentApisNavToolWindow;
-
-    private OtherApisNavToolWindow otherApisNavToolWindow;
-
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
 
-        currentApisNavToolWindow = new CurrentApisNavToolWindow(project);
+        CurrentApisNavToolWindow currentApisNavToolWindow = new CurrentApisNavToolWindow(project);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         currentApisNavToolWindow.getComponent().add(currentApisNavToolWindow.getContent());
-        Content currentApis = contentFactory.createContent(currentApisNavToolWindow, "current project", true);
+        Content currentApis = contentFactory.createContent(currentApisNavToolWindow, "Current Project", true);
         toolWindow.getContentManager().addContent(currentApis);
 
-        otherApisNavToolWindow = new OtherApisNavToolWindow(project);
+        OtherApisNavToolWindow otherApisNavToolWindow = new OtherApisNavToolWindow(project);
         otherApisNavToolWindow.getComponent().add(otherApisNavToolWindow.getContent());
-        Content otherApis = contentFactory.createContent(otherApisNavToolWindow, "other project", true);
+        Content otherApis = contentFactory.createContent(otherApisNavToolWindow, "Other Project", true);
         toolWindow.getContentManager().addContent(otherApis);
     }
 }

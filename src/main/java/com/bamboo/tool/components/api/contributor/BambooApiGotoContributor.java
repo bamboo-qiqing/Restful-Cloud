@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class BambooApiGotoContributor extends AbstractGotoSEContributor {
 
-    private Project myProject;
+    private final Project myProject;
 
     private final PersistentSearchEverywhereContributorFilter<RequestMethod> myFilter;
 
@@ -47,7 +47,7 @@ public class BambooApiGotoContributor extends AbstractGotoSEContributor {
     public @NotNull
     @Nls
     String getGroupName() {
-        return "Bamboo Apis";
+        return "Restful Cloud";
     }
 
     @Override
@@ -69,7 +69,7 @@ public class BambooApiGotoContributor extends AbstractGotoSEContributor {
     public @Nullable
     @Nls
     String getAdvertisement() {
-        return "url to search";
+        return "alt+q";
     }
 
     static class Factory implements SearchEverywhereContributorFactory<Object> {

@@ -24,7 +24,7 @@ public class BambooClass {
 
 
     public String toSql(Integer projectInfoId) {
-        StringBuffer sql = new StringBuffer();
+        StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO bamboo_class (id,class_name, model_name, description, class_path, project_id,setting_id) VALUES (");
         sql.append("'").append(id).append("',");
         sql.append("'").append(className).append("',");

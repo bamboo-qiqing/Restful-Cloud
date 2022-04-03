@@ -43,8 +43,8 @@ import java.util.List;
  */
 public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Disposable {
     private final Project myProject;
-    private JPanel panel;
-    private ApiTree apiTree;
+    private final JPanel panel;
+    private final ApiTree apiTree;
 
     public OtherApisNavToolWindow(Project project) {
         super(false, false);
@@ -97,7 +97,7 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
     }
 
     private void rendingTree(Project project) {
-        Task.Backgroundable task = new Task.Backgroundable(myProject, "bamboo apis...") {
+        Task.Backgroundable task = new Task.Backgroundable(myProject, "Bamboo apis...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
@@ -129,7 +129,7 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
 
     private final class RefreshApiAction extends AnAction {
         public RefreshApiAction() {
-            super("refresh", "refresh", AllIcons.Actions.Refresh);
+            super("Refresh", "Refresh", AllIcons.Actions.Refresh);
         }
 
         @Override

@@ -3,7 +3,6 @@ package com.bamboo.tool.util;
 import com.intellij.psi.*;
 import lombok.SneakyThrows;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -6,7 +6,6 @@ import com.bamboo.tool.components.api.view.component.tree.ApiTree;
 import com.bamboo.tool.components.api.view.component.tree.BaseNode;
 import com.bamboo.tool.components.api.view.component.tree.MethodNode;
 import com.bamboo.tool.components.api.view.component.tree.RootNode;
-import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
@@ -43,8 +42,8 @@ import java.util.List;
 
 public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements Disposable {
     private final Project myProject;
-    private JPanel panel;
-    private ApiTree apiTree;
+    private final JPanel panel;
+    private final ApiTree apiTree;
     private List<BambooClass> allApiList;
 
     public CurrentApisNavToolWindow(Project project) {
@@ -136,7 +135,7 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
 
 
     private void rendingTree(Project project) {
-        Task.Backgroundable task = new Task.Backgroundable(myProject, "Restful Cloud...") {
+        Task.Backgroundable task = new Task.Backgroundable(myProject, "Restful cloud...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
@@ -172,7 +171,7 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
 
     private final class RefreshApiAction extends AnAction {
         public RefreshApiAction() {
-            super("refresh", "refresh", AllIcons.Actions.Refresh);
+            super("Refresh", "Refresh", AllIcons.Actions.Refresh);
         }
 
         @Override

@@ -1,25 +1,14 @@
 package com.bamboo.tool.config;
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.StrUtil;
 import com.bamboo.tool.config.model.BambooToolConfig;
-import com.bamboo.tool.config.model.ProjectInfo;
-import com.intellij.conversion.ConversionContext;
-import com.intellij.conversion.ConverterProvider;
-import com.intellij.conversion.ProjectConverter;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.util.NlsContexts;
 import com.intellij.util.xmlb.XmlSerializerUtil;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 /**

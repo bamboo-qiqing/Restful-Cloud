@@ -2,31 +2,21 @@ package com.bamboo.tool.db.entity;
 
 import com.bamboo.tool.components.api.contributor.RequestMappingItemPresentation;
 import com.bamboo.tool.components.api.entity.DescFramework;
-import com.bamboo.tool.components.api.entity.MethodParam;
-import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiUtils;
-import com.intellij.ide.lightEdit.LightEdit;
-import com.intellij.ide.lightEdit.LightEditFeatureUsagesUtil;
-import com.intellij.ide.lightEdit.LightEditService;
-import com.intellij.ide.util.PsiNavigationSupport;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsSafe;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
-import com.intellij.psi.*;
-import com.intellij.psi.impl.source.PsiJavaFileImpl;
-import com.intellij.psi.util.PsiUtil;
 import lombok.Data;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Create by GuoQing

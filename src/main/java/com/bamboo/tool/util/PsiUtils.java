@@ -10,7 +10,6 @@ import com.bamboo.tool.components.api.view.component.tree.ClassNode;
 import com.bamboo.tool.components.api.view.component.tree.MethodNode;
 import com.bamboo.tool.components.api.view.component.tree.ModuleNode;
 import com.bamboo.tool.components.api.view.component.tree.ProjectNode;
-import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
@@ -61,7 +60,7 @@ public class PsiUtils {
         final List<DescFramework> descFrameworks = BambooService.selectAllDescFramework();
         Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
         Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
-        apiMethods.stream().forEach(e -> {
+        apiMethods.forEach(e -> {
             String modelName = e.getModelName();
             String className = e.getClassName();
 
@@ -85,7 +84,7 @@ public class PsiUtils {
             e.setDescFrameworks(descFrameworks);
             classNode.add(new MethodNode(e));
         });
-        moduleNodeMap.values().stream().forEach(e -> root.add(e));
+        moduleNodeMap.values().forEach(e -> root.add(e));
     }
 
     public static void convertOtherToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
@@ -96,7 +95,7 @@ public class PsiUtils {
 
         Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
 
-        apiMethods.stream().forEach(e -> {
+        apiMethods.forEach(e -> {
             String modelName = e.getModelName();
             String className = e.getClassName();
             String projectName = e.getProjectName();
@@ -127,7 +126,7 @@ public class PsiUtils {
             }
             projectNode.add(moduleNode);
         });
-        projectNodeMap.values().stream().forEach(e -> root.add(e));
+        projectNodeMap.values().forEach(e -> root.add(e));
     }
 
 
@@ -158,7 +157,7 @@ public class PsiUtils {
                             return count == 0;
                         }
                         return false;
-                    }).map(e -> e.getNavigationElement()).findFirst().get();
+                    }).map(PsiElement::getNavigationElement).findFirst().get();
                     Navigatable navigatable = (Navigatable) psiElement;
                     navigatable.navigate(true);
                 } else {

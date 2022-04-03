@@ -17,7 +17,6 @@
 package com.bamboo.tool.components.api.view.component.tree;
 
 import com.bamboo.tool.components.api.entity.DescFramework;
-import com.bamboo.tool.components.api.entity.NoteData;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.util.StringUtil;
 import icons.PluginIcons;
@@ -38,7 +37,7 @@ public class MethodNode extends BaseNode<BambooApiMethod> {
     public @Nullable
     Icon getIcon(boolean selected) {
         BambooApiMethod source = this.getSource();
-        if (source.getFrameworkName().equals("o_dian_yun")) {
+        if (source.getFrameworkName().equals("o_dian_yun")||source.getFrameworkName().equals("spring_cloud")) {
             if (source.getSoaType().equals("service")) {
                 return PluginIcons.SOA_SERVICE;
             }
@@ -72,11 +71,7 @@ public class MethodNode extends BaseNode<BambooApiMethod> {
                 }
             }).map(e -> descMap.get(e.getFrameworkCode())).findFirst();
 
-            if (first.isPresent()) {
-                return first.get() + source.getRequestMethods();
-            } else {
-                return source.getUrl() + source.getRequestMethods();
-            }
+            return first.map(s -> s + source.getRequestMethods()).orElseGet(() -> source.getUrl() + source.getRequestMethods());
         } else {
             return source.getUrl() + source.getRequestMethods();
         }

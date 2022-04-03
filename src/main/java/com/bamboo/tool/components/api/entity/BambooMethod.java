@@ -39,6 +39,7 @@ public class BambooMethod {
             for (int i = 0; i < parametersCount; i++) {
                 PsiParameter parameter = psiParameterList.getParameter(i);
                 final MethodParam methodParam = new MethodParam();
+                assert parameter != null;
                 methodParam.buildMethodParam(parameter, i);
                 methodParams.add(methodParam);
             }

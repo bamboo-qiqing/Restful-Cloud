@@ -52,9 +52,6 @@ public class FrameworkExecute {
                 bambooClass.setSetting(info);
                 bambooClass.setDescription(FrameworkExecute.getClassDescription(psiClass));
                 PsiAnnotation[] annotations = psiClass.getAnnotations();
-                if (bambooClass != null && "CacheController".equals(bambooClass.getClassName())) {
-                    System.out.printf("");
-                }
                 if (annotations.length > 0) {
                     buildAnnotations(bambooClass, null, infoSettingClassMap, annotations, info);
                 }
@@ -75,7 +72,7 @@ public class FrameworkExecute {
                                     if (methodAnnotations.length > 0) {
                                         final boolean annotations1 = buildAnnotations(null, bambooMethod, infoSettingMethodMap, methodAnnotations, info);
                                         if (annotations1) {
-                                            bambooMethod.getReturnType().buildReturnType(method.getReturnType());
+                                            bambooMethod.getReturnType().buildReturnType(Objects.requireNonNull(method.getReturnType()));
                                             bambooMethod.setDescription(FrameworkExecute.getMethodDescription(method));
                                             bambooMethod.buildMethodParams(method.getParameterList());
                                             bambooClass.getMethods().add(bambooMethod);
@@ -84,7 +81,7 @@ public class FrameworkExecute {
                                     }
                                 } else {
                                     if (info.getFramework().getName().equals("o_dian_yun")) {
-                                        bambooMethod.getReturnType().buildReturnType(method.getReturnType());
+                                        bambooMethod.getReturnType().buildReturnType(Objects.requireNonNull(method.getReturnType()));
                                         bambooMethod.setDescription(FrameworkExecute.getMethodDescription(method));
                                         bambooMethod.buildMethodParams(method.getParameterList());
                                         if (info.getSoaType().equals("service")) {
@@ -126,11 +123,6 @@ public class FrameworkExecute {
     /**
      * 构建注释
      *
-     * @param bambooClass
-     * @param bambooMethod
-     * @param infoSettingMap
-     * @param annotations
-     * @param info
      */
     private static boolean buildAnnotations(BambooClass bambooClass, BambooMethod bambooMethod, Map<String, AnnotationInfoSetting> infoSettingMap, PsiAnnotation[] annotations, AnnotationInfoSetting info) {
 
@@ -175,6 +167,7 @@ public class FrameworkExecute {
                             bambooClass.setPoolUrl(values.get(0) + "/cloud");
                         }
                     } else {
+
                         bambooClass.setPoolUrl(values.get(0));
                     }
                 } else if ("classUrl".equals(type)) {
@@ -189,6 +182,7 @@ public class FrameworkExecute {
                             }).collect(Collectors.toList());
                         }
                     }
+
                     bambooClass.setClassUrl(values);
                 } else if ("methodUrl".equals(type)) {
                     bambooMethod.setMethodUrl(values);

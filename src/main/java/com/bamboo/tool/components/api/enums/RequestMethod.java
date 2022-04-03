@@ -18,7 +18,7 @@ public enum RequestMethod {
     TRACE("TRACE"),
     ALL("ALL");
 
-    private String code;
+    private final String code;
 
     RequestMethod(String code) {
         this.code = code;

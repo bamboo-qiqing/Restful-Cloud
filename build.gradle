@@ -13,6 +13,7 @@ repositories {
     mavenCentral()
 }
 
+
 dependencies {
     implementation 'com.alibaba:fastjson:1.2.47'
     implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.36.0.3'
@@ -22,19 +23,28 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
 
-// See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = '2021.3.2'
-    localPath = "E:\\install\\tool\\idea\\IntelliJ IDEA 2021.3.2"
-    plugins = ['java']
-
+    pluginName = 'Restful Cloud'
+    plugins = ['java', "com.intellij.properties", "com.intellij.java-i18n"]
+    version = '2019.1.1'
+    type = 'IU'
+    updateSinceUntilBuild = false
+    downloadSources = true
 }
+
+
 patchPluginXml {
     changeNotes = """
-      支持框架:<br>
+      支持框架(测试版):<br>
       <em>Spring</em>
-      <em>欧电云</em>"""
+      <em>欧电云</em>
+      <em>Spring Cloud Openfeign</em>
+      <em>Swagger</em>"""
 }
 test {
     useJUnitPlatform()
+}
+runIde {
+    jvmArgs '--add-exports', 'java.base/jdk.internal.vm=ALL-UNNAMED'
+    jbrVersion = 'jbrsdk-11_0_10-osx-x64-b1314.58'
 }

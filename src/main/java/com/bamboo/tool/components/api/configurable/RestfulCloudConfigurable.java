@@ -26,7 +26,6 @@ public class RestfulCloudConfigurable implements Configurable {
     private JCheckBox descriptionBox;
     private JPanel descFrameWorkPanel;
     private JLabel descFrameWorkLable;
-    private JBTable descFrameWorkTable;
     private DescFrameWorkTableModel defaultTableModel;
     private @NotNull
     JPanel descFrameWorkPane;
@@ -49,7 +48,7 @@ public class RestfulCloudConfigurable implements Configurable {
         descriptionBox.setSelected(isShowDesc);
         descFrameWorkPanel.setBorder(IdeBorderFactory.createTitledBorder("接口描述框架设置", true));
         descFrameWorkLable.setText("该配置用于设置左侧工具栏显示接口，启用接口描述后支持的框架优先级配置");
-        descFrameWorkTable = new JBTable();
+        JBTable descFrameWorkTable = new JBTable();
 
         descFrameworks = BambooService.selectAllDescFramework();
         defaultTableModel = new DescFrameWorkTableModel(descFrameworks);
@@ -78,12 +77,15 @@ public class RestfulCloudConfigurable implements Configurable {
         if (isShowDesc != selected) {
             return true;
         }
+
         return false;
     }
 
     @Override
-    public void apply() throws ConfigurationException {
-
+    public void apply()  {
+        BambooService.updateDescFrameworkSequence(descFrameworks);
+        BambooService.updateIsShowDesc(descriptionBox.isSelected());
+        defaultTableModel.setDataList( BambooService.selectAllDescFramework());
 
     }
 }

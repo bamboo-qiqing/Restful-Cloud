@@ -55,13 +55,13 @@ public class BambooService {
         if (CollectionUtil.isNotEmpty(exeSql)) {
             Connection conn = SqliteConfig.getConnection();
             Statement state = conn.createStatement();
-            exeSql.stream().forEach(e -> {
+            for (String e : exeSql) {
                 try {
                     state.addBatch(e);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
-            });
+            }
             state.executeBatch();
             state.close();
             conn.close();
@@ -69,11 +69,9 @@ public class BambooService {
     }
 
     private static List<SqliteMaster> querTables() throws SQLException {
-        StringBuffer str = new StringBuffer();
-        str.append("select * from sqlite_master  where  type='table';");
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
-        ResultSet resultSet = state.executeQuery(str.toString());
+        ResultSet resultSet = state.executeQuery("select * from sqlite_master  where  type='table';");
         List<SqliteMaster> tableInfos = new ArrayList<>();
         while (resultSet.next()) {
             SqliteMaster sqliteMaster = new SqliteMaster();
@@ -100,7 +98,7 @@ public class BambooService {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         final List<String> sqls = BambooService.addBatchSql(projectInfo, allClasses);
-        sqls.stream().forEach(e -> {
+        sqls.forEach(e -> {
             try {
                 state.addBatch(e);
             } catch (SQLException ex) {
@@ -133,34 +131,25 @@ public class BambooService {
     @SneakyThrows
     private static List<String> addBatchSql(ProjectInfo projectInfo, List<BambooClass> allClasses) {
         final List<String> sqls = new ArrayList<>();
-        allClasses.stream().forEach(bambooClass -> {
+        allClasses.forEach(bambooClass -> {
             bambooClass.setId(UUID.randomUUID().toString());
             final String sql = bambooClass.toSql(projectInfo.getId());
             sqls.add(sql);
-            bambooClass.getDescs().stream().map(e -> e.toSql(bambooClass.getId())).forEach(e -> sqls.add(e));
+            bambooClass.getDescs().stream().map(e -> e.toSql(bambooClass.getId())).forEach(sqls::add);
 
             final List<BambooMethod> methods = bambooClass.getMethods();
             if (CollectionUtil.isNotEmpty(methods)) {
                 methods.forEach(method -> {
                     method.setId(UUID.randomUUID().toString());
-                    StringBuffer sqlMethod = new StringBuffer();
-                    sqlMethod.append("insert into bamboo_method (id, project_id, method_name, class_id,description) VALUES(");
-                    sqlMethod.append("'").append(method.getId()).append("',");
-                    sqlMethod.append("'").append(projectInfo.getId()).append("',");
-                    sqlMethod.append("'").append(method.getMethodName()).append("',");
-                    sqlMethod.append("'").append(bambooClass.getId()).append("',");
-                    sqlMethod.append("'").append(method.getDescription()).append("'");
-                    sqlMethod.append(");");
-                    sqls.add(sqlMethod.toString());
+                    String sqlMethod = "insert into bamboo_method (id, project_id, method_name, class_id,description) VALUES(" + "'" + method.getId() + "'," + "'" + projectInfo.getId() + "'," + "'" + method.getMethodName() + "'," + "'" + bambooClass.getId() + "'," + "'" + method.getDescription() + "'" + ");";
+                    sqls.add(sqlMethod);
                     sqls.add(method.getReturnType().toSql(method.getId()));
                     List<String> methodParamsSql = method.getMethodParams().parallelStream().map(e -> e.toSql(method.getId())).collect(Collectors.toList());
-                    method.getDescs().stream().map(e -> e.toSql(method.getId())).forEach(e -> sqls.add(e));
+                    method.getDescs().stream().map(e -> e.toSql(method.getId())).forEach(sqls::add);
                     sqls.addAll(methodParamsSql);
                     final List<String> classUrls = bambooClass.getClassUrl();
                     if (CollectionUtil.isNotEmpty(classUrls)) {
-                        classUrls.parallelStream().forEach(e -> {
-                            buildApiSql(sqls, bambooClass, method, e, projectInfo);
-                        });
+                        classUrls.parallelStream().forEach(e -> buildApiSql(sqls, bambooClass, method, e, projectInfo));
                     } else {
                         buildApiSql(sqls, bambooClass, method, "", projectInfo);
                     }
@@ -174,7 +163,7 @@ public class BambooService {
         List<String> methodUrls = method.getMethodUrl();
         if (CollectionUtil.isNotEmpty(methodUrls)) {
             methodUrls.parallelStream().forEach(methodUrl -> {
-                StringBuffer api = new StringBuffer();
+                StringBuilder api = new StringBuilder();
                 String poolUrl = bambooClass.getPoolUrl();
                 String classUrl = e;
                 if (StringUtil.isEmpty(poolUrl) || "/".equals(poolUrl)) {
@@ -193,15 +182,15 @@ public class BambooService {
                 }
 
                 api.append("insert into bamboo_api (id, method_id, url, request_methods,project_id,consumes,params,headers,produces) VALUES(");
-                api.append("'" + UUID.randomUUID() + "',");
-                api.append("'" + method.getId() + "',");
-                api.append("'" + poolUrl + classUrl + StringUtil.addPrefixIfNot(methodUrl, "/") + "',");
-                api.append("'" + requestMethods + "',");
-                api.append("'" + projectInfo.getId() + "',");
-                api.append("'" + method.getConsumes() + "',");
-                api.append("'" + method.getParams() + "',");
-                api.append("'" + method.getHeaders() + "',");
-                api.append("'" + method.getProduces() + "'");
+                api.append("'").append(UUID.randomUUID()).append("',");
+                api.append("'").append(method.getId()).append("',");
+                api.append("'").append(poolUrl).append(classUrl).append(StringUtil.addPrefixIfNot(methodUrl, "/")).append("',");
+                api.append("'").append(requestMethods).append("',");
+                api.append("'").append(projectInfo.getId()).append("',");
+                api.append("'").append(method.getConsumes()).append("',");
+                api.append("'").append(method.getParams()).append("',");
+                api.append("'").append(method.getHeaders()).append("',");
+                api.append("'").append(method.getProduces()).append("'");
                 api.append(");");
                 sqls.add(api.toString());
             });
@@ -212,12 +201,8 @@ public class BambooService {
     public static List<AnnotationParam> selectAllAnnotationParam() {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
-        StringBuffer str = new StringBuffer();
-        str.append("select ");
-        str.append("ap.*");
-        str.append("from ");
-        str.append("annotation_param_setting ap;");
-        ResultSet resultSet = state.executeQuery(str.toString());
+        String str = "select ap.* from annotation_param_setting ap;";
+        ResultSet resultSet = state.executeQuery(str);
         List<AnnotationParam> params = new ArrayList<>();
         while (resultSet.next()) {
             int id = resultSet.getInt("id");
@@ -244,12 +229,8 @@ public class BambooService {
     public static List<Framework> selectAllFramework() {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
-        StringBuffer str = new StringBuffer();
-        str.append("select ");
-        str.append("f.*");
-        str.append("from ");
-        str.append("framework f;");
-        ResultSet resultSet = state.executeQuery(str.toString());
+        String str = "select f.* from framework f;";
+        ResultSet resultSet = state.executeQuery(str);
         List<Framework> frameworks = new ArrayList<>();
         while (resultSet.next()) {
             int id = resultSet.getInt("id");
@@ -273,12 +254,8 @@ public class BambooService {
     public static List<AnnotationMethodScope> selectAllAnnotationMethodScope() {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
-        StringBuffer str = new StringBuffer();
-        str.append("select ");
-        str.append("ams.* ");
-        str.append("from ");
-        str.append("annotation_method_scope ams;");
-        ResultSet resultSet = state.executeQuery(str.toString());
+        String str = "select ams.* from annotation_method_scope ams;";
+        ResultSet resultSet = state.executeQuery(str);
         List<AnnotationMethodScope> methodScopes = new ArrayList<>();
         while (resultSet.next()) {
             int id = resultSet.getInt("id");
@@ -319,18 +296,7 @@ public class BambooService {
 
     @NotNull
     private static String getQuerySQL() {
-        StringBuilder str = new StringBuilder();
-        str.append("select ");
-        str.append("ai.id,");
-        str.append("ai.class_path,");
-        str.append("ai.class_short_name,");
-        str.append("ai.scope,");
-        str.append("ai.soa_type,");
-        str.append("ai.effect,");
-        str.append("ai.framework_id ");
-        str.append("from ");
-        str.append("annotation_info_setting  ai inner join framework  f on ai.framework_id = f.id and ai.is_delete=0;");
-        return str.toString();
+        return "select ai.id,ai.class_path,ai.class_short_name,ai.scope,ai.soa_type,ai.effect,ai.framework_id from annotation_info_setting  ai inner join framework  f on ai.framework_id = f.id and ai.is_delete=0;";
     }
 
     @NotNull
@@ -440,7 +406,7 @@ public class BambooService {
             str.append(notProjectId);
             str.append("'");
         }
-        str.append("group by ba.url, ba.request_methods, ba.method_id, bm.method_name, bm.description, bc.class_name, bc.class_path, bc.description, bc.model_name, bc.description, bap.project_name, bap.id, ais.soa_type, f.name");
+        str.append(" group by ba.url, ba.request_methods, ba.method_id, bm.method_name, bm.description, bc.class_name, bc.class_path, bc.description, bc.model_name, bc.description, bap.project_name, bap.id, ais.soa_type, f.name");
         str.append(";");
         List<BambooApiMethod> apis = new ArrayList<>();
         final ResultSet resultSet = state.executeQuery(str.toString());
@@ -475,13 +441,11 @@ public class BambooService {
             api.getClassDescHashMap().put("javadoc", classDesc);
 
             if (StringUtil.isNotBlank(classDescribe)) {
-                if("RestAdSourceServer".equals(className)){
-                    System.out.printf("");
-                }
+
                 JSONArray classDescribes = JSONUtil.parseArray(classDescribe);
-                final Object[] objects = classDescribes.stream().toArray();
-                if(objects.length>0){
-                    Map<String, String> otherDesc = Arrays.stream(classDescribes.stream().toArray()).collect(Collectors.toMap(e -> String.valueOf(e).split("\\|")[0], e -> String.valueOf(e).split("\\|")[1], (old, next) -> old));
+                Object[] objects = classDescribes.toArray();
+                if (objects.length > 0) {
+                    Map<String, String> otherDesc = Arrays.stream(objects).collect(Collectors.toMap(e -> String.valueOf(e).split("\\|")[0], e -> String.valueOf(e).split("\\|")[1], (old, next) -> old));
                     api.getClassDescHashMap().putAll(otherDesc);
                 }
 
@@ -489,8 +453,8 @@ public class BambooService {
             if (StringUtil.isNotBlank(methodDescribe)) {
                 JSONArray methodDescribes = JSONUtil.parseArray(methodDescribe);
                 final Object[] objects = methodDescribes.toArray();
-                if(objects.length>0){
-                    Map<String, String> otherDesc = Arrays.stream(methodDescribes.stream().toArray()).collect(Collectors.toMap(e -> String.valueOf(e).split("\\|")[0], e -> String.valueOf(e).split("\\|")[1], (old, next) -> next));
+                if (objects.length > 0) {
+                    Map<String, String> otherDesc = Arrays.stream(objects).collect(Collectors.toMap(e -> String.valueOf(e).split("\\|")[0], e -> String.valueOf(e).split("\\|")[1], (old, next) -> next));
                     api.getMethodDescHashMap().putAll(otherDesc);
                 }
             }
@@ -538,21 +502,19 @@ public class BambooService {
     }
 
     @SneakyThrows
-    public static ProjectInfo saveProject(ProjectInfo projectInfo) {
+    public static void saveProject(ProjectInfo projectInfo) {
         ProjectInfo project = BambooService.queryProject(projectInfo.getProjectPath(), projectInfo.getProjectName());
         if (project == null) {
-            StringBuffer str = new StringBuffer();
-            str.append("INSERT INTO bamboo_project (project_name, project_path) VALUES (");
-            str.append(StringUtil.format("'{}',", projectInfo.getProjectName()));
-            str.append(StringUtil.format("'{}'", projectInfo.getProjectPath()));
-            str.append(");");
+            String str = "INSERT INTO bamboo_project (project_name, project_path) VALUES (" +
+                    StringUtil.format("'{}',", projectInfo.getProjectName()) +
+                    StringUtil.format("'{}'", projectInfo.getProjectPath()) +
+                    ");";
             Connection conn = SqliteConfig.getConnection();
             Statement state = conn.createStatement();
-            state.executeUpdate(str.toString());
+            state.executeUpdate(str);
             conn.close();
-            project = BambooService.queryProject(projectInfo.getProjectPath(), projectInfo.getProjectName());
+            BambooService.queryProject(projectInfo.getProjectPath(), projectInfo.getProjectName());
         }
-        return project;
     }
 
     @SneakyThrows
@@ -611,32 +573,16 @@ public class BambooService {
     }
 
     @SneakyThrows
-    public static List<BambooDict> selectAllDictByCode(String code) {
+    public static void updateDescFrameworkSequence(List<DescFramework> descFrameworks) {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
-        String sql = " UPDATE bamboo_desc_framework SET sequence = 1 WHERE id = '1';";
-
-        ResultSet resultSet = state.executeQuery(sql);
-        List<BambooDict> dicts = new ArrayList<>();
-        while (resultSet.next()) {
-
-            String id = resultSet.getString("id");
-            String key = resultSet.getString("key");
-            String value = resultSet.getString("value");
-            String description = resultSet.getString("description");
-            BambooDict bambooDict = new BambooDict();
-            bambooDict.setId(id);
-            bambooDict.setKey(key);
-            bambooDict.setDescription(description);
-            bambooDict.setValue(value);
-            dicts.add(bambooDict);
+        for (int i = 0; i < descFrameworks.size(); i++) {
+            state.addBatch(" UPDATE bamboo_desc_framework SET sequence = " + i + " WHERE id = '" + descFrameworks.get(i).getId() + "';");
         }
-        resultSet.close();
+        state.executeBatch();
         state.close();
         conn.close();
-        return dicts;
     }
-
 
 
     public static BambooDict selectOneDictByCode(String code) {
@@ -656,4 +602,14 @@ public class BambooService {
             return isShowDesc.getValue().equals("true");
         }
     }
+
+    @SneakyThrows
+    public static void updateIsShowDesc(Boolean isShowDesc) {
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        state.executeUpdate("UPDATE bamboo_dict SET  value = '" + isShowDesc + "' WHERE key = 'isShowDesc';");
+        state.close();
+        conn.close();
+    }
+
 }

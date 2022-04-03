@@ -2,8 +2,6 @@ package com.bamboo.tool.components.api.enums;
 
 import lombok.Getter;
 
-import java.lang.reflect.Method;
-
 /**
  * Create by GuoQing
  * Date 2022/2/16 10:23
@@ -11,15 +9,15 @@ import java.lang.reflect.Method;
  */
 @Getter
 public enum PsiAnnotationMemberType {
-    PsiReferenceExpression("PsiReferenceExpression",""),
-    PsiLiteralExpression("PsiLiteralExpression","String"),
-    PsiArrayInitializerMemberValue("PsiArrayInitializerMemberValue",""),
-    PsiClassObjectAccessExpression("PsiClassObjectAccessExpression","");
+    PsiReferenceExpression("PsiReferenceExpression", ""),
+    PsiLiteralExpression("PsiLiteralExpression", "String"),
+    PsiArrayInitializerMemberValue("PsiArrayInitializerMemberValue", ""),
+    PsiClassObjectAccessExpression("PsiClassObjectAccessExpression", "");
 
-    private String code;
-    private String name;
+    private final String code;
+    private final String name;
 
-    PsiAnnotationMemberType(String code,String name) {
+    PsiAnnotationMemberType(String code, String name) {
         this.code = code;
         this.name = name;
     }

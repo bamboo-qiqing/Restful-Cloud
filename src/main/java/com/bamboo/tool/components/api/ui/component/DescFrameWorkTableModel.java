@@ -8,15 +8,19 @@ import java.util.List;
 
 public class DescFrameWorkTableModel<T> extends DefaultTableModel implements EditableModel {
 
-    private List<T> descFrameworks;
+    private  List<T> descFrameworks;
 
-    public DescFrameWorkTableModel(List<T> descFrameworks) {
+    public DescFrameWorkTableModel( List<T> descFrameworks) {
         this.descFrameworks = descFrameworks;
     }
 
     @Override
     public void addRow() {
 
+    }
+
+    public void setDataList(List<T> descFrameworks) {
+        this.descFrameworks = descFrameworks;
     }
 
     @Override

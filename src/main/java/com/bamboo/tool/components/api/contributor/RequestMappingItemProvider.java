@@ -40,7 +40,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
 
 
     public @NotNull
-    List<String> filterNames(@NotNull ChooseByNameViewModel base, String[] names, @NotNull String pattern) {
+    List<String> filterNames(@NotNull ChooseByNameViewModel base, @NotNull String[] names, @NotNull String pattern) {
         return null;
     }
 
