@@ -122,7 +122,6 @@ public class FrameworkExecute {
 
     /**
      * 构建注释
-     *
      */
     private static boolean buildAnnotations(BambooClass bambooClass, BambooMethod bambooMethod, Map<String, AnnotationInfoSetting> infoSettingMap, PsiAnnotation[] annotations, AnnotationInfoSetting info) {
 
@@ -142,9 +141,9 @@ public class FrameworkExecute {
                     if (attributes.length > 0) {
                         buildAttributes(bambooClass, bambooMethod, info, annotationInfoSetting, params, attributes);
                     } else {
-                     if(StringUtil.isNotBlank(requestMethod)){
-                         bambooMethod.getMethodUrl().add("");
-                     }
+                        if (StringUtil.isNotBlank(requestMethod)) {
+                            bambooMethod.getMethodUrl().add("");
+                        }
                     }
 
                 }
@@ -161,53 +160,79 @@ public class FrameworkExecute {
             if (!Objects.isNull(annotationParam)) {
                 List<String> values = PsiAnnotationMemberUtil.getValue(value);
                 final String type = annotationParam.getType();
-                if ("poolUrl".equals(type)) {
-                    if (info.getFramework().getName().equals("o_dian_yun")) {
-                        if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
-                            bambooClass.setPoolUrl(values.get(0) + "/cloud");
-                        }
-                    } else {
-
-                        bambooClass.setPoolUrl(values.get(0));
-                    }
-                } else if ("classUrl".equals(type)) {
-                    if (info.getFramework().getName().equals("o_dian_yun")) {
-                        if (info.getSoaType().equals("service") && CollectionUtil.isNotEmpty(values)) {
-                            values = values.stream().map(StringUtil::lowerFirst).collect(Collectors.toList());
-                        }
-                        if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
-                            values = values.stream().map(e -> {
-                                String[] split = e.split("\\.");
-                                return StringUtil.lowerFirst(split[split.length - 1]);
-                            }).collect(Collectors.toList());
-                        }
-                    }
-
-                    bambooClass.setClassUrl(values);
-                } else if ("methodUrl".equals(type)) {
-                    bambooMethod.setMethodUrl(values);
-                } else if ("requestMethod".equals(type)) {
-                    bambooMethod.getRequestMethods().addAll(values);
-                } else if ("consumes".equals(type)) {
-                    bambooMethod.setConsumes(values.toString());
-                } else if ("params".equals(type)) {
-                    bambooMethod.setParams(values.toString());
-                } else if ("headers".equals(type)) {
-                    bambooMethod.setHeaders(values.toString());
-                } else if ("produces".equals(type)) {
-                    bambooMethod.setProduces(values.toString());
-                } else if ("desc".equals(type)) {
-                    final BambooDesc bambooDesc = new BambooDesc();
-                    final String frameworkName = annotationInfoSetting.getFramework().getName();
-                    bambooDesc.setFramewordCode(frameworkName);
-                    bambooDesc.setDescribe(values.get(0));
-                    if (bambooClass != null) {
-                        bambooClass.getDescs().add(bambooDesc);
-                    }
-                    if (bambooMethod != null) {
-                        bambooMethod.getDescs().add(bambooDesc);
-                    }
+                if (bambooMethod != null) {
+                    buildAttributesMethod(bambooMethod, annotationInfoSetting, values, type);
                 }
+                if (bambooClass != null) {
+                    buildAttributesClass(bambooClass, info, annotationInfoSetting, values, type);
+                }
+
+            }
+        }
+    }
+
+    private static void buildAttributesClass(BambooClass bambooClass, AnnotationInfoSetting info, AnnotationInfoSetting annotationInfoSetting, List<String> values, String type) {
+        if ("poolUrl".equals(type)) {
+            if (info.getFramework().getName().equals("o_dian_yun")) {
+                if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
+                    bambooClass.setPoolUrl(values.get(0) + "/cloud");
+                }
+            } else {
+                bambooClass.setPoolUrl(values.get(0));
+            }
+        } else if ("classUrl".equals(type)) {
+            if (info.getFramework().getName().equals("o_dian_yun")) {
+                if (info.getSoaType().equals("service") && CollectionUtil.isNotEmpty(values)) {
+                    values = values.stream().map(StringUtil::lowerFirst).collect(Collectors.toList());
+                }
+                if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
+                    values = values.stream().map(e -> {
+                        String[] split = e.split("\\.");
+                        return StringUtil.lowerFirst(split[split.length - 1]);
+                    }).collect(Collectors.toList());
+                }
+            }
+            bambooClass.setClassUrl(values);
+        } else if ("consumes".equals(type)) {
+            bambooClass.setConsumes(values.toString());
+        } else if ("params".equals(type)) {
+            bambooClass.setParams(values.toString());
+        } else if ("headers".equals(type)) {
+            bambooClass.setHeaders(values.toString());
+        } else if ("produces".equals(type)) {
+            bambooClass.setProduces(values.toString());
+        } else if ("desc".equals(type)) {
+            final BambooDesc bambooDesc = new BambooDesc();
+            final String frameworkName = annotationInfoSetting.getFramework().getName();
+            bambooDesc.setFramewordCode(frameworkName);
+            bambooDesc.setDescribe(values.get(0));
+            if (bambooClass != null && StringUtil.isNotBlank(values.get(0))) {
+                bambooClass.getDescs().add(bambooDesc);
+            }
+
+        }
+    }
+
+    private static void buildAttributesMethod(BambooMethod bambooMethod, AnnotationInfoSetting annotationInfoSetting, List<String> values, String type) {
+        if ("methodUrl".equals(type)) {
+            bambooMethod.setMethodUrl(values);
+        } else if ("requestMethod".equals(type)) {
+            bambooMethod.getRequestMethods().addAll(values);
+        } else if ("consumes".equals(type)) {
+            bambooMethod.setConsumes(values.toString());
+        } else if ("params".equals(type)) {
+            bambooMethod.setParams(values.toString());
+        } else if ("headers".equals(type)) {
+            bambooMethod.setHeaders(values.toString());
+        } else if ("produces".equals(type)) {
+            bambooMethod.setProduces(values.toString());
+        } else if ("desc".equals(type)) {
+            final BambooDesc bambooDesc = new BambooDesc();
+            final String frameworkName = annotationInfoSetting.getFramework().getName();
+            bambooDesc.setFramewordCode(frameworkName);
+            bambooDesc.setDescribe(values.get(0));
+            if (bambooMethod != null && StringUtil.isNotBlank(values.get(0))) {
+                bambooMethod.getDescs().add(bambooDesc);
             }
         }
     }

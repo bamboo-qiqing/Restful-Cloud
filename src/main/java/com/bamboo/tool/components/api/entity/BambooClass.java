@@ -21,7 +21,10 @@ public class BambooClass {
     private List<BambooMethod> methods = new ArrayList<>();
     private AnnotationInfoSetting setting;
     private List<BambooDesc> descs = new ArrayList<>();
-
+    private String consumes = StringUtils.EMPTY;
+    private String params = StringUtils.EMPTY;
+    private String headers = StringUtils.EMPTY;
+    private String produces = StringUtils.EMPTY;
 
     public String toSql(Integer projectInfoId) {
         StringBuilder sql = new StringBuilder();
