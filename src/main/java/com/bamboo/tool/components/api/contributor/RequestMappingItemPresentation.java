@@ -23,14 +23,14 @@ public class RequestMappingItemPresentation implements ItemPresentation {
     }
 
     @Override
-    public @NlsSafe
+    public
     @Nullable
     String getPresentableText() {
         return item.getUrl();
     }
 
     @Override
-    public @NlsSafe
+    public
     @Nullable
     String getLocationString() {
         return item.getProjectName() + "." + item.getClassName() + item.getRequestMethods();

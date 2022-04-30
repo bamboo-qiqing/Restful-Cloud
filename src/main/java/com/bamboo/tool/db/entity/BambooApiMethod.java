@@ -43,8 +43,7 @@ public class BambooApiMethod implements NavigationItem {
     private List<DescFramework> descFrameworks;
 
     @Override
-    public @Nullable
-    @NlsSafe String getName() {
+    public @Nullable String getName() {
         return this.requestMethods + " " + this.url;
     }
 

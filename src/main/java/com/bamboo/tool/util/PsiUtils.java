@@ -140,33 +140,27 @@ public class PsiUtils {
         }
         Map<String, List<MethodParam>> api = BambooService.getApi(methodId);
         NonProjectFileWritingAccessProvider.allowWriting(Collections.singletonList(file));
-        if (LightEdit.owns(project)) {
-            LightEditService.getInstance().openFile(file);
-            LightEditFeatureUsagesUtil.logFileOpen(project, LightEditFeatureUsagesUtil.OpenPlace.LightEditOpenAction);
-        } else {
-            PsiFile psiFile = PsiUtil.getPsiFile(project, file);
-            if (psiFile instanceof PsiJavaFile) {
-                PsiClass childClass = ((PsiJavaFileImpl) psiFile).findChildByClass(PsiClass.class);
-                if (childClass != null) {
-                    PsiElement psiElement = Arrays.stream(childClass.getMethods()).filter(e -> e.getName().equals(methodName)).filter(e -> {
-                        List<MethodParam> methodParams = api.get(e.getReturnType().getPresentableText());
-                        List<String> paramTypePaths = methodParams.parallelStream().map(type -> type.getParamType()).collect(Collectors.toList());
-                        if (methodParams != null) {
-                            PsiParameterList parameters = e.getParameterList();
-                            long count = Arrays.stream(parameters.getParameters()).filter(a -> !paramTypePaths.contains(a.getType().getPresentableText())).count();
-                            return count == 0;
-                        }
-                        return false;
-                    }).map(PsiElement::getNavigationElement).findFirst().get();
-                    Navigatable navigatable = (Navigatable) psiElement;
-                    navigatable.navigate(true);
-                } else {
-                    PsiNavigationSupport.getInstance().createNavigatable(project, file, -1).navigate(true);
-                }
+        PsiFile psiFile = PsiUtil.getPsiFile(project, file);
+        if (psiFile instanceof PsiJavaFile) {
+            PsiClass childClass = ((PsiJavaFileImpl) psiFile).findChildByClass(PsiClass.class);
+            if (childClass != null) {
+                PsiElement psiElement = Arrays.stream(childClass.getMethods()).filter(e -> e.getName().equals(methodName)).filter(e -> {
+                    List<MethodParam> methodParams = api.get(e.getReturnType().getPresentableText());
+                    List<String> paramTypePaths = methodParams.parallelStream().map(type -> type.getParamType()).collect(Collectors.toList());
+                    if (methodParams != null) {
+                        PsiParameterList parameters = e.getParameterList();
+                        long count = Arrays.stream(parameters.getParameters()).filter(a -> !paramTypePaths.contains(a.getType().getPresentableText())).count();
+                        return count == 0;
+                    }
+                    return false;
+                }).map(PsiElement::getNavigationElement).findFirst().get();
+                Navigatable navigatable = (Navigatable) psiElement;
+                navigatable.navigate(true);
             } else {
                 PsiNavigationSupport.getInstance().createNavigatable(project, file, -1).navigate(true);
             }
-
+        } else {
+            PsiNavigationSupport.getInstance().createNavigatable(project, file, -1).navigate(true);
         }
 
     }

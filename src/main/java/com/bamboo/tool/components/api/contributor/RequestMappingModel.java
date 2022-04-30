@@ -51,19 +51,18 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
 
     @Override
     public @NotNull
-    @NlsContexts.Label String getNotInMessage() {
+     String getNotInMessage() {
         return "Mapping not found";
     }
 
     @Override
     public @NotNull
-    @NlsContexts.Label String getNotFoundMessage() {
+     String getNotFoundMessage() {
         return null;
     }
 
     @Override
-    public @Nullable
-    @NlsContexts.Label String getCheckBoxName() {
+    public @Nullable String getCheckBoxName() {
         return null;
     }
 

@@ -32,7 +32,7 @@ public class RestfulCloudConfigurable implements Configurable {
     List<DescFramework> descFrameworks;
 
     @Override
-    public @NlsContexts.ConfigurableName String getDisplayName() {
+    public  String getDisplayName() {
         return "RestfulCloud";
     }
 
