@@ -9,7 +9,6 @@ import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiUtils;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.CommonActionsManager;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
@@ -36,17 +35,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-/**
- * Create by GuoQing
- * Date 2022/2/14 10:58
- * Description
- */
-public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Disposable {
+public class HistoryApisNavToolWindow extends SimpleToolWindowPanel implements Disposable {
+
     private final Project myProject;
     private final JPanel panel;
     private final ApiTree apiTree;
 
-    public OtherApisNavToolWindow(Project project) {
+
+    public HistoryApisNavToolWindow(Project project) {
         super(false, false);
         this.myProject = project;
         panel = new JPanel();
@@ -56,7 +52,7 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
 
         initActionBar();
         apiTree = new ApiTree();
-        apiTree.setCellRenderer(new MyCellRenderer());
+        apiTree.setCellRenderer(new HistoryApisNavToolWindow.MyCellRenderer());
         apiTree.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -91,31 +87,9 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
 
     }
 
-    private void renderData(Project project) {
-
-        DumbService.getInstance(project).smartInvokeLater(() -> rendingTree(project));
-    }
-
-    private void rendingTree(Project project) {
-        Task.Backgroundable task = new Task.Backgroundable(myProject, "Bamboo apis...") {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                indicator.setIndeterminate(false);
-                ProjectInfo currentProject = BambooService.queryProject(project.getBasePath(), project.getName());
-                 List<BambooApiMethod> allApi = BambooService.getAllApi(null, currentProject.getId().toString(), project);
-                RootNode root = new RootNode("apis("+allApi.size()+")");
-                PsiUtils.convertOtherToRoot(root, allApi);
-
-                apiTree.setModel(new DefaultTreeModel(root));
-                NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
-            }
-        };
-        ProgressManager.getInstance().runProcessWithProgressAsynchronously(task, new BackgroundableProcessIndicator(task));
-    }
-
     private void initActionBar() {
         DefaultActionGroup group = new DefaultActionGroup();
-        group.add(new RefreshApiAction());
+        group.add(new HistoryApisNavToolWindow.RefreshApiAction());
 
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, group, false);
         actionToolbar.setTargetComponent(panel);
@@ -136,6 +110,40 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
         }
     }
 
+    private void renderData(Project project) {
+
+        DumbService.getInstance(project).smartInvokeLater(() -> rendingTree(project));
+    }
+
+    private void navigateToMethod() {
+        if (!apiTree.isEnabled()) {
+            return;
+        }
+        Object component = apiTree.getLastSelectedPathComponent();
+        if (!(component instanceof MethodNode)) {
+            return;
+        }
+        MethodNode methodNode = (MethodNode) component;
+        final BambooApiMethod source = methodNode.getSource();
+        source.navigate(true);
+    }
+
+    private void rendingTree(Project project) {
+        Task.Backgroundable task = new Task.Backgroundable(myProject, "Bamboo apis...") {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(false);
+                final List<BambooApiMethod> allApi = BambooService.getHistoryAllApi( project);
+                RootNode root = new RootNode("apis("+allApi.size()+")");
+                PsiUtils.convertHistoryToRoot(root, allApi);
+
+                apiTree.setModel(new DefaultTreeModel(root));
+                NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
+            }
+        };
+        ProgressManager.getInstance().runProcessWithProgressAsynchronously(task, new BackgroundableProcessIndicator(task));
+    }
+
     private static class MyCellRenderer extends ColoredTreeCellRenderer {
 
         @Override
@@ -154,18 +162,5 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
             }
             SpeedSearchUtil.applySpeedSearchHighlighting(this, this, false, true);
         }
-    }
-
-    private void navigateToMethod() {
-        if (!apiTree.isEnabled()) {
-            return;
-        }
-        Object component = apiTree.getLastSelectedPathComponent();
-        if (!(component instanceof MethodNode)) {
-            return;
-        }
-        MethodNode methodNode = (MethodNode) component;
-        final BambooApiMethod source = methodNode.getSource();
-        source.navigate(true);
     }
 }

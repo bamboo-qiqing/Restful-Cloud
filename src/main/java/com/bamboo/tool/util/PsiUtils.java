@@ -130,6 +130,24 @@ public class PsiUtils {
     }
 
 
+    public static void convertHistoryToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
+        boolean isShowDesc = BambooService.selectIsShowDesc();
+        final List<DescFramework> descFrameworks = BambooService.selectAllDescFramework();
+        Map<String, List<BambooApiMethod>> projectGroup = apiMethods.stream().collect(Collectors.groupingBy(e -> e.getProjectName(), Collectors.toList()));
+
+        projectGroup.forEach((projectName, value) -> {
+            ProjectNode projectNode = new ProjectNode(projectName);
+            value.stream().sorted(Comparator.comparingInt(BambooApiMethod::getQueryCount)).map(e -> {
+                e.setIsShowDesc(isShowDesc);
+                e.setDescFrameworks(descFrameworks);
+                MethodNode methodNode = new MethodNode(e);
+                return methodNode;
+            }).forEach(e -> projectNode.add(e));
+            root.add(projectNode);
+        });
+    }
+
+
     public static void openFile(@NotNull VirtualFile file, @NotNull Project project, String methodName, String methodId) {
         if (file == null) {
             return;

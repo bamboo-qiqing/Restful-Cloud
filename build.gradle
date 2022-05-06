@@ -26,10 +26,11 @@ dependencies {
 intellij {
     pluginName = 'Restful Cloud'
     plugins = ['java', "com.intellij.properties", "com.intellij.java-i18n"]
-    version = '2019.1.1'
+    version = '2021.3.1'
     type = 'IU'
     updateSinceUntilBuild = false
     downloadSources = true
+
 }
 
 
@@ -44,7 +45,4 @@ patchPluginXml {
 test {
     useJUnitPlatform()
 }
-runIde {
-    jvmArgs '--add-exports', 'java.base/jdk.internal.vm=ALL-UNNAMED'
-    jbrVersion = 'jbrsdk-11_0_10-osx-x64-b1314.58'
-}
+

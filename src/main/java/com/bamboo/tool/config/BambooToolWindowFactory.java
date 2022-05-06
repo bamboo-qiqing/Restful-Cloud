@@ -2,6 +2,7 @@ package com.bamboo.tool.config;
 
 import com.bamboo.tool.components.api.view.CurrentApisNavToolWindow;
 import com.bamboo.tool.components.api.view.OtherApisNavToolWindow;
+import com.bamboo.tool.components.api.view.HistoryApisNavToolWindow;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -19,12 +20,18 @@ public class BambooToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
 
         CurrentApisNavToolWindow currentApisNavToolWindow = new CurrentApisNavToolWindow(project);
-        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         currentApisNavToolWindow.getComponent().add(currentApisNavToolWindow.getContent());
         Content currentApis = contentFactory.createContent(currentApisNavToolWindow, "Current Project", true);
         toolWindow.getContentManager().addContent(currentApis);
+
+        HistoryApisNavToolWindow historyApisNavToolWindow = new HistoryApisNavToolWindow(project);
+        historyApisNavToolWindow.getComponent().add(historyApisNavToolWindow.getContent());
+        Content historyApis = contentFactory.createContent(historyApisNavToolWindow, "History Project", true);
+        toolWindow.getContentManager().addContent(historyApis);
+
 
         OtherApisNavToolWindow otherApisNavToolWindow = new OtherApisNavToolWindow(project);
         otherApisNavToolWindow.getComponent().add(otherApisNavToolWindow.getContent());

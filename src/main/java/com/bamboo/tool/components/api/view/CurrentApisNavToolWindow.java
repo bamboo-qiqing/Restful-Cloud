@@ -142,7 +142,7 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                 ApplicationManager.getApplication().runReadAction(() -> {
                     allApiList = FrameworkExecute.buildApiMethod(myProject);
                     indicator.setText("Rendering");
-                    RootNode root = new RootNode("apis");
+                    RootNode root = new RootNode("apis("+allApiList.size()+")");
                     apiTree.setModel(new DefaultTreeModel(root));
                     ProjectInfo currentProject = BambooService.queryProject(project.getBasePath(), project.getName());
                     BambooService.saveClass(allApiList, currentProject);

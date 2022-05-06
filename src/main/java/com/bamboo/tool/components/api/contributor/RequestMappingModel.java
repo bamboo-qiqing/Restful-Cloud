@@ -35,6 +35,7 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
     }
 
 
+
     @Override
     protected boolean acceptItem(NavigationItem item) {
          BambooApiMethod api = (BambooApiMethod) item;

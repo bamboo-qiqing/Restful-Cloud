@@ -1,7 +1,9 @@
 package com.bamboo.tool.db.entity;
 
 import com.bamboo.tool.components.api.contributor.RequestMappingItemPresentation;
+import com.bamboo.tool.components.api.entity.BambooHistoryApis;
 import com.bamboo.tool.components.api.entity.DescFramework;
+import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiUtils;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
@@ -29,6 +31,7 @@ public class BambooApiMethod implements NavigationItem {
     private String url;
     private String requestMethods;
     private String methodName;
+    private String methodReturn;
     private String className;
     private String classPath;
     private Map<String, String> classDescHashMap = new HashMap<>();
@@ -37,13 +40,16 @@ public class BambooApiMethod implements NavigationItem {
     private String projectName;
     private String soaType;
     private String frameworkName;
+    private String projectPath;
+    private Integer queryCount;
     private String methodId;
     private Project project;
     private Boolean IsShowDesc;
     private List<DescFramework> descFrameworks;
 
     @Override
-    public @Nullable String getName() {
+    public @Nullable
+    String getName() {
         return this.requestMethods + " " + this.url;
     }
 
@@ -60,6 +66,14 @@ public class BambooApiMethod implements NavigationItem {
 
         ApplicationManager.getApplication().runReadAction(() -> {
             if (file != null && file.isValid()) {
+                BambooHistoryApis historyApis = new BambooHistoryApis();
+                historyApis.setMethodName(methodName);
+                historyApis.setProjectName(projectName);
+                historyApis.setProjectPath(projectPath);
+                historyApis.setClassName(className);
+                historyApis.setClassPath(classPath);
+                historyApis.setMethodReturn(methodReturn);
+                BambooService.saveHistoryApis(historyApis);
                 PsiUtils.openFile(file, project, methodName, methodId);
             }
             if (navigationElement != null) {

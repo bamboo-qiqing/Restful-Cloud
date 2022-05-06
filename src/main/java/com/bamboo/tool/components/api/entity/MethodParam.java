@@ -28,7 +28,7 @@ public class MethodParam {
                 + UUID.randomUUID() + "', '"
                 + paramType + "', '"
                 + paramTypePath + "', '"
-                + paramName + "', "
+                + paramName + "',"
                 + paramIndex + ", '"
                 + methodId + "');";
     }

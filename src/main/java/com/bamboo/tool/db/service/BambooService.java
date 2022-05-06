@@ -375,6 +375,7 @@ public class BambooService {
         str.append("ba.request_methods requestMethods,");
         str.append("ba.method_id  methodId,");
         str.append("bm.method_name     methodName,");
+        str.append("bmrt.return_type_path  methodReturn,");
         str.append("bm.description     methodDesc,");
         str.append("bc.class_name      className,");
         str.append("bc.class_path      classPath,");
@@ -382,6 +383,7 @@ public class BambooService {
         str.append("bc.model_name      modelName,");
         str.append("bc.description     classDesc,");
         str.append("bap.project_name   projectName,");
+        str.append("bap.project_path   projectPath,");
         str.append("bap.id     projectId,");
         str.append("ais.soa_type       soaType,");
         str.append("f.name             frameworkName,");
@@ -393,6 +395,7 @@ public class BambooService {
         str.append(" inner join bamboo_project bap on bc.project_id = bap.id ");
         str.append(" inner join annotation_info_setting ais on bc.setting_id = ais.id");
         str.append(" inner join framework f on f.id = ais.framework_id");
+        str.append(" inner join bamboo_method_return_type bmrt on bmrt.method_id = bm.id");
 
         if (StringUtil.isNotEmpty(projectId)) {
             str.append(" where ba.project_id =");
@@ -415,12 +418,14 @@ public class BambooService {
             String url = resultSet.getString("url");
             String requestMethods = resultSet.getString("requestMethods");
             String methodName = resultSet.getString("methodName");
+            String methodReturn = resultSet.getString("methodReturn");
             String methodDesc = resultSet.getString("methodDesc");
             String className = resultSet.getString("className");
             String classPath = resultSet.getString("classPath");
             String classDesc = resultSet.getString("classDesc");
             String modelName = resultSet.getString("modelName");
             String projectName = resultSet.getString("projectName");
+            String projectPath = resultSet.getString("projectPath");
             String soaType = resultSet.getString("soaType");
             String frameworkName = resultSet.getString("frameworkName");
             String methodId = resultSet.getString("methodId");
@@ -429,6 +434,7 @@ public class BambooService {
             api.setUrl(url);
             api.setRequestMethods(requestMethods);
             api.setMethodName(methodName);
+            api.setMethodReturn(methodReturn);
             api.setModelName(modelName);
             api.setClassName(className);
             api.setClassPath(classPath);
@@ -437,6 +443,105 @@ public class BambooService {
             api.setFrameworkName(frameworkName);
             api.setProject(project);
             api.setMethodId(methodId);
+            api.setProjectPath(projectPath);
+            api.getMethodDescHashMap().put("javadoc", methodDesc);
+            api.getClassDescHashMap().put("javadoc", classDesc);
+
+            if (StringUtil.isNotBlank(classDescribe)) {
+
+                JSONArray classDescribes = JSONUtil.parseArray(classDescribe);
+                Object[] objects = classDescribes.toArray();
+                if (objects.length > 0) {
+                    Map<String, String> otherDesc = Arrays.stream(objects).collect(Collectors.toMap(e -> String.valueOf(e).split("\\|")[0], e -> String.valueOf(e).split("\\|")[1], (old, next) -> old));
+                    api.getClassDescHashMap().putAll(otherDesc);
+                }
+
+            }
+            if (StringUtil.isNotBlank(methodDescribe)) {
+                JSONArray methodDescribes = JSONUtil.parseArray(methodDescribe);
+                final Object[] objects = methodDescribes.toArray();
+                if (objects.length > 0) {
+                    Map<String, String> otherDesc = Arrays.stream(objects).collect(Collectors.toMap(e -> String.valueOf(e).split("\\|")[0], e -> String.valueOf(e).split("\\|")[1], (old, next) -> next));
+                    api.getMethodDescHashMap().putAll(otherDesc);
+                }
+            }
+            apis.add(api);
+        }
+        resultSet.close();
+        state.close();
+        conn.close();
+        return apis;
+    }
+
+
+    @SneakyThrows
+    public static List<BambooApiMethod> getHistoryAllApi(Project project) {
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        StringBuilder str = new StringBuilder();
+        str.append("select ba.url,");
+        str.append("ba.request_methods requestMethods,");
+        str.append("ba.method_id  methodId,");
+        str.append("bm.method_name     methodName,");
+        str.append("bmrt.return_type_path  methodReturn,");
+        str.append("bm.description     methodDesc,");
+        str.append("bc.class_name      className,");
+        str.append("bc.class_path      classPath,");
+        str.append("bc.description     classDesc,");
+        str.append("bc.model_name      modelName,");
+        str.append("bc.description     classDesc,");
+        str.append("bap.project_name   projectName,");
+        str.append("bap.project_path   projectPath,");
+        str.append("bap.id     projectId,");
+        str.append("ais.soa_type       soaType,");
+        str.append("bha.query_count queryCount,");
+        str.append("f.name             frameworkName,");
+        str.append("(select json_group_array((frameword_code || '|' || describe)) from bamboo_desc where association_id = bc.id) classDescribe,");
+        str.append("(select json_group_array((frameword_code || '|' || describe)) from bamboo_desc where association_id = bm.id) methodDescribe");
+        str.append(" from bamboo_api ba");
+        str.append(" inner join bamboo_method bm on ba.method_id = bm.id");
+        str.append(" inner join bamboo_class bc on bm.class_id = bc.id");
+        str.append(" inner join bamboo_project bap on bc.project_id = bap.id ");
+        str.append(" inner join annotation_info_setting ais on bc.setting_id = ais.id");
+        str.append(" inner join framework f on f.id = ais.framework_id");
+        str.append(" inner join bamboo_method_return_type bmrt on bmrt.method_id = bm.id");
+        str.append(" inner join bamboo_history_apis bha on bha.project_path = bap.project_path and bha.project_name = bap.project_name and bha.class_name = bc.class_name and bha.class_path = bc.class_path and bha.method_name = bm.method_name and bha.method_return = bmrt.return_type_path ");
+        str.append(";");
+        List<BambooApiMethod> apis = new ArrayList<>();
+        final ResultSet resultSet = state.executeQuery(str.toString());
+        while (resultSet.next()) {
+            final BambooApiMethod api = new BambooApiMethod();
+            String url = resultSet.getString("url");
+            String requestMethods = resultSet.getString("requestMethods");
+            String methodName = resultSet.getString("methodName");
+            String methodReturn = resultSet.getString("methodReturn");
+            String methodDesc = resultSet.getString("methodDesc");
+            String className = resultSet.getString("className");
+            String classPath = resultSet.getString("classPath");
+            String classDesc = resultSet.getString("classDesc");
+            String modelName = resultSet.getString("modelName");
+            String projectName = resultSet.getString("projectName");
+            String projectPath = resultSet.getString("projectPath");
+            String queryCount = resultSet.getString("queryCount");
+            String soaType = resultSet.getString("soaType");
+            String frameworkName = resultSet.getString("frameworkName");
+            String methodId = resultSet.getString("methodId");
+            String classDescribe = resultSet.getString("classDescribe");
+            String methodDescribe = resultSet.getString("methodDescribe");
+            api.setUrl(url);
+            api.setRequestMethods(requestMethods);
+            api.setMethodName(methodName);
+            api.setMethodReturn(methodReturn);
+            api.setModelName(modelName);
+            api.setClassName(className);
+            api.setClassPath(classPath);
+            api.setProjectName(projectName);
+            api.setSoaType(soaType);
+            api.setFrameworkName(frameworkName);
+            api.setProject(project);
+            api.setMethodId(methodId);
+            api.setProjectPath(projectPath);
+            api.setQueryCount(Integer.valueOf(queryCount));
             api.getMethodDescHashMap().put("javadoc", methodDesc);
             api.getClassDescHashMap().put("javadoc", classDesc);
 
@@ -505,10 +610,7 @@ public class BambooService {
     public static void saveProject(ProjectInfo projectInfo) {
         ProjectInfo project = BambooService.queryProject(projectInfo.getProjectPath(), projectInfo.getProjectName());
         if (project == null) {
-            String str = "INSERT INTO bamboo_project (project_name, project_path) VALUES (" +
-                    StringUtil.format("'{}',", projectInfo.getProjectName()) +
-                    StringUtil.format("'{}'", projectInfo.getProjectPath()) +
-                    ");";
+            String str = "INSERT INTO bamboo_project (project_name, project_path) VALUES (" + StringUtil.format("'{}',", projectInfo.getProjectName()) + StringUtil.format("'{}'", projectInfo.getProjectPath()) + ");";
             Connection conn = SqliteConfig.getConnection();
             Statement state = conn.createStatement();
             state.executeUpdate(str);
@@ -612,4 +714,68 @@ public class BambooService {
         conn.close();
     }
 
+    @SneakyThrows
+    public static void saveHistoryApis(BambooHistoryApis historyApis) {
+
+        List<BambooHistoryApis> bambooHistoryApis = BambooService.selectHistoryApis(historyApis);
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        if (CollectionUtil.isNotEmpty(bambooHistoryApis)) {
+            bambooHistoryApis.forEach(e -> {
+                try {
+                    Integer count = Integer.valueOf(e.getQueryCount());
+                    state.addBatch("UPDATE bamboo_history_apis SET query_count = '" + (count + 1) + "' WHERE id = '" + e.getId() + "';");
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
+            state.executeBatch();
+        } else {
+            state.execute(historyApis.toSql());
+        }
+        state.close();
+        conn.close();
+    }
+
+    @SneakyThrows
+    public static List<BambooHistoryApis> selectHistoryApis(BambooHistoryApis historyApis) {
+
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        StringBuilder str = new StringBuilder();
+        str.append("select * from bamboo_history_apis where ");
+        str.append("project_path = '" + historyApis.getProjectPath() + "'");
+        str.append(" and project_name = '" + historyApis.getProjectName() + "'");
+        str.append(" and class_name = '" + historyApis.getClassName() + "'");
+        str.append(" and class_path = '" + historyApis.getClassPath() + "'");
+        str.append(" and method_name = '" + historyApis.getMethodName() + "'");
+        str.append(" and method_return = '" + historyApis.getMethodReturn() + "'");
+        str.append(";");
+        ResultSet resultSet = state.executeQuery(str.toString());
+        List<BambooHistoryApis> historyApisList = new ArrayList<>();
+        while (resultSet.next()) {
+
+            String id = resultSet.getString("id");
+            String projectName = resultSet.getString("project_name");
+            String projectPath = resultSet.getString("project_path");
+            String className = resultSet.getString("class_name");
+            String classPath = resultSet.getString("class_path");
+            String methodName = resultSet.getString("method_name");
+            String methodReturn = resultSet.getString("method_return");
+            String queryCount = resultSet.getString("query_count");
+            BambooHistoryApis historyApi = new BambooHistoryApis();
+            historyApi.setId(id);
+            historyApi.setProjectPath(projectPath);
+            historyApi.setProjectName(projectName);
+            historyApi.setClassName(className);
+            historyApi.setClassPath(classPath);
+            historyApi.setQueryCount(queryCount);
+            historyApi.setMethodName(methodName);
+            historyApi.setMethodReturn(methodReturn);
+            historyApisList.add(historyApi);
+        }
+        state.close();
+        conn.close();
+        return historyApisList;
+    }
 }
