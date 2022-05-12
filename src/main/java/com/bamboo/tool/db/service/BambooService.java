@@ -367,7 +367,7 @@ public class BambooService {
     }
 
     @SneakyThrows
-    public static List<BambooApiMethod> getAllApi(String projectId, String notProjectId, Project project) {
+    public static List<BambooApiMethod> getAllApi(String projectId, String notProjectId, Project project, String queryCondition) {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         StringBuilder str = new StringBuilder();
@@ -396,18 +396,22 @@ public class BambooService {
         str.append(" inner join annotation_info_setting ais on bc.setting_id = ais.id");
         str.append(" inner join framework f on f.id = ais.framework_id");
         str.append(" inner join bamboo_method_return_type bmrt on bmrt.method_id = bm.id");
+        str.append(" where 1=1");
 
         if (StringUtil.isNotEmpty(projectId)) {
-            str.append(" where ba.project_id =");
+            str.append("  and ba.project_id =");
             str.append("'");
             str.append(projectId);
             str.append("'");
         }
         if (StringUtil.isNotEmpty(notProjectId)) {
-            str.append(" where ba.project_id !=");
+            str.append(" and ba.project_id !=");
             str.append("'");
             str.append(notProjectId);
             str.append("'");
+        }
+        if (StringUtil.isNotBlank(queryCondition)) {
+            str.append(" and ba.url like '%" + queryCondition + "%'");
         }
         str.append(" group by ba.url, ba.request_methods, ba.method_id, bm.method_name, bm.description, bc.class_name, bc.class_path, bc.description, bc.model_name, bc.description, bap.project_name, bap.id, ais.soa_type, f.name");
         str.append(";");

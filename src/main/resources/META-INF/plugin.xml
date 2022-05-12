@@ -11,7 +11,7 @@
         <a href="http://liangkezaoshu.space/index.php/6.html">文档地址</a>
         ]]>
     </description>
-    <idea-version since-build="191"/>
+    <idea-version since-build="211"/>
     <!-- 插件版本号 -->
     <version>1.0</version>
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
@@ -36,8 +36,6 @@
         <applicationConfigurable dynamic="true" displayName="Restful Cloud"
                                  instance="com.bamboo.tool.components.api.configurable.RestfulCloudConfigurable"/>
     </extensions>
-
-
 
     <actions>
         <action id="restfulCloud.search"

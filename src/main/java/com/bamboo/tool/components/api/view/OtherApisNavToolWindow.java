@@ -102,7 +102,7 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
                 ProjectInfo currentProject = BambooService.queryProject(project.getBasePath(), project.getName());
-                 List<BambooApiMethod> allApi = BambooService.getAllApi(null, currentProject.getId().toString(), project);
+                 List<BambooApiMethod> allApi = BambooService.getAllApi(null, currentProject.getId().toString(), project,null);
                 RootNode root = new RootNode("apis("+allApi.size()+")");
                 PsiUtils.convertOtherToRoot(root, allApi);
 

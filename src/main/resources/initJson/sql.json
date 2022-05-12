@@ -199,5 +199,15 @@
     ],
     "datas": [
     ]
-  }
+  },
+  {
+    "tableName": "bamboo_history_apis",
+    "creatSql": "CREATE TABLE bamboo_history_apis ( id text, project_name text, project_path text, class_name text, class_path text, method_name text, method_return text, query_count text DEFAULT 0 );",
+    "index": [
+      "create unique index bamboo_history_apis_id_uindex on bamboo_history_apis (id);"
+    ],
+    "datas": [
+    ]
+  },
+
 ]

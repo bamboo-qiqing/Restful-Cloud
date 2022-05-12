@@ -3,6 +3,7 @@ package com.bamboo.tool.components.api.contributor;
 
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
+import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
@@ -19,15 +20,16 @@ public class RequestMappingByNameContributor implements ChooseByNameContributor 
     @NotNull
     @Override
     public String[] getNames(Project project, boolean b) {
-        navigationItems = BambooService.getAllApi(null, null,project);
-        String[] strings = navigationItems.stream().map(BambooApiMethod::getName).distinct().toArray(String[]::new);
+        String userData = project.getUserData(ChooseByNamePopup.CURRENT_SEARCH_PATTERN);
+        navigationItems = BambooService.getAllApi(null, null,project,userData);
+        String[] strings = navigationItems.parallelStream().map(BambooApiMethod::getName).distinct().toArray(String[]::new);
         return strings;
     }
 
     @NotNull
     @Override
     public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
-        BambooApiMethod[] requestMappingItems = navigationItems.stream().filter(q -> q.getName().equals(name)).toArray(BambooApiMethod[]::new);
+        BambooApiMethod[] requestMappingItems = navigationItems.parallelStream().filter(q -> q.getName().equals(name)).toArray(BambooApiMethod[]::new);
         return requestMappingItems;
     }
 

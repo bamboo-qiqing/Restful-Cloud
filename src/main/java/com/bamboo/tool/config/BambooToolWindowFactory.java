@@ -29,6 +29,7 @@ public class BambooToolWindowFactory implements ToolWindowFactory, DumbAware {
 
         HistoryApisNavToolWindow historyApisNavToolWindow = new HistoryApisNavToolWindow(project);
         historyApisNavToolWindow.getComponent().add(historyApisNavToolWindow.getContent());
+
         Content historyApis = contentFactory.createContent(historyApisNavToolWindow, "History Project", true);
         toolWindow.getContentManager().addContent(historyApis);
 

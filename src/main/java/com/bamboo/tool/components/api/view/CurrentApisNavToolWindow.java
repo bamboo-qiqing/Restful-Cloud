@@ -146,7 +146,7 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                     apiTree.setModel(new DefaultTreeModel(root));
                     ProjectInfo currentProject = BambooService.queryProject(project.getBasePath(), project.getName());
                     BambooService.saveClass(allApiList, currentProject);
-                    final List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, project);
+                    final List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, project,null);
                     PsiUtils.convertToRoot(root, allApi);
                     NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
                 });
