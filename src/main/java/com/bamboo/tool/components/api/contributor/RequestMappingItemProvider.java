@@ -39,15 +39,13 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
     }
 
 
-    public @NotNull
-    List<String> filterNames(@NotNull ChooseByNameViewModel base, @NotNull String[] names, @NotNull String pattern) {
-        return null;
+    public @NotNull List<String> filterNames(@NotNull ChooseByNameViewModel base, @NotNull String[] names, @NotNull String pattern) {
+        return new ArrayList<>();
     }
 
 
+    @Override
     public boolean filterElements(@NotNull ChooseByNameViewModel base, @NotNull String pattern, boolean everywhere, @NotNull ProgressIndicator indicator, @NotNull Processor<Object> consumer) {
-
-
         Project project = base.getProject();
         if (project == null) {
             return false;
@@ -59,6 +57,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
         indicator.checkCanceled();
         return processByNames(base, everywhere, indicator, consumer, namesList, parameters);
     }
+
 
     private List<String> getSortedResults(ChooseByNameViewModel base, String pattern, ProgressIndicator indicator, FindSymbolParameters parameters) {
 

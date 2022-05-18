@@ -4,14 +4,15 @@ import com.bamboo.tool.components.api.view.component.tree.ApiTree;
 import com.bamboo.tool.components.api.view.component.tree.BaseNode;
 import com.bamboo.tool.components.api.view.component.tree.MethodNode;
 import com.bamboo.tool.components.api.view.component.tree.RootNode;
-import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiUtils;
-import com.intellij.icons.AllIcons;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -89,7 +90,6 @@ public class HistoryApisNavToolWindow extends SimpleToolWindowPanel implements D
 
     private void initActionBar() {
         DefaultActionGroup group = new DefaultActionGroup();
-        group.add(new HistoryApisNavToolWindow.RefreshApiAction());
 
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, group, false);
         actionToolbar.setTargetComponent(panel);
@@ -99,18 +99,7 @@ public class HistoryApisNavToolWindow extends SimpleToolWindowPanel implements D
         setToolbar(toolbarComponent);
     }
 
-    private final class RefreshApiAction extends AnAction {
-        public RefreshApiAction() {
-            super("Refresh", "Refresh", AllIcons.Actions.Refresh);
-        }
-
-        @Override
-        public void actionPerformed(@NotNull AnActionEvent e) {
-            renderData(myProject);
-        }
-    }
-
-    private void renderData(Project project) {
+    public void renderData(Project project) {
 
         DumbService.getInstance(project).smartInvokeLater(() -> rendingTree(project));
     }
@@ -162,5 +151,10 @@ public class HistoryApisNavToolWindow extends SimpleToolWindowPanel implements D
             }
             SpeedSearchUtil.applySpeedSearchHighlighting(this, this, false, true);
         }
+    }
+
+    @Override
+    public boolean isToolbarVisible() {
+        return super.isToolbarVisible();
     }
 }

@@ -1,11 +1,9 @@
 package com.bamboo.tool.components.api.configurable;
 
 import com.bamboo.tool.components.api.entity.DescFramework;
-import com.bamboo.tool.components.api.ui.component.DescFrameWorkTableModel;
+import com.bamboo.tool.components.api.view.component.table.DescFrameWorkTableModel;
 import com.bamboo.tool.db.service.BambooService;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.util.NlsContexts;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;

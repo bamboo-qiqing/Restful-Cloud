@@ -33,6 +33,7 @@ public class MethodNode extends BaseNode<BambooApiMethod> {
         super(apiModel);
     }
 
+
     @Override
     public @Nullable
     Icon getIcon(boolean selected) {

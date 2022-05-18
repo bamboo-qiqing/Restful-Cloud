@@ -39,10 +39,10 @@ public class FrameworkExecute {
         Map<String, AnnotationInfoSetting> infoSettingClassMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.CLASS.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
         Map<String, AnnotationInfoSetting> infoSettingMethodMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
         List<BambooClass> bambooClasses = new ArrayList<>();
-        final List<PsiClassCache> caches = PsiUtils.getALLPsiClass(project, annotationInfoSettings);
+        List<PsiClassCache> caches = PsiUtils.getALLPsiClass(project, annotationInfoSettings);
         caches.forEach(cache -> {
-            final PsiClass psiClass = cache.getPsiClass();
-            final AnnotationInfoSetting info = cache.getInfo();
+            PsiClass psiClass = cache.getPsiClass();
+            AnnotationInfoSetting info = cache.getInfo();
             Module module = ModuleUtil.findModuleForPsiElement(psiClass);
             if (module != null) {
                 BambooClass bambooClass = new BambooClass();
@@ -55,7 +55,7 @@ public class FrameworkExecute {
                 if (annotations.length > 0) {
                     buildAnnotations(bambooClass, null, infoSettingClassMap, annotations, info);
                 }
-                final PsiMethod[] methods = psiClass.getMethods();
+                PsiMethod[] methods = psiClass.getMethods();
                 if (methods.length > 0) {
                     Map<String, AnnotationMethodScope> methodScopes = info.getMethodScopes().stream().collect(Collectors.toMap(AnnotationMethodScope::getMethodScope, methodScope -> methodScope));
                     Arrays.stream(methods).forEach(method -> {
@@ -66,11 +66,11 @@ public class FrameworkExecute {
                                 bambooMethod.setMethodName(method.getName());
                                 bambooMethod.setAccessLevel(PsiUtil.getAccessLevel(method.getModifierList()));
 
-                                final AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
+                                AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
                                 if (annotationMethodScope != null) {
-                                    final PsiAnnotation[] methodAnnotations = method.getAnnotations();
+                                    PsiAnnotation[] methodAnnotations = method.getAnnotations();
                                     if (methodAnnotations.length > 0) {
-                                        final boolean annotations1 = buildAnnotations(null, bambooMethod, infoSettingMethodMap, methodAnnotations, info);
+                                        boolean annotations1 = buildAnnotations(null, bambooMethod, infoSettingMethodMap, methodAnnotations, info);
                                         if (annotations1) {
                                             bambooMethod.getReturnType().buildReturnType(Objects.requireNonNull(method.getReturnType()));
                                             bambooMethod.setDescription(FrameworkExecute.getMethodDescription(method));
@@ -108,12 +108,12 @@ public class FrameworkExecute {
      */
     private static boolean methodLevel(Map<String, AnnotationMethodScope> methodScopes, PsiMethod method) {
 
-        final int accessLevel = PsiUtil.getAccessLevel(method.getModifierList());
-        final AnnotationMethodScope privateScope = methodScopes.get(MethodScope.PRIVATE.getCode());
+        int accessLevel = PsiUtil.getAccessLevel(method.getModifierList());
+        AnnotationMethodScope privateScope = methodScopes.get(MethodScope.PRIVATE.getCode());
         if (privateScope != null) {
             return accessLevel == PsiUtil.ACCESS_LEVEL_PRIVATE;
         }
-        final AnnotationMethodScope publicScope = methodScopes.get(MethodScope.PUBLIC.getCode());
+        AnnotationMethodScope publicScope = methodScopes.get(MethodScope.PUBLIC.getCode());
         if (publicScope != null) {
             return accessLevel == PsiUtil.ACCESS_LEVEL_PUBLIC;
         }
@@ -131,7 +131,7 @@ public class FrameworkExecute {
             AnnotationInfoSetting annotationInfoSetting = infoSettingMap.get(Objects.requireNonNull(annotation.getNameReferenceElement()).getCanonicalText());
             if (!Objects.isNull(annotationInfoSetting)) {
                 results.set(true);
-                final String requestMethod = RequestMethodUtil.REQUEST_METHOD.get(annotationInfoSetting.getAnnotationPath());
+                String requestMethod = RequestMethodUtil.REQUEST_METHOD.get(annotationInfoSetting.getAnnotationPath());
                 if (StringUtil.isNotEmpty(requestMethod)) {
                     bambooMethod.getRequestMethods().add(requestMethod);
                 }
@@ -159,7 +159,7 @@ public class FrameworkExecute {
             AnnotationParam annotationParam = params.get(name);
             if (!Objects.isNull(annotationParam)) {
                 List<String> values = PsiAnnotationMemberUtil.getValue(value);
-                final String type = annotationParam.getType();
+                String type = annotationParam.getType();
                 if (bambooMethod != null) {
                     buildAttributesMethod(bambooMethod, annotationInfoSetting, values, type);
                 }
@@ -202,8 +202,8 @@ public class FrameworkExecute {
         } else if ("produces".equals(type)) {
             bambooClass.setProduces(values.toString());
         } else if ("desc".equals(type)) {
-            final BambooDesc bambooDesc = new BambooDesc();
-            final String frameworkName = annotationInfoSetting.getFramework().getName();
+            BambooDesc bambooDesc = new BambooDesc();
+            String frameworkName = annotationInfoSetting.getFramework().getName();
             bambooDesc.setFramewordCode(frameworkName);
             bambooDesc.setDescribe(values.get(0));
             if (bambooClass != null && StringUtil.isNotBlank(values.get(0))) {
@@ -227,8 +227,8 @@ public class FrameworkExecute {
         } else if ("produces".equals(type)) {
             bambooMethod.setProduces(values.toString());
         } else if ("desc".equals(type)) {
-            final BambooDesc bambooDesc = new BambooDesc();
-            final String frameworkName = annotationInfoSetting.getFramework().getName();
+            BambooDesc bambooDesc = new BambooDesc();
+            String frameworkName = annotationInfoSetting.getFramework().getName();
             bambooDesc.setFramewordCode(frameworkName);
             bambooDesc.setDescribe(values.get(0));
             if (bambooMethod != null && StringUtil.isNotBlank(values.get(0))) {

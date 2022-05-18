@@ -1,9 +1,10 @@
 plugins {
-    id 'org.jetbrains.intellij' version '1.3.1'
+    id 'org.jetbrains.intellij' version '1.4.0'
     id 'java'
     id 'groovy'
+    id 'org.jetbrains.changelog' version "1.3.1"
 }
-
+apply plugin: 'org.jetbrains.changelog'
 group 'com.bamboo'
 version '1.0.0'
 sourceCompatibility = JavaVersion.VERSION_11
@@ -12,7 +13,6 @@ repositories {
     maven { name "Alibaba"; url "https://maven.aliyun.com/repository/public" }
     mavenCentral()
 }
-
 
 dependencies {
     implementation 'com.alibaba:fastjson:1.2.47'
@@ -24,15 +24,25 @@ dependencies {
 }
 
 intellij {
-    pluginName = 'Restful Cloud'
     plugins = ['java', "com.intellij.properties", "com.intellij.java-i18n"]
-    version = '2021.2.1'
+    version = '2021.3.1'
     type = 'IU'
     updateSinceUntilBuild = false
     downloadSources = true
 
 }
+runPluginVerifier {
+    intellij {
+        type= 'IU'
+        ideVersions = ["IU-2022.1.1","IU-2022.1",
+                       "IU-2021.3.3", "IU-2021.3.2", "IU-2021.3.1", "IU-2021.3",
+                       "IU-2021.2.4", "IU-2021.2.3", "IU-2021.2.2", "IU-2021.2.1", "IU-2021.2",
+                       "IU-2021.1.3", "IU-2021.1.2"]
+        downloadDir = "E:\\ides"
+        runtimeDir  = "E:\\install\\program\\plugins\\jdk\\jdk11"
+    }
 
+}
 
 patchPluginXml {
     changeNotes = """

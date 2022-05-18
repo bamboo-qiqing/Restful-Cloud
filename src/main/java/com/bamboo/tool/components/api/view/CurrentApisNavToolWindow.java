@@ -2,10 +2,8 @@ package com.bamboo.tool.components.api.view;
 
 import com.bamboo.tool.components.api.entity.BambooClass;
 import com.bamboo.tool.components.api.factory.FrameworkExecute;
-import com.bamboo.tool.components.api.view.component.tree.ApiTree;
-import com.bamboo.tool.components.api.view.component.tree.BaseNode;
-import com.bamboo.tool.components.api.view.component.tree.MethodNode;
-import com.bamboo.tool.components.api.view.component.tree.RootNode;
+import com.bamboo.tool.components.api.view.component.actions.RenameDescAction;
+import com.bamboo.tool.components.api.view.component.tree.*;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
@@ -15,6 +13,8 @@ import com.intellij.ide.CommonActionsManager;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.impl.ActionManagerImpl;
+import com.intellij.openapi.actionSystem.impl.MenuItemPresentationFactory;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -31,12 +31,11 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,8 +55,6 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
         setLayout(new BorderLayout());
         apiTree = new ApiTree();
         initActionBar();
-
-
         Disposer.register(myProject, this);
         apiTree.setCellRenderer(new MyCellRenderer());
         apiTree.addKeyListener(new KeyAdapter() {
@@ -69,6 +66,42 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                 }
             }
         });
+        apiTree.addTreeSelectionListener(new TreeSelectionListener() {
+
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+                System.out.printf("1");
+            }
+        });
+
+        PopupHandler popupHandler = new PopupHandler() {
+            @Override
+            public void invokePopup(Component comp, int x, int y) {
+
+                if (comp instanceof ApiTree) {
+
+                    DefaultActionGroup group = new DefaultActionGroup();
+                    ApiTree source = (ApiTree) comp;
+                    Object lastPathComponent = source.getSelectionPath().getLastPathComponent();
+                    if (lastPathComponent instanceof MethodNode) {
+                        group.add(new RenameDescAction(source));
+                    }
+                    if (lastPathComponent instanceof ClassNode) {
+                        group.add(new RenameDescAction(source));
+                    }
+                    if (lastPathComponent instanceof ModuleNode) {
+                        group.add(new RenameDescAction(source));
+                    }
+                    if (lastPathComponent instanceof ProjectNode) {
+                        group.add(new RenameDescAction(source));
+                    }
+                    ActionPopupMenu contextMenu = ((ActionManagerImpl) ActionManager.getInstance()).createActionPopupMenu(ActionPlaces.POPUP, new DefaultActionGroup(group), new MenuItemPresentationFactory(true));
+                    contextMenu.getComponent().show(comp, x, y);
+                }
+
+            }
+        };
+        apiTree.addMouseListener(popupHandler);
         apiTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent event) {
@@ -142,11 +175,11 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                 ApplicationManager.getApplication().runReadAction(() -> {
                     allApiList = FrameworkExecute.buildApiMethod(myProject);
                     indicator.setText("Rendering");
-                    RootNode root = new RootNode("apis("+allApiList.size()+")");
+                    RootNode root = new RootNode("apis(" + allApiList.size() + ")");
                     apiTree.setModel(new DefaultTreeModel(root));
                     ProjectInfo currentProject = BambooService.queryProject(project.getBasePath(), project.getName());
                     BambooService.saveClass(allApiList, currentProject);
-                    final List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, project,null);
+                    final List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, project, null);
                     PsiUtils.convertToRoot(root, allApi);
                     NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
                 });

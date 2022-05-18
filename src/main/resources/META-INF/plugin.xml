@@ -4,19 +4,25 @@
     <vendor email="760560079@qq.com" url="http://liangkezaoshu.space/index.php/6.html">Restful Cloud</vendor>
 
     <description><![CDATA[
-        Restful Cloud是一个restful api工具包插件 (http客户端).
-        致力于restful api多个项目的管理。
-        该插件产生的是由于微服务的普遍化，平时开发时不得不搜索所有的项目，以及不同项目之间SOA接口调用，插件缓存了已经打开过项目的所有restful api接口。
-        在打开一个项目的时候，可以搜索到所有已经打开过的项目的restful api。
+        Restful Cloud is a restful api toolkit plug-in (http client).
+        It is dedicated to restful the management of multiple api projects.
+        Due to the generalization of microservices, the plug-in has to search all projects and SOA interface calls between different projects during normal development.
+        The plug-in caches all restful api interfaces that have been opened. When opening a project, you can search for the restful api of all opened projects.
         <a href="http://liangkezaoshu.space/index.php/6.html">文档地址</a>
         ]]>
     </description>
-    <idea-version since-build="211"/>
+
+    <idea-version since-build="212"/>
+
+
     <!-- 插件版本号 -->
     <version>1.0</version>
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
          on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
+    <depends>com.intellij.modules.idea.ultimate</depends>
+    <depends>com.intellij.modules.idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
@@ -31,10 +37,10 @@
         <searchEverywhereContributor
                 implementation="com.bamboo.tool.components.api.contributor.BambooApiGotoContributor$Factory">
         </searchEverywhereContributor>
-        <searchEverywhereResultsEqualityProvider
-                implementation="com.bamboo.tool.components.api.contributor.BambooApiEqualityProvider"/>
+
         <applicationConfigurable dynamic="true" displayName="Restful Cloud"
                                  instance="com.bamboo.tool.components.api.configurable.RestfulCloudConfigurable"/>
+
     </extensions>
 
     <actions>
@@ -42,8 +48,8 @@
                 class="com.bamboo.tool.components.api.view.component.actions.RestfulCloudSearchAction">
             <keyboard-shortcut first-keystroke="alt q" keymap="$default"/>
         </action>
-    </actions>
 
+    </actions>
 
 
     <extensions defaultExtensionNs="com.intellij.searchEverywhereContributor">
@@ -61,10 +67,5 @@
 
     </extensions>
 
-
-    <projectListeners>
-        <listener class="com.bamboo.tool.listeners.ToolProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </projectListeners>
 
 </idea-plugin>

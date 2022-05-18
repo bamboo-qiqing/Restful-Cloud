@@ -1,4 +1,4 @@
-package com.bamboo.tool.components.api.ui.component;
+package com.bamboo.tool.components.api.view.component.table;
 
 import com.bamboo.tool.components.api.entity.DescFramework;
 import com.intellij.util.ui.EditableModel;

@@ -7,7 +7,6 @@ import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
 import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.NlsContexts;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -34,14 +33,12 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
         return null;
     }
 
-
-
     @Override
     protected boolean acceptItem(NavigationItem item) {
-         BambooApiMethod api = (BambooApiMethod) item;
+        BambooApiMethod api = (BambooApiMethod) item;
         final Collection<RequestMethod> filterItems = this.getFilterItems();
         long count = filterItems.parallelStream().filter(e -> api.getRequestMethods().contains(e.getCode())).count();
-        return count>0;
+        return count > 0;
     }
 
     @Override
@@ -52,18 +49,19 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
 
     @Override
     public @NotNull
-     String getNotInMessage() {
+    String getNotInMessage() {
         return "Mapping not found";
     }
 
     @Override
     public @NotNull
-     String getNotFoundMessage() {
+    String getNotFoundMessage() {
         return null;
     }
 
     @Override
-    public @Nullable String getCheckBoxName() {
+    public @Nullable
+    String getCheckBoxName() {
         return null;
     }
 
@@ -102,6 +100,8 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
     @Override
     public @NotNull
     ChooseByNameItemProvider getItemProvider(@Nullable PsiElement context) {
+
+
         return new RequestMappingItemProvider(this);
     }
 
