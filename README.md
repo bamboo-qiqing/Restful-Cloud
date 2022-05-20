@@ -1,3 +1,8 @@
+## 参考项目
+
+[Restful Fast Request](https://github.com/dromara/fast-request)
+[RestfulTool](https://github.com/mrmanzhaow/RestfulToolkit)
+
 ## 插件简介
 Restful Cloud是一个restful Api工具包插件。
 使用Sqllite缓存所有打开过的项目的Api是Restful Cloud最大的特点。
