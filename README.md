@@ -28,8 +28,9 @@ Restful Cloud是一个restful Api工具包插件。
 1. 当前项目列表显示
 
 2. 其他项目列表显示
+3. 历史点击列表显示
 
-3. Swagger，javadoc别名显示，默认开启
+4. Swagger，javadoc别名显示，默认开启
 
    **示例**
 

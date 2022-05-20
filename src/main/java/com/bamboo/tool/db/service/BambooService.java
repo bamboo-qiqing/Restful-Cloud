@@ -228,6 +228,11 @@ public class BambooService {
                 });
             }
         });
+        classMap.values().stream().filter(e -> !e.getIsExist()).forEach(e -> {
+            sqls.add(e.toDeleteSql());
+            sqls.add(e.toDeleteMethodSql());
+        });
+        methodMap.values().stream().filter(e->!e.getIsExist()).forEach(e->sqls.add(e.toDeleteSql()));
         return sqls;
     }
 
@@ -516,16 +521,16 @@ public class BambooService {
                 List<BambooDesc> classDescribes = JSONObject.parseArray(classDescribe, BambooDesc.class);
                 Map<String, String> methodDescHashMap = classDescribes.stream().collect(Collectors.toMap(BambooDesc::getFramewordCode, BambooDesc::getDescribe, (key1, key2) -> key2));
                 api.getClassDescHashMap().putAll(methodDescHashMap);
-                if(StringUtil.isNotBlank(classRename)){
-                    api.getClassDescHashMap().put("custom",classRename);
+                if (StringUtil.isNotBlank(classRename)) {
+                    api.getClassDescHashMap().put("custom", classRename);
                 }
             }
             if (StringUtil.isNotBlank(methodDesc)) {
                 List<BambooDesc> bambooDescs = JSONObject.parseArray(methodDesc, BambooDesc.class);
                 Map<String, String> methodDescHashMap = bambooDescs.stream().collect(Collectors.toMap(BambooDesc::getFramewordCode, BambooDesc::getDescribe, (key1, key2) -> key2));
                 api.getMethodDescHashMap().putAll(methodDescHashMap);
-                if(StringUtil.isNotBlank(methodRename)){
-                    api.getMethodDescHashMap().put("custom",methodRename);
+                if (StringUtil.isNotBlank(methodRename)) {
+                    api.getMethodDescHashMap().put("custom", methodRename);
                 }
             }
             apis.add(api);

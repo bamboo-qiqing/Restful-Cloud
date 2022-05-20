@@ -1,9 +1,8 @@
 package com.bamboo.tool.db.entity;
 
 import com.bamboo.tool.contributor.RequestMappingItemPresentation;
-import com.bamboo.tool.entity.BambooHistoryApis;
-import com.bamboo.tool.entity.DescFramework;
 import com.bamboo.tool.db.service.BambooService;
+import com.bamboo.tool.entity.DescFramework;
 import com.bamboo.tool.util.PsiUtils;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
@@ -66,14 +65,7 @@ public class BambooApiMethod implements NavigationItem {
 
         ApplicationManager.getApplication().runReadAction(() -> {
             if (file != null && file.isValid()) {
-                BambooHistoryApis historyApis = new BambooHistoryApis();
-                historyApis.setMethodName(methodName);
-                historyApis.setProjectName(projectName);
-                historyApis.setProjectPath(projectPath);
-                historyApis.setClassName(className);
-                historyApis.setClassPath(classPath);
-                historyApis.setMethodReturn(methodReturn);
-                BambooService.saveMethodCount(methodId,queryCount);
+                BambooService.saveMethodCount(methodId, queryCount);
                 PsiUtils.openFile(file, project, methodName, methodId);
             }
             if (navigationElement != null) {

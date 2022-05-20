@@ -46,4 +46,12 @@ public class BambooClass {
     public String toUpdateSql() {
         return "UPDATE bamboo_class SET description = '" + JSONObject.toJSONString(descs) + "',setting_id  = '" + settingId + "' WHERE id = '" + id + "';";
     }
+
+    public String toDeleteSql() {
+        return "delete from bamboo_class where id='" + id + "';";
+    }
+
+    public String toDeleteMethodSql() {
+        return "delete from bamboo_method where class_id='" + id + "';";
+    }
 }

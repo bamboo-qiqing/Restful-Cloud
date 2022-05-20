@@ -66,5 +66,7 @@ public class BambooMethod {
         return "UPDATE bamboo_method SET description   = '" + description + "' WHERE id = '" + id + "';";
     }
 
-
+    public String toDeleteSql() {
+        return "delete from bamboo_method where id='" + id + "';";
+    }
 }
