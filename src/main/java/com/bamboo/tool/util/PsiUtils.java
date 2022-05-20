@@ -1,21 +1,18 @@
 package com.bamboo.tool.util;
 
 
-import com.bamboo.tool.components.api.entity.AnnotationInfoSetting;
-import com.bamboo.tool.components.api.entity.DescFramework;
-import com.bamboo.tool.components.api.entity.MethodParam;
-import com.bamboo.tool.components.api.entity.NoteData;
-import com.bamboo.tool.components.api.enums.AnnotationScope;
-import com.bamboo.tool.components.api.view.component.tree.ClassNode;
-import com.bamboo.tool.components.api.view.component.tree.MethodNode;
-import com.bamboo.tool.components.api.view.component.tree.ModuleNode;
-import com.bamboo.tool.components.api.view.component.tree.ProjectNode;
+import com.bamboo.tool.entity.AnnotationInfoSetting;
+import com.bamboo.tool.entity.DescFramework;
+import com.bamboo.tool.entity.MethodParam;
+import com.bamboo.tool.entity.NoteData;
+import com.bamboo.tool.enums.AnnotationScope;
+import com.bamboo.tool.view.component.tree.ClassNode;
+import com.bamboo.tool.view.component.tree.MethodNode;
+import com.bamboo.tool.view.component.tree.ModuleNode;
+import com.bamboo.tool.view.component.tree.ProjectNode;
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
-import com.intellij.ide.lightEdit.LightEdit;
-import com.intellij.ide.lightEdit.LightEditFeatureUsagesUtil;
-import com.intellij.ide.lightEdit.LightEditService;
 import com.intellij.ide.util.PsiNavigationSupport;
 import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider;
 import com.intellij.openapi.project.Project;
@@ -74,6 +71,7 @@ public class PsiUtils {
             noteData.setDescMap(e.getClassDescHashMap());
             noteData.setDescFrameworks(descFrameworks);
             noteData.setName(className);
+            noteData.setClassId(e.getClassId());
             ClassNode classNode = new ClassNode(noteData);
             ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
             if (classNode1 != null) {
@@ -104,11 +102,12 @@ public class PsiUtils {
             if (moduleNode1 != null) {
                 moduleNode = moduleNode1;
             }
-            final NoteData noteData = new NoteData();
+             NoteData noteData = new NoteData();
             noteData.setIsShowDesc(isShowDesc);
             noteData.setDescMap(e.getClassDescHashMap());
             noteData.setDescFrameworks(descFrameworks);
             noteData.setName(className);
+            noteData.setClassId(e.getClassId());
             ClassNode classNode = new ClassNode(noteData);
             ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
             if (classNode1 != null) {

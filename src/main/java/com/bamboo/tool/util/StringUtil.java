@@ -3,7 +3,7 @@ package com.bamboo.tool.util;
 
 import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.StrUtil;
-import com.bamboo.tool.components.api.enums.RequestMethod;
+import com.bamboo.tool.enums.RequestMethod;
 import com.intellij.psi.PsiNameValuePair;
 
 import java.util.ArrayList;

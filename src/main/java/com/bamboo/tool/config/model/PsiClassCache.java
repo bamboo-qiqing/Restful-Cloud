@@ -1,6 +1,6 @@
 package com.bamboo.tool.config.model;
 
-import com.bamboo.tool.components.api.entity.AnnotationInfoSetting;
+import com.bamboo.tool.entity.AnnotationInfoSetting;
 import com.intellij.psi.PsiClass;
 import lombok.Data;
 

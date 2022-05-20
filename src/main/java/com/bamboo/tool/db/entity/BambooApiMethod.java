@@ -1,15 +1,14 @@
 package com.bamboo.tool.db.entity;
 
-import com.bamboo.tool.components.api.contributor.RequestMappingItemPresentation;
-import com.bamboo.tool.components.api.entity.BambooHistoryApis;
-import com.bamboo.tool.components.api.entity.DescFramework;
+import com.bamboo.tool.contributor.RequestMappingItemPresentation;
+import com.bamboo.tool.entity.BambooHistoryApis;
+import com.bamboo.tool.entity.DescFramework;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiUtils;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.NlsSafe;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
@@ -34,6 +33,7 @@ public class BambooApiMethod implements NavigationItem {
     private String methodReturn;
     private String className;
     private String classPath;
+    private String classId;
     private Map<String, String> classDescHashMap = new HashMap<>();
     private Map<String, String> methodDescHashMap = new HashMap<>();
     private String modelName;
@@ -73,7 +73,7 @@ public class BambooApiMethod implements NavigationItem {
                 historyApis.setClassName(className);
                 historyApis.setClassPath(classPath);
                 historyApis.setMethodReturn(methodReturn);
-                BambooService.saveHistoryApis(historyApis);
+                BambooService.saveMethodCount(methodId,queryCount);
                 PsiUtils.openFile(file, project, methodName, methodId);
             }
             if (navigationElement != null) {

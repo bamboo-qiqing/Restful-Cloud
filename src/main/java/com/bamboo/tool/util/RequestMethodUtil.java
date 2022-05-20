@@ -1,6 +1,6 @@
 package com.bamboo.tool.util;
 
-import com.bamboo.tool.components.api.enums.RequestMethod;
+import com.bamboo.tool.enums.RequestMethod;
 
 import java.util.HashMap;
 import java.util.Map;

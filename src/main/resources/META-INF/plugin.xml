@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.bamboo</id>
     <name>Restful Cloud</name>
-    <vendor email="760560079@qq.com" url="http://liangkezaoshu.space/index.php/6.html">Restful Cloud</vendor>
+    <vendor email="760560079@qq.com" url="https://github.com/bamboo-qiqing/Restful-Cloud">Restful Cloud</vendor>
 
     <description><![CDATA[
         Restful Cloud is a restful api toolkit plug-in (http client).
@@ -27,7 +27,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
-        <projectService serviceImplementation="com.bamboo.tool.components.api.configurable.BambooApiFilterConfiguration"
+        <projectService serviceImplementation="com.bamboo.tool.configurable.BambooApiFilterConfiguration"
                         order="first"/>
         <toolWindow id="Restful Cloud" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
                     secondary="false" icon="PluginIcons.LOGO"/>
@@ -35,17 +35,17 @@
         <notificationGroup id="toolWindowNotificationGroup" displayType="TOOL_WINDOW"/>
 
         <searchEverywhereContributor
-                implementation="com.bamboo.tool.components.api.contributor.BambooApiGotoContributor$Factory">
+                implementation="com.bamboo.tool.contributor.BambooApiGotoContributor$Factory">
         </searchEverywhereContributor>
 
         <applicationConfigurable dynamic="true" displayName="Restful Cloud"
-                                 instance="com.bamboo.tool.components.api.configurable.RestfulCloudConfigurable"/>
+                                 instance="com.bamboo.tool.configurable.RestfulCloudConfigurable"/>
 
     </extensions>
 
     <actions>
         <action id="restfulCloud.search"
-                class="com.bamboo.tool.components.api.view.component.actions.RestfulCloudSearchAction">
+                class="com.bamboo.tool.view.component.actions.RestfulCloudSearchAction">
             <keyboard-shortcut first-keystroke="alt q" keymap="$default"/>
         </action>
 
@@ -63,9 +63,8 @@
 
     <extensions defaultExtensionNs="com.bamboo">
         <requestMappingContributor
-                implementation="com.bamboo.tool.components.api.contributor.RequestMappingByNameContributor"/>
+                implementation="com.bamboo.tool.contributor.RequestMappingByNameContributor"/>
 
     </extensions>
-
 
 </idea-plugin>

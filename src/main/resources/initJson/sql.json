@@ -8,14 +8,14 @@
   },
   {
     "tableName": "bamboo_class",
-    "creatSql": "create table bamboo_class(id    text not null  constraint bamboo_class_pk  primary key,class_name  text,model_name  text,description text,class_path  text,project_id  text,setting_id  text);",
+    "creatSql": "create table bamboo_class ( id text not null constraint bamboo_class_pk primary key, class_name text, model_name text, description blob, class_path text, project_id text, setting_id text, remark text );",
     "index": [
       "create unique index bamboo_class_id_uindex on bamboo_class (id);"
     ]
   },
   {
     "tableName": "bamboo_method",
-    "creatSql": "create table bamboo_method(id  text not null constraint bamboo_api_method_pk  primary key,project_id  text not null,method_name text,class_id  text,description  text);",
+    "creatSql": "create table bamboo_method ( id text not null constraint bamboo_api_method_pk primary key, project_id text not null, method_name text, class_id text, description text, method_params blob, return_type text, remark text, query_count integer default 0 );",
     "index": [
       "create unique index bamboo_method_id_uindex on bamboo_method (id);"
     ]
@@ -96,7 +96,6 @@
       "INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('name', 'poolUrl', null, 15);",
       "INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('path', 'classUrl', null, 15);",
       "INSERT INTO annotation_param_setting (name, type, describe, annotation_info_setting_id) VALUES ('method', 'requestMethod', null, 12);"
-
     ]
   },
   {
@@ -152,24 +151,6 @@
     ]
   },
   {
-    "tableName": "bamboo_method_return_type",
-    "creatSql": "create table bamboo_method_return_type( id text not null constraint bamboo_method_return_type_pk primary key, return_type   text, return_type_path text, method_id   text);",
-    "index": [
-      "create unique index bamboo_method_return_type_id_uindex on bamboo_method_return_type (id);",
-      "create index bamboo_method_return_type_method_id_index on bamboo_method_return_type (method_id);"
-    ],
-    "datas": []
-  },
-  {
-    "tableName": "bamboo_method_param",
-    "creatSql": "create table bamboo_method_param( id   text not null constraint bamboo_method_param_pk primary key, param_type text,param_type_path text, param_name text, param_index  integer, method_id  text not null);",
-    "index": [
-      "create unique index bamboo_method_param_id_uindex on bamboo_method_param (id);",
-      "create index bamboo_method_param_method_id_index on bamboo_method_param (method_id);"
-    ],
-    "datas": []
-  },
-  {
     "tableName": "bamboo_desc_framework",
     "creatSql": "create table bamboo_desc_framework ( framework text, id text not null constraint bamboo_desc_framework_pk primary key, framework_code text, describe text, sequence integer );",
     "index": [
@@ -190,24 +171,5 @@
     "datas": [
       "INSERT INTO bamboo_dict (id, key, value, description) VALUES ('1', 'isShowDesc', 'true', '是否开启描述');"
     ]
-  },
-  {
-    "tableName": "bamboo_desc",
-    "creatSql": "create table bamboo_desc ( id text not null constraint bamboo_desc_pk primary key, describe text, frameword_code text, association_id text );",
-    "index": [
-      "create unique index bamboo_desc_id_uindex on bamboo_desc (id);"
-    ],
-    "datas": [
-    ]
-  },
-  {
-    "tableName": "bamboo_history_apis",
-    "creatSql": "CREATE TABLE bamboo_history_apis ( id text, project_name text, project_path text, class_name text, class_path text, method_name text, method_return text, query_count text DEFAULT 0 );",
-    "index": [
-      "create unique index bamboo_history_apis_id_uindex on bamboo_history_apis (id);"
-    ],
-    "datas": [
-    ]
-  },
-
+  }
 ]
