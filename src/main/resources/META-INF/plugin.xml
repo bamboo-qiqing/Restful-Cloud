@@ -8,8 +8,34 @@
         It is dedicated to restful the management of multiple api projects.
         Due to the generalization of microservices, the plug-in has to search all projects and SOA interface calls between different projects during normal development.
         The plug-in caches all restful api interfaces that have been opened. When opening a project, you can search for the restful api of all opened projects.
-        <a href="https://github.com/bamboo-qiqing/Restful-Cloud">文档地址</a>
+        <br/>
+        中文:<br/>
+        Restful Cloud 是restful api工具包插件，使用sqlite缓存所有已打开项目的url，可以使打开一个项目的同时搜索到其他项目的url。
+        <br>由于sqlite的缓存，可以使得开发者更便捷的对所有项目进行url的统计和soa接口的提供和消费的url检索。
+
+        <a href="https://github.com/bamboo-qiqing/Restful-Cloud">Github</a> | <a href="https://gitee.com/bamboo-qiqing/Restful-Cloud">Gitee</a> Welcome to star(欢迎star)
+        <br/><br/>
+        <a href="https://gitee.com/bamboo-qiqing/Restful-Cloud">详细文档</a> |   <a href="https://fast-request.sheng90.wang/fast-request/guide/whatsnew/">历史变更</a> | QQ群:694804495<br/
+        <br/>
+        <br/>
+        支持框架:
+        <ul>
+            <li>Spring</li>
+            <li>odianyun</li>
+            <li>Spring Cloud Openfeign</li>
+            <li>Swagger</li>
+        </ul>
+        <br/>
+        支持功能:
+        <ul>
+            <li>api 检索</li>
+            <li>数据储存</li>
+            <li>请求类型筛选</li>
+            <li>当前项目，历史点击，其他项目api列表显示</li>
+            <li>api列表重命名</li>
+        </ul>
         ]]>
+
     </description>
 
     <idea-version since-build="212"/>

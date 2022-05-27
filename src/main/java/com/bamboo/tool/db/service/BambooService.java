@@ -5,12 +5,11 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.bamboo.tool.config.BambooToolComponent;
-import com.bamboo.tool.config.model.BambooToolConfig;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.db.SqlConstant;
 import com.bamboo.tool.db.SqliteConfig;
@@ -23,6 +22,7 @@ import com.intellij.openapi.project.Project;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -41,10 +41,15 @@ public class BambooService {
 
     @SneakyThrows
     public static void initTable(Project project) {
-        String db = FileUtil.getUserHomePath() + "\\bambooTool\\bambooApi.db";
+
+        String db = FileUtil.getUserHomePath() + "\\restfulCloud\\restfulCloud.db";
         final boolean exist = FileUtil.exist(db);
         if (!exist) {
-            FileUtil.touch(db);
+             File touch = FileUtil.touch(db);
+        }
+        String osName = System.getProperty("os.name");
+        if(osName.startsWith("Mac")) {
+            RuntimeUtil.exec("sudo chmod -R 777 "+db);
         }
         ProjectInfo projectInfo = null;
 

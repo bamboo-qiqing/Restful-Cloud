@@ -16,7 +16,7 @@ public class SqliteConfig {
     public static Connection getConnection() {
 
         Class.forName("org.sqlite.JDBC");
-        String db = FileUtil.getUserHomePath() + "\\bambooTool\\bambooApi.db";
+        String db = FileUtil.getUserHomePath() + "\\restfulCloud\\restfulCloud.db";
         Connection conn = DriverManager.getConnection("jdbc:sqlite:" + db);
         return conn;
     }
