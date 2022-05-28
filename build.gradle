@@ -6,7 +6,7 @@ plugins {
 }
 apply plugin: 'org.jetbrains.changelog'
 group 'com.bamboo'
-version '1.0'
+version '1.0.1'
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 repositories {
@@ -46,6 +46,12 @@ runPluginVerifier {
 
 patchPluginXml {
     changeNotes = """
+    <h3>v1.0.1</h3>
+    <ul>
+        <li>修复已有bug</li>
+        <li>修改文档描述</li>
+        <li>增加utool支持（测试中）</li>
+    </ul>
       Framework (Beta):<br>
       <em>Spring</em>
       <em>oudianyun</em>

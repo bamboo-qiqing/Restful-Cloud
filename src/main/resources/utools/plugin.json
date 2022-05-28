@@ -2,12 +2,12 @@
 	"main": "index.html",
 	"logo": "logo.png",
 	"preload": "preload.js",
-	"cmds": [ "api", "bamboo" ],
+	"cmds": [ "api", "url","Restful Cloud" ],
 	"features": [
 		{
-		  "code": "bamboo",
-		  "explain": "bamboo",
-			"cmds":["bamboo", "bamboo"]
+		  "code": "Restful Cloud",
+		  "explain": "Restful Cloud",
+			"cmds":["api", "url","Restful Cloud" ]
 		}
 	]
 }

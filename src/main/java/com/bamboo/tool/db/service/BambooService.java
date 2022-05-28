@@ -176,15 +176,14 @@ public class BambooService {
             BambooClass oldClass = classMap.get(Id);
             bambooClass.setId(Id);
             if (!Objects.isNull(oldClass)) {
-
+                oldClass.setIsExist(true);
                 if (bambooClass.getSettingId() != null && !oldClass.getSettingId().equals(bambooClass.getSettingId())) {
                     oldClass.setSettingId(bambooClass.getSettingId());
-                    oldClass.setIsExist(true);
+
                 }
                 String description = oldClass.getDescription();
                 String descs = JSONObject.toJSONString(bambooClass.getDescs());
                 if (!description.equals(descs)) {
-                    oldClass.setIsExist(true);
                     oldClass.setDescription(descs);
                 }
                 if (oldClass.getIsExist()) {
@@ -219,9 +218,8 @@ public class BambooService {
                         if (!descs.equals(bambooMethod.getDescription())) {
                             bambooMethod.setDescription(descs);
                             sqls.add(bambooMethod.toUpdateSql());
-                            bambooMethod.setIsExist(true);
                         }
-
+                        bambooMethod.setIsExist(true);
                     }
 
                     List<String> classUrls = bambooClass.getClassUrl();

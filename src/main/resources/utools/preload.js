@@ -1,7 +1,7 @@
 let fs = require("fs");
 let os = require("os");
 let sqlite3 = require('sqlite3').verbose();
-let projectsPath = os.homedir() + "\\bambooTool\\bambooApi.db"
+let projectsPath = os.homedir() + "\\restfulCloud\\restfulCloud.db"
 let db = new sqlite3.Database(projectsPath);
 
 
