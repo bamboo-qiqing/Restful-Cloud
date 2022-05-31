@@ -19,8 +19,8 @@ public class RequestMappingItemPresentation implements ItemPresentation {
     private BambooApiMethod item;
 
     public RequestMappingItemPresentation(BambooApiMethod bambooApiMethod) {
-        this.item = bambooApiMethod;
-    }
+        this.item = bambooApiMethod;    }
+
 
     @Override
     public
