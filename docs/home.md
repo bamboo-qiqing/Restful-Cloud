@@ -14,7 +14,7 @@ actions:
     link: /zh/
 
 features:
-  - title: Markdown 增强1
+  - title: Markdown 增强
     icon: markdown
     details: 新增文字对齐、上下角标、脚注、标记、任务列表、数学公式、流程图、图表与幻灯片支持
     link: https://vuepress-theme-hope.github.io/v2/zh/guide/markdown/
