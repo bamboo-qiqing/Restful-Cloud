@@ -202,7 +202,7 @@ public class BambooService {
                     List<String> paramTypePaths = methodParams.stream().map(e -> e.getParamTypePath()).collect(Collectors.toList());
                     String methodParamsStr = JSONObject.toJSONString(methodParams);
                     String descs = JSONObject.toJSONString(method.getDescs());
-                    String methodId = Base64.encode(method.getReturnType().getReturnTypePath() + paramTypePaths + method.getMethodName() + bambooClass.getClassUrl(), CharsetUtil.CHARSET_UTF_8);
+                    String methodId = Base64.encode(bambooClass.getId()+method.getReturnType().getReturnTypePath() + paramTypePaths + method.getMethodName() + bambooClass.getClassUrl(), CharsetUtil.CHARSET_UTF_8);
 
                     BambooMethod bambooMethod = methodMap.get(methodId);
                     method.setId(methodId);

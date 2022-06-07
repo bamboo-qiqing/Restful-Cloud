@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.bamboo</id>
     <name>Restful Cloud</name>
-    <vendor email="760560079@qq.com" url="https://github.com/bamboo-qiqing/Restful-Cloud">Restful Cloud</vendor>
+    <vendor email="760560079@qq.com" url="https://bamboo-qiqing.github.io/projects/restfulCloud/home.html">Restful Cloud</vendor>
 
     <description><![CDATA[
         Restful Cloud is a restful api toolkit plug-in (http client).
@@ -15,10 +15,10 @@
         <br>
         <a href="https://github.com/bamboo-qiqing/Restful-Cloud">Github</a> | <a href="https://gitee.com/bamboo-qiqing/Restful-Cloud">Gitee</a> Welcome to star(欢迎star)
         <br/><br/>
-        <a href="https://gitee.com/bamboo-qiqing/Restful-Cloud">详细文档</a> | QQ群:694804495<br/
+        <a href="https://bamboo-qiqing.github.io/projects/restfulCloud/home.html">详细文档</a> | QQ群:694804495<br/
         <br/>
         <br/>
-        支持框架:
+        支持框架：
         <ul>
             <li>Spring</li>
             <li>odianyun</li>

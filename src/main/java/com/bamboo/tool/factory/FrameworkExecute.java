@@ -80,7 +80,13 @@ public class FrameworkExecute {
                                         boolean annotations1 = buildAnnotations(null, bambooMethod, infoSettingMethodMap, methodAnnotations, info);
                                         if (annotations1) {
                                             bambooMethod.getReturnType().buildReturnType(Objects.requireNonNull(method.getReturnType()));
-                                            bambooMethod.setDescription(FrameworkExecute.getMethodDescription(method));
+                                            String methodDescription = FrameworkExecute.getMethodDescription(method);
+                                            if (StringUtil.isNotBlank(methodDescription)) {
+                                                BambooDesc bambooDesc = new BambooDesc();
+                                                bambooDesc.setDescribe(methodDescription);
+                                                bambooDesc.setFramewordCode("javadoc");
+                                                bambooMethod.getDescs().add(bambooDesc);
+                                            }
                                             bambooMethod.buildMethodParams(method.getParameterList());
                                             bambooClass.getMethods().add(bambooMethod);
                                         }
@@ -89,7 +95,13 @@ public class FrameworkExecute {
                                 } else {
                                     if (info.getFramework().getName().equals("o_dian_yun")) {
                                         bambooMethod.getReturnType().buildReturnType(Objects.requireNonNull(method.getReturnType()));
-                                        bambooMethod.setDescription(FrameworkExecute.getMethodDescription(method));
+                                        String methodDescription = FrameworkExecute.getMethodDescription(method);
+                                        if (StringUtil.isNotBlank(methodDescription)) {
+                                            BambooDesc bambooDesc = new BambooDesc();
+                                            bambooDesc.setDescribe(methodDescription);
+                                            bambooDesc.setFramewordCode("javadoc");
+                                            bambooMethod.getDescs().add(bambooDesc);
+                                        }
                                         bambooMethod.buildMethodParams(method.getParameterList());
                                         if (info.getSoaType().equals("service")) {
                                             bambooMethod.getMethodUrl().add(method.getName());
