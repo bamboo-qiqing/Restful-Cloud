@@ -4,6 +4,7 @@
 [RestfulTool](https://github.com/mrmanzhaow/RestfulToolkit)
 
 ## 插件简介
+[官方详细文档](https://bamboo-qiqing.github.io/projects/restfulCloud/home.html)
 Restful Cloud是一个restful Api工具包插件。
 使用Sqllite缓存所有打开过的项目的Api是Restful Cloud最大的特点。
 
