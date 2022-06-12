@@ -1,15 +1,14 @@
 package com.bamboo.tool.view.component.table;
 
-import com.bamboo.tool.entity.DescFramework;
 import com.intellij.util.ui.EditableModel;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
-public class FrameWorkTableModel <T> extends DefaultTableModel implements EditableModel {
+public class AnnotationTableModel<T> extends DefaultTableModel implements EditableModel {
     private List<T> frameworks;
 
-    public FrameWorkTableModel( List<T> frameworks) {
+    public AnnotationTableModel(List<T> frameworks) {
         this.frameworks = frameworks;
     }
 
@@ -39,9 +38,9 @@ public class FrameWorkTableModel <T> extends DefaultTableModel implements Editab
     }
 
     public void removeAll() {
-        final int rowCount = super.getRowCount();
+        int rowCount = super.getRowCount();
         for (int i = 0; i < rowCount; i++) {
-            super.removeRow(i);
+            super.removeRow(0);
         }
     }
 }

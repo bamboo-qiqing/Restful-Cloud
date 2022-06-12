@@ -12,4 +12,14 @@ public class Framework {
     private Integer id;
     private String name;
     private String describe;
+
+    public Object[] getStrings() {
+        Object[] data = { name,describe, id};
+        return data;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

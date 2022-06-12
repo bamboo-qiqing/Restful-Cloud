@@ -1,6 +1,9 @@
 package com.bamboo.tool.entity;
 
+import com.bamboo.tool.enums.AttributeEnums;
+import com.bamboo.tool.util.StringUtil;
 import lombok.Data;
+
 
 /**
  * Create by GuoQing
@@ -15,4 +18,10 @@ public class AnnotationParam {
     private String describe;
     private String attribute;
     private Integer annotationInfoId;
+
+
+    public Object[] getStrings() {
+        Object[] data = {name, StringUtil.isNotBlank(type)?AttributeEnums.getAttributeEnums(type).getDesc():"",attribute, describe,annotationInfoId,id};
+        return data;
+    }
 }

@@ -1,6 +1,7 @@
 package com.bamboo.tool.entity;
 
 import com.bamboo.tool.enums.AnnotationScope;
+import com.bamboo.tool.enums.SoaType;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -18,9 +19,21 @@ public class AnnotationInfoSetting {
     private String annotationPath;
     private Framework framework;
     private AnnotationScope scope;
-    private String soaType;
+    private SoaType soaType;
     private String effect;
     private List<AnnotationParam> params = new ArrayList<>();
     List<AnnotationMethodScope> methodScopes = new ArrayList<>();
 
+    public Object[] getStrings() {
+        Object[] data = {annotationPath,
+                scope.getDesc(),
+                soaType == null ? "无" : soaType.getDesc(),
+                effect.contains("scann")?"是":"否",effect.contains("attribute")?"是":"否", annotationName, id};
+        return data;
+    }
+
+    @Override
+    public String toString() {
+        return annotationName+"("+scope.getDesc()+")";
+    }
 }

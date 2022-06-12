@@ -35,7 +35,7 @@ public class FrameworkExecute {
      */
     public static List<BambooClass> buildApiMethod(Project project) {
 
-        List<AnnotationInfoSetting> annotationInfoSettings = BambooService.selectAllAnnotationInfoSetting();
+        List<AnnotationInfoSetting> annotationInfoSettings = BambooService.selectAllAnnotationInfoSetting(null);
         Map<String, AnnotationInfoSetting> infoSettingClassMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.CLASS.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
         Map<String, AnnotationInfoSetting> infoSettingMethodMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
         List<BambooClass> bambooClasses = new ArrayList<>();
@@ -103,10 +103,10 @@ public class FrameworkExecute {
                                             bambooMethod.getDescs().add(bambooDesc);
                                         }
                                         bambooMethod.buildMethodParams(method.getParameterList());
-                                        if (info.getSoaType().equals("service")) {
+                                        if (info.getSoaType().getCode().equals("service")) {
                                             bambooMethod.getMethodUrl().add(method.getName());
                                         }
-                                        if (info.getSoaType().equals("client")) {
+                                        if (info.getSoaType().getCode().equals("client")) {
                                             bambooMethod.getMethodUrl().add(method.getName());
                                         }
                                     }
@@ -193,7 +193,7 @@ public class FrameworkExecute {
     private static void buildAttributesClass(BambooClass bambooClass, AnnotationInfoSetting info, AnnotationInfoSetting annotationInfoSetting, List<String> values, String type) {
         if ("poolUrl".equals(type)) {
             if (info.getFramework().getName().equals("o_dian_yun")) {
-                if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
+                if (info.getSoaType().getCode().equals("client") && CollectionUtil.isNotEmpty(values)) {
                     bambooClass.setPoolUrl(values.get(0) + "/cloud");
                 }
             } else {
@@ -201,10 +201,10 @@ public class FrameworkExecute {
             }
         } else if ("classUrl".equals(type)) {
             if (info.getFramework().getName().equals("o_dian_yun")) {
-                if (info.getSoaType().equals("service") && CollectionUtil.isNotEmpty(values)) {
+                if (info.getSoaType().getCode().equals("service") && CollectionUtil.isNotEmpty(values)) {
                     values = values.stream().map(StringUtil::lowerFirst).collect(Collectors.toList());
                 }
-                if (info.getSoaType().equals("client") && CollectionUtil.isNotEmpty(values)) {
+                if (info.getSoaType().getCode().equals("client") && CollectionUtil.isNotEmpty(values)) {
                     values = values.stream().map(e -> {
                         String[] split = e.split("\\.");
                         return StringUtil.lowerFirst(split[split.length - 1]);
