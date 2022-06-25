@@ -69,14 +69,15 @@
 
         <applicationConfigurable dynamic="true" displayName="Restful Cloud"
                                  instance="com.bamboo.tool.configurable.RestfulCloudConfigurable">
-            <configurable dynamic="true" instance="com.bamboo.tool.configurable.CustomFrameworkConfigurable"/>
         </applicationConfigurable>
 
     </extensions>
 
+
     <actions>
+
         <action id="restfulCloud.search"
-                class="com.bamboo.tool.view.component.actions.RestfulCloudSearchAction">
+                class="com.bamboo.tool.view.component.actions.RestfulCloudSearchAction" icon="AllIcons.Actions.Search">
             <keyboard-shortcut first-keystroke="alt q" keymap="$default"/>
         </action>
 

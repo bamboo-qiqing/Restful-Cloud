@@ -1,5 +1,8 @@
 package com.bamboo.tool.view;
 
+import com.bamboo.tool.configurable.BambooApiFilterConfiguration;
+import com.bamboo.tool.enums.RequestMethod;
+import com.bamboo.tool.view.component.actions.RefreshApiAction;
 import com.bamboo.tool.view.component.tree.ApiTree;
 import com.bamboo.tool.view.component.tree.BaseNode;
 import com.bamboo.tool.view.component.tree.MethodNode;
@@ -9,6 +12,8 @@ import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.PsiUtils;
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.actions.searcheverywhere.PersistentSearchEverywhereContributorFilter;
+import com.intellij.ide.actions.searcheverywhere.SearchEverywhereFiltersAction;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
@@ -33,6 +38,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,7 +50,7 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
     private final Project myProject;
     private final JPanel panel;
     private final ApiTree apiTree;
-
+    private PersistentSearchEverywhereContributorFilter requestTypeFiler;
     public OtherApisNavToolWindow(Project project) {
         super(false, false);
         this.myProject = project;
@@ -82,7 +88,7 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
         panel.add(scrollPane);
 
         Disposer.register(myProject, this);
-        renderData(myProject);
+        renderData();
     }
 
     @Override
@@ -90,18 +96,18 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
 
     }
 
-    private void renderData(Project project) {
+    private void renderData() {
 
-        DumbService.getInstance(project).smartInvokeLater(() -> rendingTree(project));
+        DumbService.getInstance(myProject).smartInvokeLater(() -> rendingTree());
     }
 
-    private void rendingTree(Project project) {
+    private void rendingTree() {
         Task.Backgroundable task = new Task.Backgroundable(myProject, "Bamboo apis...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
-                ProjectInfo currentProject = BambooService.queryProject(project.getBasePath(), project.getName());
-                 List<BambooApiMethod> allApi = BambooService.getAllApi(null, currentProject.getId().toString(), project,null,false);
+                ProjectInfo currentProject = BambooService.queryProject(myProject.getBasePath(), myProject.getName());
+                 List<BambooApiMethod> allApi = BambooService.getAllApi(null, currentProject.getId().toString(), myProject,null,false);
                 RootNode root = new RootNode("apis("+allApi.size()+")");
                 PsiUtils.convertOtherToRoot(root, allApi);
                 apiTree.setModel(new DefaultTreeModel(root));
@@ -113,8 +119,10 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
 
     private void initActionBar() {
         DefaultActionGroup group = new DefaultActionGroup();
-        group.add(new RefreshApiAction());
-
+        group.add(new RefreshApiAction(this::renderData));
+        BambooApiFilterConfiguration instance = BambooApiFilterConfiguration.getInstance(myProject);
+        requestTypeFiler = new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null);
+        group.add(new SearchEverywhereFiltersAction(requestTypeFiler, this::renderData));
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, group, false);
         actionToolbar.setTargetComponent(panel);
         JComponent toolbarComponent = actionToolbar.getComponent();
@@ -123,16 +131,7 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
         setToolbar(toolbarComponent);
     }
 
-    private final class RefreshApiAction extends AnAction {
-        public RefreshApiAction() {
-            super("Refresh", "Refresh", AllIcons.Actions.Refresh);
-        }
 
-        @Override
-        public void actionPerformed(@NotNull AnActionEvent e) {
-            renderData(myProject);
-        }
-    }
 
     private static class MyCellRenderer extends ColoredTreeCellRenderer {
 

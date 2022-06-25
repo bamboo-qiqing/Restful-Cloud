@@ -17,6 +17,7 @@
 package com.bamboo.tool.view.component.tree;
 
 import com.intellij.icons.AllIcons;
+import icons.PluginIcons;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -28,6 +29,6 @@ public class RootNode extends BaseNode<String> {
 
     @Override
     public @Nullable Icon getIcon(boolean selected) {
-        return AllIcons.Actions.ShortcutFilter;
+        return PluginIcons.LOGO;
     }
 }

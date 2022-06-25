@@ -1,15 +1,20 @@
 package com.bamboo.tool.view;
 
 import com.bamboo.tool.config.model.ProjectInfo;
+import com.bamboo.tool.configurable.BambooApiFilterConfiguration;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.entity.BambooClass;
+import com.bamboo.tool.enums.RequestMethod;
 import com.bamboo.tool.factory.FrameworkExecute;
 import com.bamboo.tool.util.PsiUtils;
+import com.bamboo.tool.view.component.actions.RefreshApiAction;
 import com.bamboo.tool.view.component.actions.RenameDescAction;
+import com.bamboo.tool.view.component.actions.SearchApiAction;
 import com.bamboo.tool.view.component.tree.*;
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
+import com.intellij.ide.actions.searcheverywhere.PersistentSearchEverywhereContributorFilter;
+import com.intellij.ide.actions.searcheverywhere.SearchEverywhereFiltersAction;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
@@ -31,8 +36,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -40,20 +43,24 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements Disposable {
-    private  Project myProject;
-    private  JPanel panel;
-    private  ApiTree apiTree;
+public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposable {
+    private Project myProject;
+    private JPanel mainJPanel;
+    private JTextField textField1;
+    private ApiTree apiTree;
     private List<BambooClass> allApiList;
+    private PersistentSearchEverywhereContributorFilter requestTypeFiler;
 
-    public CurrentApisNavToolWindow(Project project) {
-        super(false, false);
+    public CurrentApisNavTool(Project project) {
+        super(true, false);
         this.myProject = project;
-        panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        this.setContent(panel);
+        mainJPanel = new JPanel();
+        textField1 = new JTextField();
+        mainJPanel.setLayout(new BorderLayout());
+        this.setContent(mainJPanel);
         allApiList = new ArrayList<>();
         setLayout(new BorderLayout());
         apiTree = new ApiTree();
@@ -112,8 +119,10 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
             return object.toString();
         }, true);
         JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(treeSpeedSearch.getComponent());
-        panel.add(scrollPane);
-        renderData(myProject);
+        scrollPane.add(textField1);
+        mainJPanel.add(scrollPane);
+        mainJPanel.add(scrollPane);
+        renderData();
     }
 
     @Override
@@ -121,8 +130,8 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
 
     }
 
-    private void renderData(Project project) {
-        DumbService.getInstance(project).smartInvokeLater(() -> rendingTree(project));
+    private void renderData() {
+        DumbService.getInstance(myProject).smartInvokeLater(() -> rendingTree());
     }
 
 
@@ -157,13 +166,16 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
             return;
         }
         MethodNode methodNode = (MethodNode) component;
-         BambooApiMethod source = methodNode.getSource();
+        BambooApiMethod source = methodNode.getSource();
 
         source.navigate(true);
     }
 
+    private void refresh() {
+        this.rendingTree();
+    }
 
-    private void rendingTree(Project project) {
+    private void rendingTree() {
         Task.Backgroundable task = new Task.Backgroundable(myProject, "Restful cloud...") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
@@ -172,12 +184,12 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
                     allApiList = FrameworkExecute.buildApiMethod(myProject);
                     indicator.setText("Rendering");
 
-                    ProjectInfo currentProject = BambooService.queryProject(project.getBasePath(), project.getName());
+                    ProjectInfo currentProject = BambooService.queryProject(myProject.getBasePath(), myProject.getName());
                     BambooService.saveClass(allApiList, currentProject);
-                    List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, project, null,false);
+                    List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, myProject, null, false);
                     RootNode root = new RootNode("apis(" + allApi.size() + ")");
                     apiTree.setModel(new DefaultTreeModel(root));
-                    PsiUtils.convertToRoot(root, allApi);
+                    PsiUtils.convertToRoot(root, allApi, requestTypeFiler.getSelectedElements());
                     NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
                 });
 
@@ -188,26 +200,20 @@ public class CurrentApisNavToolWindow extends SimpleToolWindowPanel implements D
 
     private void initActionBar() {
         DefaultActionGroup group = new DefaultActionGroup();
-        group.add(new RefreshApiAction());
+        group.add(new RefreshApiAction(this::renderData));
+        group.add(new SearchApiAction());
+        BambooApiFilterConfiguration instance = BambooApiFilterConfiguration.getInstance(myProject);
+        requestTypeFiler = new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null);
+        group.add(new SearchEverywhereFiltersAction(requestTypeFiler, this::refresh));
         group.add(CommonActionsManager.getInstance().createExpandAllAction(apiTree, apiTree));
         group.add(CommonActionsManager.getInstance().createCollapseAllAction(apiTree, apiTree));
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, group, true);
-        actionToolbar.setTargetComponent(panel);
+        actionToolbar.setTargetComponent(mainJPanel);
         JComponent toolbarComponent = actionToolbar.getComponent();
         Border border = IdeBorderFactory.createBorder(SideBorder.BOTTOM);
         actionToolbar.getComponent().setBorder(border);
         setToolbar(toolbarComponent);
-    }
 
-    private  class RefreshApiAction extends AnAction {
-        public RefreshApiAction() {
-            super("Refresh", "Refresh", AllIcons.Actions.Refresh);
-        }
-
-        @Override
-        public void actionPerformed(@NotNull AnActionEvent e) {
-            renderData(myProject);
-        }
     }
 
 

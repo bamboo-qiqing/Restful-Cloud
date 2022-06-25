@@ -6,6 +6,7 @@ import com.bamboo.tool.entity.DescFramework;
 import com.bamboo.tool.entity.MethodParam;
 import com.bamboo.tool.entity.NoteData;
 import com.bamboo.tool.enums.AnnotationScope;
+import com.bamboo.tool.enums.RequestMethod;
 import com.bamboo.tool.view.component.tree.ClassNode;
 import com.bamboo.tool.view.component.tree.MethodNode;
 import com.bamboo.tool.view.component.tree.ModuleNode;
@@ -52,35 +53,39 @@ public class PsiUtils {
         return caches;
     }
 
-    public static void convertToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
+    public static void convertToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods, List<RequestMethod> requestMethods) {
         boolean isShowDesc = BambooService.selectIsShowDesc();
         final List<DescFramework> descFrameworks = BambooService.selectAllDescFramework();
         Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
         Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
         apiMethods.forEach(e -> {
-            String modelName = e.getModelName();
-            String className = e.getClassName();
+            long count = requestMethods.parallelStream().filter(a -> e.getRequestMethods().contains(a.getCode())).count();
+            if(count>0){
+                String modelName = e.getModelName();
+                String className = e.getClassName();
 
-            ModuleNode moduleNode = new ModuleNode(modelName);
-            ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
-            if (moduleNode1 != null) {
-                moduleNode = moduleNode1;
+                ModuleNode moduleNode = new ModuleNode(modelName);
+                ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
+                if (moduleNode1 != null) {
+                    moduleNode = moduleNode1;
+                }
+                final NoteData noteData = new NoteData();
+                noteData.setIsShowDesc(isShowDesc);
+                noteData.setDescMap(e.getClassDescHashMap());
+                noteData.setDescFrameworks(descFrameworks);
+                noteData.setName(className);
+                noteData.setClassId(e.getClassId());
+                ClassNode classNode = new ClassNode(noteData);
+                ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
+                if (classNode1 != null) {
+                    classNode = classNode1;
+                }
+                moduleNode.add(classNode);
+                e.setIsShowDesc(isShowDesc);
+                e.setDescFrameworks(descFrameworks);
+                classNode.add(new MethodNode(e));
             }
-            final NoteData noteData = new NoteData();
-            noteData.setIsShowDesc(isShowDesc);
-            noteData.setDescMap(e.getClassDescHashMap());
-            noteData.setDescFrameworks(descFrameworks);
-            noteData.setName(className);
-            noteData.setClassId(e.getClassId());
-            ClassNode classNode = new ClassNode(noteData);
-            ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
-            if (classNode1 != null) {
-                classNode = classNode1;
-            }
-            moduleNode.add(classNode);
-            e.setIsShowDesc(isShowDesc);
-            e.setDescFrameworks(descFrameworks);
-            classNode.add(new MethodNode(e));
+
         });
         moduleNodeMap.values().forEach(e -> root.add(e));
     }

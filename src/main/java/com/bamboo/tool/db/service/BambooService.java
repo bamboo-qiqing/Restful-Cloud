@@ -797,4 +797,14 @@ public class BambooService {
         conn.close();
         return CollectionUtil.isNotEmpty(frameworks)?frameworks.get(0):null;
     }
+    @SneakyThrows
+    public static void removeFramework(Integer id) {
+        Connection conn = SqliteConfig.getConnection();
+        Statement state = conn.createStatement();
+        state.execute("delete  from framework  where id = '" + id + "';");
+        state.close();
+        conn.close();
+
+    }
+
 }
