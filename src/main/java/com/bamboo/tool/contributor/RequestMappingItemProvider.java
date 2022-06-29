@@ -40,12 +40,31 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
     }
 
 
+
+    public @NotNull List<String> filterNames(@NotNull ChooseByNameBase chooseByNameBase, String  [] strings, @NotNull String s) {
+        return null;
+    }
+
     public @NotNull List<String> filterNames(@NotNull ChooseByNameViewModel base, @NotNull String[] names, @NotNull String pattern) {
-        return new ArrayList<>();
+        return null;
     }
 
 
-    @Override
+    public boolean filterElements(@NotNull ChooseByNameBase base, @NotNull String pattern, boolean everywhere, @NotNull ProgressIndicator indicator, @NotNull Processor<Object> consumer) {
+        Project project = base.getProject();
+        if (project == null) {
+            return false;
+        }
+        project.putUserData(ChooseByNamePopup.CURRENT_SEARCH_PATTERN, pattern);
+        GlobalSearchScope searchScope = FindSymbolParameters.searchScopeFor(project, everywhere);
+        FindSymbolParameters parameters = FindSymbolParameters.wrap(pattern, searchScope);
+        List<String> namesList = getSortedResults(base, pattern, indicator, parameters);
+        indicator.checkCanceled();
+        return processByNames(base, everywhere, indicator, consumer, namesList, parameters);
+    }
+
+
+
     public boolean filterElements(@NotNull ChooseByNameViewModel base, @NotNull String pattern, boolean everywhere, @NotNull ProgressIndicator indicator, @NotNull Processor<Object> consumer) {
         Project project = base.getProject();
         if (project == null) {
