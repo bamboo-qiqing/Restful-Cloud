@@ -1,13 +1,13 @@
 package com.bamboo.tool.view;
 
+import com.bamboo.tool.db.entity.BambooApiMethod;
+import com.bamboo.tool.db.service.BambooService;
+import com.bamboo.tool.util.PsiUtils;
+import com.bamboo.tool.view.component.notificationGroup.ToolWindowNotificationGroup;
 import com.bamboo.tool.view.component.tree.ApiTree;
 import com.bamboo.tool.view.component.tree.BaseNode;
 import com.bamboo.tool.view.component.tree.MethodNode;
 import com.bamboo.tool.view.component.tree.RootNode;
-import com.bamboo.tool.db.entity.BambooApiMethod;
-import com.bamboo.tool.db.service.BambooService;
-import com.bamboo.tool.util.PsiUtils;
-import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -127,7 +127,7 @@ public class HistoryApisNavToolWindow extends SimpleToolWindowPanel implements D
                 PsiUtils.convertHistoryToRoot(root, allApi);
 
                 apiTree.setModel(new DefaultTreeModel(root));
-                NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
+                ToolWindowNotificationGroup.NOTIFICATION_GROUP.createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
             }
         };
         ProgressManager.getInstance().runProcessWithProgressAsynchronously(task, new BackgroundableProcessIndicator(task));

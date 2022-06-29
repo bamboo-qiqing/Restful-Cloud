@@ -2,7 +2,13 @@ package com.bamboo.tool.contributor;
 
 import com.bamboo.tool.configurable.BambooApiFilterConfiguration;
 import com.bamboo.tool.enums.RequestMethod;
-import com.intellij.ide.actions.searcheverywhere.*;
+
+import com.bamboo.tool.view.component.actions.SearchEverywhereFiltersAction;
+import com.intellij.icons.AllIcons;
+import com.intellij.ide.actions.searcheverywhere.AbstractGotoSEContributor;
+import com.intellij.ide.actions.searcheverywhere.PersistentSearchEverywhereContributorFilter;
+import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributor;
+import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributorFactory;
 import com.intellij.ide.util.gotoByName.FilteringGotoByModel;
 import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -60,7 +66,8 @@ public class BambooApiGotoContributor extends AbstractGotoSEContributor {
     List<AnAction> getActions(@NotNull Runnable onChanged) {
         BambooApiFilterConfiguration instance = BambooApiFilterConfiguration.getInstance(myProject);
         List<AnAction> actions = new ArrayList<>();
-        actions.add(new SearchEverywhereFiltersAction(new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null), onChanged));
+        PersistentSearchEverywhereContributorFilter requestTypeFilter = new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null);
+        actions.add(new SearchEverywhereFiltersAction(requestTypeFilter, onChanged,"请求类型过滤器", "请求类型过滤器", AllIcons.General.Filter));
         return actions;
     }
 

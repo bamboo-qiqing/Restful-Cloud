@@ -14,12 +14,11 @@ import com.bamboo.tool.view.component.actions.RefreshApiAction;
 import com.bamboo.tool.view.component.actions.RenameDescAction;
 import com.bamboo.tool.view.component.actions.SearchApiAction;
 import com.bamboo.tool.view.component.actions.SearchEverywhereFiltersAction;
+import com.bamboo.tool.view.component.notificationGroup.ToolWindowNotificationGroup;
 import com.bamboo.tool.view.component.tree.*;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
 import com.intellij.ide.actions.searcheverywhere.PersistentSearchEverywhereContributorFilter;
-
-import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.impl.ActionManagerImpl;
@@ -52,6 +51,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposable {
+
     private Project myProject;
     private JPanel mainJPanel;
     private JTextField textField1;
@@ -70,8 +70,10 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
         allApiList = new ArrayList<>();
         setLayout(new BorderLayout());
         apiTree = new ApiTree();
-        initActionBar();
+
         Disposer.register(myProject, this);
+
+        initActionBar();
         apiTree.setCellRenderer(new MyCellRenderer());
         apiTree.addKeyListener(new KeyAdapter() {
             @Override
@@ -196,7 +198,7 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
 
                     RootNode rootNode = PsiUtils.convertToRoot(allApi, requestTypeFiler.getSelectedElements());
                     apiTree.setModel(new DefaultTreeModel(rootNode));
-                    NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
+                    ToolWindowNotificationGroup.NOTIFICATION_GROUP.createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
                 });
 
             }
@@ -210,16 +212,16 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
         group.add(new SearchApiAction());
         BambooApiFilterConfiguration instance = BambooApiFilterConfiguration.getInstance(myProject);
         BambooSoaFilterConfiguration soaFilterConfiguration = BambooSoaFilterConfiguration.getInstance(myProject);
-        requestTypeFiler = new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null);
-        soaTypeFiler = new PersistentSearchEverywhereContributorFilter(Arrays.asList(SoaType.values()), soaFilterConfiguration, (a) ->{
+        this.requestTypeFiler = new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null);
+        this.soaTypeFiler = new PersistentSearchEverywhereContributorFilter(Arrays.asList(SoaType.values()), soaFilterConfiguration, (a) ->{
             SoaType soaType = (SoaType) a;
             return soaType.getDesc();
         }, (e) -> {
             SoaType soaType = (SoaType) e;
             return soaType.getIcon();
         });
-        group.add(new SearchEverywhereFiltersAction(requestTypeFiler, this::refresh, "请求类型过滤器", "请求类型过滤器", AllIcons.General.Filter));
-        group.add(new SearchEverywhereFiltersAction(soaTypeFiler, this::refresh, "Soa类型过滤器", "Soa类型过滤器", PluginIcons.FILERSOA));
+        group.add(new SearchEverywhereFiltersAction( this.requestTypeFiler, this::refresh, "请求类型过滤器", "请求类型过滤器", AllIcons.General.Filter));
+        group.add(new SearchEverywhereFiltersAction( this.soaTypeFiler, this::refresh, "Soa类型过滤器", "Soa类型过滤器", PluginIcons.FILERSOA));
         group.add(CommonActionsManager.getInstance().createExpandAllAction(apiTree, apiTree));
         group.add(CommonActionsManager.getInstance().createCollapseAllAction(apiTree, apiTree));
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, group, true);

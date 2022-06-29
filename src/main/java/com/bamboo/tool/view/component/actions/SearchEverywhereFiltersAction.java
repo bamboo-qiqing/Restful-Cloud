@@ -9,22 +9,15 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class SearchEverywhereFiltersAction<T> extends ShowFilterAction {
-    final PersistentSearchEverywhereContributorFilter<T> filter;
-    final Runnable rebuildRunnable;
-    final ElementsChooser.StatisticsCollector<T> myStatisticsCollector;
+     PersistentSearchEverywhereContributorFilter<T> filter;
+     Runnable rebuildRunnable;
 
-    public SearchEverywhereFiltersAction(@NotNull PersistentSearchEverywhereContributorFilter<T> filter,
-                                         @NotNull Runnable rebuildRunnable ,String text,String desc,Icon icon) {
-        this(filter, rebuildRunnable, null,text,desc,icon);
-    }
-
-    SearchEverywhereFiltersAction(@NotNull PersistentSearchEverywhereContributorFilter<T> filter,
-                                  @NotNull Runnable rebuildRunnable,
-                                  @Nullable ElementsChooser.StatisticsCollector<T> collector,String text,String desc,Icon icon) {
+    public SearchEverywhereFiltersAction(PersistentSearchEverywhereContributorFilter<T> filter,
+                                          Runnable rebuildRunnable, String text, String desc, Icon icon) {
         super(text,desc,icon);
         this.filter = filter;
         this.rebuildRunnable = rebuildRunnable;
-        myStatisticsCollector = collector;
+
     }
 
     public PersistentSearchEverywhereContributorFilter<T> getFilter() {
@@ -43,10 +36,10 @@ public class SearchEverywhereFiltersAction<T> extends ShowFilterAction {
 
     @Override
     protected ElementsChooser<?> createChooser() {
-        return createChooser(filter, rebuildRunnable, myStatisticsCollector);
+        return createChooser(filter, rebuildRunnable);
     }
 
-    private static <T> ElementsChooser<T> createChooser(@NotNull PersistentSearchEverywhereContributorFilter<T> filter, @NotNull Runnable rebuildRunnable, @Nullable ElementsChooser.StatisticsCollector<T> statisticsCollector) {
+    private static <T> ElementsChooser<T> createChooser(@NotNull PersistentSearchEverywhereContributorFilter<T> filter, @NotNull Runnable rebuildRunnable) {
         ElementsChooser<T> res = new ElementsChooser<>(filter.getAllElements(), false) {
             @Override
             protected String getItemText(@NotNull T value) {
@@ -65,10 +58,6 @@ public class SearchEverywhereFiltersAction<T> extends ShowFilterAction {
             rebuildRunnable.run();
         };
         res.addElementsMarkListener(listener);
-
-        if (statisticsCollector != null) {
-            res.addStatisticsCollector(statisticsCollector);
-        }
 
         return res;
     }

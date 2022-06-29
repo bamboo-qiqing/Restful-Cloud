@@ -50,7 +50,7 @@ public class RequestMappingItemProvider implements ChooseByNameItemProvider {
     }
 
 
-    public boolean filterElements(@NotNull ChooseByNameBase base, @NotNull String pattern, boolean everywhere, @NotNull ProgressIndicator indicator, @NotNull Processor<Object> consumer) {
+    public boolean filterElements(@NotNull ChooseByNameBase base, @NotNull String pattern, boolean everywhere, @NotNull ProgressIndicator indicator, @NotNull Processor consumer) {
         Project project = base.getProject();
         if (project == null) {
             return false;

@@ -3,9 +3,9 @@
  <g>
   <title>Layer 1</title>
   <g id="svg_1" fill-rule="evenodd" fill="none">
-   <polygon id="svg_2" points="2 2 14 2 14 2.857 9.5 8 6.5 8 2 2.857" fill="#AFB1B3"/>
-   <rect id="svg_3" fill="#AFB1B3" y="8" x="6.5" height="6" width="3"/>
+   <polygon id="svg_2" points="2 2 14 2 14 2.857 9.5 8 6.5 8 2 2.857" fill="#59A869"/>
+   <rect id="svg_3" fill="#59A869" y="8" x="6.5" height="6" width="3"/>
   </g>
-  <text transform="matrix(0.271954 0 0 0.208967 9.14805 3.40179)" stroke="#000" xml:space="preserve" text-anchor="start" font-family="Noto Sans JP" font-size="24" id="svg_5" y="13.33439" x="-9.27774" stroke-width="0" fill="#007f00">s</text>
+  <text transform="matrix(0.271954 0 0 0.208967 9.14805 3.40179)" stroke="#000" xml:space="preserve" text-anchor="start" font-family="Noto Sans JP" font-size="24" id="svg_5" y="13.33439" x="-9.27774" stroke-width="0" fill="#59A869">s</text>
  </g>
 </svg>

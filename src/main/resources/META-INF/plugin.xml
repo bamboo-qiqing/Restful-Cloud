@@ -1,9 +1,7 @@
 <idea-plugin>
     <id>com.bamboo</id>
     <name>Restful Cloud</name>
-    <vendor email="760560079@qq.com" url="https://bamboo-qiqing.github.io/projects/restfulCloud/home.html">Restful
-        Cloud
-    </vendor>
+    <vendor email="760560079@qq.com" url="https://bamboo-qiqing.github.io/projects/restfulCloud/home.html">Restful Cloud </vendor>
 
     <description><![CDATA[
         Restful Cloud is a restful api toolkit plug-in (http client).
@@ -41,7 +39,7 @@
 
     </description>
 
-    <idea-version since-build="203"/>
+    <idea-version since-build="193.5"/>
 
 
     <!-- 插件版本号 -->
@@ -58,6 +56,10 @@
         <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
         <projectService serviceImplementation="com.bamboo.tool.configurable.BambooApiFilterConfiguration"
                         order="first"/>
+        <projectService serviceImplementation="com.bamboo.tool.configurable.BambooSoaFilterConfiguration"
+                        order="first"/>
+
+
         <toolWindow id="Restful Cloud" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
                     secondary="false" icon="PluginIcons.LOGO"/>
         <!--兼容性处理code-->
@@ -78,7 +80,7 @@
 
         <action id="restfulCloud.search"
                 class="com.bamboo.tool.view.component.actions.RestfulCloudSearchAction" icon="AllIcons.Actions.Search">
-            <keyboard-shortcut first-keystroke="alt q" keymap="$default"/>
+            <keyboard-shortcut first-keystroke="ctrl shift m" keymap="$default"/>
         </action>
 
     </actions>
