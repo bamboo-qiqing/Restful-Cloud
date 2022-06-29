@@ -193,7 +193,7 @@ public class FrameworkExecute {
     private static void buildAttributesClass(BambooClass bambooClass, AnnotationInfoSetting info, AnnotationInfoSetting annotationInfoSetting, List<String> values, String type) {
         if ("poolUrl".equals(type)) {
             if (info.getFramework().getName().equals("o_dian_yun")) {
-                if (info.getSoaType().getCode().equals("client") && CollectionUtil.isNotEmpty(values)) {
+                if (info.getSoaType().getCode().equals("soa_client") && CollectionUtil.isNotEmpty(values)) {
                     bambooClass.setPoolUrl(values.get(0) + "/cloud");
                 }
             } else {
@@ -201,10 +201,10 @@ public class FrameworkExecute {
             }
         } else if ("classUrl".equals(type)) {
             if (info.getFramework().getName().equals("o_dian_yun")) {
-                if (info.getSoaType().getCode().equals("service") && CollectionUtil.isNotEmpty(values)) {
+                if (info.getSoaType().getCode().equals("soa_service") && CollectionUtil.isNotEmpty(values)) {
                     values = values.stream().map(StringUtil::lowerFirst).collect(Collectors.toList());
                 }
-                if (info.getSoaType().getCode().equals("client") && CollectionUtil.isNotEmpty(values)) {
+                if (info.getSoaType().getCode().equals("soa_client") && CollectionUtil.isNotEmpty(values)) {
                     values = values.stream().map(e -> {
                         String[] split = e.split("\\.");
                         return StringUtil.lowerFirst(split[split.length - 1]);

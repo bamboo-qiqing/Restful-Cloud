@@ -3,6 +3,7 @@ package com.bamboo.tool.db.entity;
 import com.bamboo.tool.contributor.RequestMappingItemPresentation;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.entity.DescFramework;
+import com.bamboo.tool.enums.SoaType;
 import com.bamboo.tool.util.PsiUtils;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
@@ -37,7 +38,7 @@ public class BambooApiMethod implements NavigationItem {
     private Map<String, String> methodDescHashMap = new HashMap<>();
     private String modelName;
     private String projectName;
-    private String soaType;
+    private SoaType soaType;
     private String frameworkName;
     private String projectPath;
     private Integer queryCount;

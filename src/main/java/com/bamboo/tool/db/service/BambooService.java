@@ -445,7 +445,7 @@ public class BambooService {
     }
 
     @SneakyThrows
-    public static List<BambooApiMethod> getAllApi(String projectId, String notProjectId, Project project, String queryCondition, Boolean isHistory) {
+    public static List<BambooApiMethod>   getAllApi(String projectId, String notProjectId, Project project, String queryCondition, Boolean isHistory,List<SoaType> soaTypes) {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         StringBuilder str = new StringBuilder();
@@ -493,6 +493,20 @@ public class BambooService {
             str.append(notProjectId);
             str.append("'");
         }
+        if(CollectionUtil.isNotEmpty(soaTypes)){
+            str.append(" and ais.soa_type in(");
+            for (int i = 0; i <soaTypes.size() ; i++) {
+                SoaType  soaType= soaTypes.get(i);
+                str.append("'");
+                str.append(soaType.getCode());
+                if(i==(soaTypes.size()-1)){
+                    str.append("'");
+                }else{
+                    str.append("',");
+                }
+            }
+            str.append(")");
+        }
         if (StringUtil.isNotBlank(queryCondition)) {
             str.append(" and ba.url like '%" + queryCondition + "%'");
         }
@@ -515,6 +529,10 @@ public class BambooService {
             String projectName = resultSet.getString("projectName");
             String projectPath = resultSet.getString("projectPath");
             String soaType = resultSet.getString("soaType");
+            if(StringUtil.isNotEmpty(soaType)){
+                 SoaType soaType1 = SoaType.getSoaType(soaType);
+                 api.setSoaType(soaType1);
+            }
             String frameworkName = resultSet.getString("frameworkName");
             String methodId = resultSet.getString("methodId");
             String classDescribe = resultSet.getString("classDesc");
@@ -528,7 +546,7 @@ public class BambooService {
             api.setClassName(className);
             api.setClassPath(classPath);
             api.setProjectName(projectName);
-            api.setSoaType(soaType);
+
             api.setFrameworkName(frameworkName);
             api.setProject(project);
             api.setMethodId(methodId);

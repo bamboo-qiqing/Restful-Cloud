@@ -7,10 +7,7 @@ import com.bamboo.tool.entity.MethodParam;
 import com.bamboo.tool.entity.NoteData;
 import com.bamboo.tool.enums.AnnotationScope;
 import com.bamboo.tool.enums.RequestMethod;
-import com.bamboo.tool.view.component.tree.ClassNode;
-import com.bamboo.tool.view.component.tree.MethodNode;
-import com.bamboo.tool.view.component.tree.ModuleNode;
-import com.bamboo.tool.view.component.tree.ProjectNode;
+import com.bamboo.tool.view.component.tree.*;
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
@@ -30,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class PsiUtils {
@@ -53,14 +51,16 @@ public class PsiUtils {
         return caches;
     }
 
-    public static void convertToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods, List<RequestMethod> requestMethods) {
+    public static RootNode convertToRoot( List<BambooApiMethod> apiMethods, List<RequestMethod> requestMethods) {
         boolean isShowDesc = BambooService.selectIsShowDesc();
         final List<DescFramework> descFrameworks = BambooService.selectAllDescFramework();
         Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
         Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
+        AtomicInteger apiCount = new AtomicInteger();
         apiMethods.forEach(e -> {
             long count = requestMethods.parallelStream().filter(a -> e.getRequestMethods().contains(a.getCode())).count();
-            if(count>0){
+            if (count > 0) {
+                apiCount.getAndIncrement();
                 String modelName = e.getModelName();
                 String className = e.getClassName();
 
@@ -87,50 +87,60 @@ public class PsiUtils {
             }
 
         });
+        RootNode root = new RootNode("apis(" + apiCount.get() + ")");
         moduleNodeMap.values().forEach(e -> root.add(e));
+        return root;
     }
 
-    public static void convertOtherToRoot(DefaultMutableTreeNode root, List<BambooApiMethod> apiMethods) {
+    public static RootNode convertOtherToRoot(List<BambooApiMethod> apiMethods, List<RequestMethod> requestMethods) {
+
         boolean isShowDesc = BambooService.selectIsShowDesc();
         final List<DescFramework> descFrameworks = BambooService.selectAllDescFramework();
         Map<String, ProjectNode> projectNodeMap = new ConcurrentHashMap<>();
         Map<String, ModuleNode> moduleNodeMap = new ConcurrentHashMap<>();
 
         Map<String, ClassNode> classNodeMap = new ConcurrentHashMap<>();
-
+        AtomicInteger apiCount = new AtomicInteger();
         apiMethods.forEach(e -> {
-            String modelName = e.getModelName();
-            String className = e.getClassName();
-            String projectName = e.getProjectName();
-            ModuleNode moduleNode = new ModuleNode(modelName);
-            ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
-            if (moduleNode1 != null) {
-                moduleNode = moduleNode1;
-            }
-             NoteData noteData = new NoteData();
-            noteData.setIsShowDesc(isShowDesc);
-            noteData.setDescMap(e.getClassDescHashMap());
-            noteData.setDescFrameworks(descFrameworks);
-            noteData.setName(className);
-            noteData.setClassId(e.getClassId());
-            ClassNode classNode = new ClassNode(noteData);
-            ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
-            if (classNode1 != null) {
-                classNode = classNode1;
-            }
-            moduleNode.add(classNode);
-            e.setIsShowDesc(isShowDesc);
-            e.setDescFrameworks(descFrameworks);
-            classNode.add(new MethodNode(e));
+            long count = requestMethods.parallelStream().filter(a -> e.getRequestMethods().contains(a.getCode())).count();
+            if (count > 0) {
+                apiCount.getAndIncrement();
+                String modelName = e.getModelName();
+                String className = e.getClassName();
+                String projectName = e.getProjectName();
+                ModuleNode moduleNode = new ModuleNode(modelName);
+                ModuleNode moduleNode1 = moduleNodeMap.putIfAbsent(modelName, moduleNode);
+                if (moduleNode1 != null) {
+                    moduleNode = moduleNode1;
+                }
+                NoteData noteData = new NoteData();
+                noteData.setIsShowDesc(isShowDesc);
+                noteData.setDescMap(e.getClassDescHashMap());
+                noteData.setDescFrameworks(descFrameworks);
+                noteData.setName(className);
+                noteData.setClassId(e.getClassId());
+                ClassNode classNode = new ClassNode(noteData);
+                ClassNode classNode1 = classNodeMap.putIfAbsent(modelName + className, classNode);
+                if (classNode1 != null) {
+                    classNode = classNode1;
+                }
+                moduleNode.add(classNode);
+                e.setIsShowDesc(isShowDesc);
+                e.setDescFrameworks(descFrameworks);
+                classNode.add(new MethodNode(e));
 
-            ProjectNode projectNode = new ProjectNode(projectName);
-            ProjectNode projectNode1 = projectNodeMap.putIfAbsent(projectName, projectNode);
-            if (projectNode1 != null) {
-                projectNode = projectNode1;
+                ProjectNode projectNode = new ProjectNode(projectName);
+                ProjectNode projectNode1 = projectNodeMap.putIfAbsent(projectName, projectNode);
+                if (projectNode1 != null) {
+                    projectNode = projectNode1;
+                }
+                projectNode.add(moduleNode);
             }
-            projectNode.add(moduleNode);
+
         });
+        RootNode root = new RootNode("apis(" + apiCount.get() + ")");
         projectNodeMap.values().forEach(e -> root.add(e));
+        return root;
     }
 
 

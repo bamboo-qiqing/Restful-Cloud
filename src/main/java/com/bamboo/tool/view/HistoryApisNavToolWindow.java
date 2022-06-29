@@ -122,7 +122,7 @@ public class HistoryApisNavToolWindow extends SimpleToolWindowPanel implements D
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
-                List<BambooApiMethod> allApi = BambooService.getAllApi(null,null ,project,null,true);
+                List<BambooApiMethod> allApi = BambooService.getAllApi(null,null ,project,null,true,null);
                 RootNode root = new RootNode("apis("+allApi.size()+")");
                 PsiUtils.convertHistoryToRoot(root, allApi);
 

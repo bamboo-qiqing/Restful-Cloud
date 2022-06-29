@@ -1,6 +1,7 @@
 package com.bamboo.tool.config;
 
 import com.bamboo.tool.db.service.BambooService;
+import com.bamboo.tool.util.I18nUtil;
 import com.bamboo.tool.view.CurrentApisNavTool;
 
 import com.bamboo.tool.view.OtherApisNavToolWindow;
@@ -30,7 +31,7 @@ public class BambooToolWindowFactory implements ToolWindowFactory, DumbAware {
 
         CurrentApisNavTool currentApisNavTool = new CurrentApisNavTool(project);
         currentApisNavTool.getComponent().add(currentApisNavTool.getContent());
-        Content currentApisNavToolApis = contentFactory.createContent(currentApisNavTool, "Current", true);
+        Content currentApisNavToolApis = contentFactory.createContent(currentApisNavTool, I18nUtil.getString("panel.current"), true);
         toolWindow.getContentManager().addContent(currentApisNavToolApis);
 
 
@@ -38,7 +39,7 @@ public class BambooToolWindowFactory implements ToolWindowFactory, DumbAware {
         HistoryApisNavToolWindow historyApisNavToolWindow = new HistoryApisNavToolWindow(project);
         historyApisNavToolWindow.getComponent().add(historyApisNavToolWindow.getContent());
 
-        Content historyApis = contentFactory.createContent(historyApisNavToolWindow, "History", true);
+        Content historyApis = contentFactory.createContent(historyApisNavToolWindow, I18nUtil.getString("panel.history"), true);
         toolWindow.getContentManager().addContent(historyApis);
         toolWindow.addContentManagerListener(new ContentManagerListener(){
             @Override
@@ -54,7 +55,7 @@ public class BambooToolWindowFactory implements ToolWindowFactory, DumbAware {
 
         OtherApisNavToolWindow otherApisNavToolWindow = new OtherApisNavToolWindow(project);
         otherApisNavToolWindow.getComponent().add(otherApisNavToolWindow.getContent());
-        Content otherApis = contentFactory.createContent(otherApisNavToolWindow, "Other", true);
+        Content otherApis = contentFactory.createContent(otherApisNavToolWindow, I18nUtil.getString("panel.other"), true);
         toolWindow.getContentManager().addContent(otherApis);
     }
 }

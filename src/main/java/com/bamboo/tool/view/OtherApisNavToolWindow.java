@@ -1,22 +1,27 @@
 package com.bamboo.tool.view;
 
+import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.configurable.BambooApiFilterConfiguration;
+import com.bamboo.tool.configurable.BambooSoaFilterConfiguration;
+import com.bamboo.tool.db.entity.BambooApiMethod;
+import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.enums.RequestMethod;
+import com.bamboo.tool.enums.SoaType;
+import com.bamboo.tool.util.PsiUtils;
 import com.bamboo.tool.view.component.actions.RefreshApiAction;
+import com.bamboo.tool.view.component.actions.SearchEverywhereFiltersAction;
 import com.bamboo.tool.view.component.tree.ApiTree;
 import com.bamboo.tool.view.component.tree.BaseNode;
 import com.bamboo.tool.view.component.tree.MethodNode;
 import com.bamboo.tool.view.component.tree.RootNode;
-import com.bamboo.tool.config.model.ProjectInfo;
-import com.bamboo.tool.db.entity.BambooApiMethod;
-import com.bamboo.tool.db.service.BambooService;
-import com.bamboo.tool.util.PsiUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.actions.searcheverywhere.PersistentSearchEverywhereContributorFilter;
-import com.intellij.ide.actions.searcheverywhere.SearchEverywhereFiltersAction;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -28,6 +33,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.*;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
+import icons.PluginIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -51,6 +57,8 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
     private final JPanel panel;
     private final ApiTree apiTree;
     private PersistentSearchEverywhereContributorFilter requestTypeFiler;
+    private PersistentSearchEverywhereContributorFilter soaTypeFiler;
+
     public OtherApisNavToolWindow(Project project) {
         super(false, false);
         this.myProject = project;
@@ -107,22 +115,35 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
                 ProjectInfo currentProject = BambooService.queryProject(myProject.getBasePath(), myProject.getName());
-                 List<BambooApiMethod> allApi = BambooService.getAllApi(null, currentProject.getId().toString(), myProject,null,false);
-                RootNode root = new RootNode("apis("+allApi.size()+")");
-                PsiUtils.convertOtherToRoot(root, allApi);
-                apiTree.setModel(new DefaultTreeModel(root));
+                List<BambooApiMethod> allApi = BambooService.getAllApi(null, currentProject.getId().toString(), myProject, null, false, soaTypeFiler.getSelectedElements());
+
+                RootNode rootNode = PsiUtils.convertOtherToRoot(allApi, requestTypeFiler.getSelectedElements());
+                apiTree.setModel(new DefaultTreeModel(rootNode));
                 NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
             }
         };
         ProgressManager.getInstance().runProcessWithProgressAsynchronously(task, new BackgroundableProcessIndicator(task));
     }
 
+    /**
+     * Initialize operation bar
+     */
     private void initActionBar() {
         DefaultActionGroup group = new DefaultActionGroup();
-        group.add(new RefreshApiAction(this::renderData));
         BambooApiFilterConfiguration instance = BambooApiFilterConfiguration.getInstance(myProject);
         requestTypeFiler = new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null);
-        group.add(new SearchEverywhereFiltersAction(requestTypeFiler, this::renderData));
+        group.add(new SearchEverywhereFiltersAction(requestTypeFiler, this::renderData, "请求类型过滤器", "请求类型过滤器", AllIcons.General.Filter));
+
+        BambooSoaFilterConfiguration soaFilterConfiguration = BambooSoaFilterConfiguration.getInstance(myProject);
+        soaTypeFiler = new PersistentSearchEverywhereContributorFilter(Arrays.asList(SoaType.values()), soaFilterConfiguration, (a) -> {
+            SoaType soaType = (SoaType) a;
+            return soaType.getDesc();
+        }, (e) -> {
+            SoaType soaType = (SoaType) e;
+            return soaType.getIcon();
+        });
+        group.add(new com.bamboo.tool.view.component.actions.SearchEverywhereFiltersAction(soaTypeFiler, this::renderData, "Soa类型过滤器", "Soa类型过滤器", PluginIcons.FILERSOA));
+
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, group, false);
         actionToolbar.setTargetComponent(panel);
         JComponent toolbarComponent = actionToolbar.getComponent();
@@ -130,7 +151,6 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
         actionToolbar.getComponent().setBorder(border);
         setToolbar(toolbarComponent);
     }
-
 
 
     private static class MyCellRenderer extends ColoredTreeCellRenderer {
@@ -162,7 +182,7 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
             return;
         }
         MethodNode methodNode = (MethodNode) component;
-        final BambooApiMethod source = methodNode.getSource();
+        BambooApiMethod source = methodNode.getSource();
         source.navigate(true);
     }
 }

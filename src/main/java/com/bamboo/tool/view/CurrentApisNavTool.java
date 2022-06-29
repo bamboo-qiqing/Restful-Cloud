@@ -2,19 +2,23 @@ package com.bamboo.tool.view;
 
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.configurable.BambooApiFilterConfiguration;
+import com.bamboo.tool.configurable.BambooSoaFilterConfiguration;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.entity.BambooClass;
 import com.bamboo.tool.enums.RequestMethod;
+import com.bamboo.tool.enums.SoaType;
 import com.bamboo.tool.factory.FrameworkExecute;
 import com.bamboo.tool.util.PsiUtils;
 import com.bamboo.tool.view.component.actions.RefreshApiAction;
 import com.bamboo.tool.view.component.actions.RenameDescAction;
 import com.bamboo.tool.view.component.actions.SearchApiAction;
+import com.bamboo.tool.view.component.actions.SearchEverywhereFiltersAction;
 import com.bamboo.tool.view.component.tree.*;
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
 import com.intellij.ide.actions.searcheverywhere.PersistentSearchEverywhereContributorFilter;
-import com.intellij.ide.actions.searcheverywhere.SearchEverywhereFiltersAction;
+
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
@@ -32,6 +36,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.*;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
+import icons.PluginIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -53,6 +58,7 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
     private ApiTree apiTree;
     private List<BambooClass> allApiList;
     private PersistentSearchEverywhereContributorFilter requestTypeFiler;
+    private PersistentSearchEverywhereContributorFilter soaTypeFiler;
 
     public CurrentApisNavTool(Project project) {
         super(true, false);
@@ -186,10 +192,10 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
 
                     ProjectInfo currentProject = BambooService.queryProject(myProject.getBasePath(), myProject.getName());
                     BambooService.saveClass(allApiList, currentProject);
-                    List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, myProject, null, false);
-                    RootNode root = new RootNode("apis(" + allApi.size() + ")");
-                    apiTree.setModel(new DefaultTreeModel(root));
-                    PsiUtils.convertToRoot(root, allApi, requestTypeFiler.getSelectedElements());
+                    List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, myProject, null, false,soaTypeFiler.getSelectedElements());
+
+                    RootNode rootNode = PsiUtils.convertToRoot(allApi, requestTypeFiler.getSelectedElements());
+                    apiTree.setModel(new DefaultTreeModel(rootNode));
                     NotificationGroupManager.getInstance().getNotificationGroup("toolWindowNotificationGroup").createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
                 });
 
@@ -203,8 +209,17 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
         group.add(new RefreshApiAction(this::renderData));
         group.add(new SearchApiAction());
         BambooApiFilterConfiguration instance = BambooApiFilterConfiguration.getInstance(myProject);
+        BambooSoaFilterConfiguration soaFilterConfiguration = BambooSoaFilterConfiguration.getInstance(myProject);
         requestTypeFiler = new PersistentSearchEverywhereContributorFilter(Arrays.asList(RequestMethod.values()), instance, (a) -> a.toString(), (e) -> null);
-        group.add(new SearchEverywhereFiltersAction(requestTypeFiler, this::refresh));
+        soaTypeFiler = new PersistentSearchEverywhereContributorFilter(Arrays.asList(SoaType.values()), soaFilterConfiguration, (a) ->{
+            SoaType soaType = (SoaType) a;
+            return soaType.getDesc();
+        }, (e) -> {
+            SoaType soaType = (SoaType) e;
+            return soaType.getIcon();
+        });
+        group.add(new SearchEverywhereFiltersAction(requestTypeFiler, this::refresh, "请求类型过滤器", "请求类型过滤器", AllIcons.General.Filter));
+        group.add(new SearchEverywhereFiltersAction(soaTypeFiler, this::refresh, "Soa类型过滤器", "Soa类型过滤器", PluginIcons.FILERSOA));
         group.add(CommonActionsManager.getInstance().createExpandAllAction(apiTree, apiTree));
         group.add(CommonActionsManager.getInstance().createCollapseAllAction(apiTree, apiTree));
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, group, true);

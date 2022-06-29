@@ -1,6 +1,7 @@
 package com.bamboo.tool.configurable;
 
 import com.bamboo.tool.entity.DescFramework;
+import com.bamboo.tool.util.I18nUtil;
 import com.bamboo.tool.view.component.table.DescFrameWorkTableModel;
 import com.bamboo.tool.db.service.BambooService;
 import com.intellij.openapi.options.Configurable;
@@ -38,19 +39,19 @@ public class RestfulCloudConfigurable implements Configurable {
     public @Nullable
     JComponent createComponent() {
         boolean isShowDesc = BambooService.selectIsShowDesc();
-        initDataUrlLable.setText("初始化数据地址");
+        initDataUrlLable.setText(I18nUtil.getString("setting.init.dataAddress"));
         initDataUrlField.setText(BambooService.initDataUrl);
-        initDataSettingPanel.setBorder(IdeBorderFactory.createTitledBorder("初始化数据配置", true));
-        incPanel.setBorder(IdeBorderFactory.createTitledBorder("接口描述配置", true));
-        descriptionBox.setText("是否开启接口描述");
+        initDataSettingPanel.setBorder(IdeBorderFactory.createTitledBorder(I18nUtil.getString("setting.init.dataConfiguration"), true));
+        incPanel.setBorder(IdeBorderFactory.createTitledBorder(I18nUtil.getString("setting.interfaceDescConfig"), true));
+        descriptionBox.setText(I18nUtil.getString("setting.isOpenInterfaceDesc"));
         descriptionBox.setSelected(isShowDesc);
-        descFrameWorkPanel.setBorder(IdeBorderFactory.createTitledBorder("接口描述框架设置", true));
-        descFrameWorkLable.setText("该配置用于设置左侧工具栏显示接口，启用接口描述后支持的框架优先级配置");
+        descFrameWorkPanel.setBorder(IdeBorderFactory.createTitledBorder(I18nUtil.getString("setting.interfaceDescFrameworkSettings"), true));
+        descFrameWorkLable.setText(I18nUtil.getString("setting.descFrameWorkLable"));
         JBTable descFrameWorkTable = new JBTable();
 
         descFrameworks = BambooService.selectAllDescFramework();
         defaultTableModel = new DescFrameWorkTableModel(descFrameworks);
-        defaultTableModel.addColumn("框架");
+        defaultTableModel.addColumn(I18nUtil.getString("setting.defaultTableModel.framework"));
 
         for (DescFramework descFramework : descFrameworks) {
             defaultTableModel.addRow(descFramework.getStrings());

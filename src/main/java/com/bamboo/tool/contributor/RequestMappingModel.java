@@ -100,8 +100,6 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
     @Override
     public @NotNull
     ChooseByNameItemProvider getItemProvider(@Nullable PsiElement context) {
-
-
         return new RequestMappingItemProvider(this);
     }
 

@@ -38,23 +38,7 @@ public class MethodNode extends BaseNode<BambooApiMethod> {
     public @Nullable
     Icon getIcon(boolean selected) {
         BambooApiMethod source = this.getSource();
-        if (source.getFrameworkName().equals("o_dian_yun")||source.getFrameworkName().equals("spring_cloud")) {
-            if (source.getSoaType().equals("service")) {
-                return PluginIcons.SOA_SERVICE;
-            }
-            if (source.getSoaType().equals("client")) {
-                return PluginIcons.SOA_CLIENT;
-            }
-        }
-        if (source.getFrameworkName().equals("Spring")) {
-            if (source.getSoaType().equals("service")) {
-                return PluginIcons.SERVICE;
-            }
-            if (source.getSoaType().equals("client")) {
-                return PluginIcons.CLIENT;
-            }
-        }
-        return null;
+        return source.getSoaType().getIcon();
     }
 
     @Override

@@ -21,7 +21,7 @@ public class RequestMappingByNameContributor implements ChooseByNameContributor 
     @Override
     public String[] getNames(Project project, boolean b) {
         String userData = project.getUserData(ChooseByNamePopup.CURRENT_SEARCH_PATTERN);
-        navigationItems = BambooService.getAllApi(null, null,project,userData,false);
+        navigationItems = BambooService.getAllApi(null, null,project,userData,false,null);
         String[] strings = navigationItems.parallelStream().map(BambooApiMethod::getName).distinct().toArray(String[]::new);
         return strings;
     }

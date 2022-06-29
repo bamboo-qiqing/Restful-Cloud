@@ -17,4 +17,5 @@ public interface PluginIcons {
     Icon SOA_SERVICE = IconLoader.getIcon("/icons/bamboo_api_soa_server.svg", PluginIcons.class);
     Icon LOGO = IconLoader.getIcon("/icons/logo.svg", PluginIcons.class);
     Icon SEARCH = IconLoader.getIcon("/icons/search.svg", PluginIcons.class);
+    Icon FILERSOA = IconLoader.getIcon("/icons/filerSoa.svg", PluginIcons.class);
 }
