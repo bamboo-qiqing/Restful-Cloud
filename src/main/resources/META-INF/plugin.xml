@@ -39,11 +39,11 @@
 
     </description>
 
-    <idea-version since-build="193.5"/>
+    <idea-version since-build="201"/>
 
 
     <!-- 插件版本号 -->
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
