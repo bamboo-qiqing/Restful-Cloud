@@ -80,7 +80,7 @@
 
         <action id="restfulCloud.search"
                 class="com.bamboo.tool.view.component.actions.RestfulCloudSearchAction" icon="AllIcons.Actions.Search">
-            <keyboard-shortcut first-keystroke="ctrl shift m" keymap="$default"/>
+            <keyboard-shortcut first-keystroke="alt q" keymap="$default"/>
         </action>
 
     </actions>

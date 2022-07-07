@@ -141,7 +141,7 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
             SoaType soaType = (SoaType) e;
             return soaType.getIcon();
         });
-        group.add(new com.bamboo.tool.view.component.actions.SearchEverywhereFiltersAction(soaTypeFiler, this::renderData, "Soa类型过滤器", "Soa类型过滤器", PluginIcons.FILERSOA));
+        group.add(new SearchEverywhereFiltersAction(soaTypeFiler, this::renderData, "Soa类型过滤器", "Soa类型过滤器", PluginIcons.FILERSOA));
 
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_CONTENT, group, false);
         actionToolbar.setTargetComponent(panel);

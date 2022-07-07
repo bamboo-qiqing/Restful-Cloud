@@ -103,10 +103,10 @@ public class FrameworkExecute {
                                             bambooMethod.getDescs().add(bambooDesc);
                                         }
                                         bambooMethod.buildMethodParams(method.getParameterList());
-                                        if (info.getSoaType().getCode().equals("service")) {
+                                        if (info.getSoaType().getCode().equals("soa_service")) {
                                             bambooMethod.getMethodUrl().add(method.getName());
                                         }
-                                        if (info.getSoaType().getCode().equals("client")) {
+                                        if (info.getSoaType().getCode().equals("soa_client")) {
                                             bambooMethod.getMethodUrl().add(method.getName());
                                         }
                                     }
