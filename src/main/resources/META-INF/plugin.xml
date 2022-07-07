@@ -59,9 +59,10 @@
         <projectService serviceImplementation="com.bamboo.tool.configurable.BambooSoaFilterConfiguration"
                         order="first"/>
 
-
         <toolWindow id="Restful Cloud" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
-                    secondary="false" icon="PluginIcons.LOGO"/>
+                    secondary="false" icon="PluginIcons.LOGO"
+                    order="last"
+                    doNotActivateOnStart="true" />
         <!--兼容性处理code-->
         <notificationGroup id="toolWindowNotificationGroup" displayType="TOOL_WINDOW"/>
 
