@@ -1,12 +1,15 @@
 package com.bamboo.tool.entity;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bamboo.tool.enums.MethodScope;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.util.PsiUtil;
 import lombok.Data;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @ToString
@@ -27,7 +30,29 @@ public class BambooClass {
     private String params = StringUtils.EMPTY;
     private String headers = StringUtils.EMPTY;
     private String produces = StringUtils.EMPTY;
+    private Map<String, AnnotationInfo> annotationInfoMap;
     private Boolean isExist = false;
+
+    public void buildMethods(PsiMethod[] methods, Map<String, AnnotationMethodScope> methodScopes, List<String> scanMethods) {
+
+        if (methods.length > 0) {
+            // 构建所有方法
+            List<BambooMethod> methodList = Arrays.stream(methods).map(method -> new BambooMethod().buildMethod(method)).filter(a -> {
+                if (methodScopes.get(MethodScope.PUBLIC.getCode()) != null) {
+                    return a.getAccessLevel() == PsiUtil.ACCESS_LEVEL_PUBLIC;
+                } else if (methodScopes.get(MethodScope.PRIVATE.getCode()) != null) {
+                    return a.getAccessLevel() == PsiUtil.ACCESS_LEVEL_PRIVATE;
+                } else if (methodScopes.get(MethodScope.ANNOTATION.getCode()) != null) {
+                    long count = a.getAnnotationInfoMap().values().stream().map(f -> f.getAnnotationName()).filter(f -> scanMethods.contains(f)).count();
+                    if (count < 1) {
+                        return false;
+                    }
+                }
+                return true;
+            }).collect(Collectors.toList());
+            this.setMethods(methodList);
+        }
+    }
 
     public String toInsertSql(Integer projectInfoId) {
         StringBuilder sql = new StringBuilder();
@@ -44,7 +69,7 @@ public class BambooClass {
     }
 
     public String toUpdateSql() {
-        return "UPDATE bamboo_class SET description = '" + description+ "' WHERE id = '" + id + "';";
+        return "UPDATE bamboo_class SET description = '" + description + "' WHERE id = '" + id + "';";
     }
 
     public String toDeleteSql() {

@@ -17,6 +17,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.java.stubs.index.JavaAnnotationIndex;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
@@ -35,18 +36,10 @@ public class PsiUtils {
 
     public static List<PsiClassCache> getALLPsiClass(Project project, List<AnnotationInfoSetting> annotationInfoSettings) {
         List<AnnotationInfoSetting> infos = annotationInfoSettings.stream().filter(e -> AnnotationScope.CLASS.equals(e.getScope())).filter(e -> e.getEffect().contains("scann")).collect(Collectors.toList());
-        Map<String, AnnotationInfoSetting> infoMap = infos.stream().collect(Collectors.toMap(e -> e.getAnnotationPath(), e -> e));
-        Query<PsiClass> query = AllClassesSearch.search(ProjectScope.getContentScope(project), project);
-        List<PsiClassCache> caches = new ArrayList<>();
-        query.allowParallelProcessing().forEachAsync(e -> {
-            PsiAnnotation[] annotations = e.getAnnotations();
-            Arrays.stream(annotations).forEach(annotation -> {
-                AnnotationInfoSetting annotationInfoSetting = infoMap.get(annotation.getQualifiedName());
-                if (annotationInfoSetting != null) {
-                    caches.add(new PsiClassCache(annotationInfoSetting, e));
-                }
-            });
-            return true;
+        List<PsiClassCache> caches=new ArrayList<>();
+        infos.forEach(e->{
+            Collection<PsiAnnotation> psiAnnotations = JavaAnnotationIndex.getInstance().get(e.getAnnotationName(), project, ProjectScope.getContentScope(project));
+            caches.add(new PsiClassCache(e,psiAnnotations));
         });
         return caches;
     }

@@ -25,10 +25,11 @@ dependencies {
 
 intellij {
     plugins = ['java', "com.intellij.properties", "com.intellij.java-i18n"]
-    version = '2022.1.1'
+//    version = '2022.1.1'
     type = 'IU'
     updateSinceUntilBuild = false
     downloadSources = true
+    localPath ="D:\\install\\tools\\Idea\\IntelliJ IDEA 2021.3"
 
 }
 runPluginVerifier {

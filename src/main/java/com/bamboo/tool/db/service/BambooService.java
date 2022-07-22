@@ -268,10 +268,10 @@ public class BambooService {
                 api.append("'").append(poolUrl).append(classUrl).append(StringUtil.addPrefixIfNot(methodUrl, "/")).append("',");
                 api.append("'").append(requestMethods).append("',");
                 api.append("'").append(projectInfo.getId()).append("',");
-                api.append("'").append(method.getConsumes()).append("',");
-                api.append("'").append(method.getParams()).append("',");
-                api.append("'").append(method.getHeaders()).append("',");
-                api.append("'").append(method.getProduces()).append("'");
+//                api.append("'").append(method.getConsumes()).append("',");
+//                api.append("'").append(method.getParams()).append("',");
+//                api.append("'").append(method.getHeaders()).append("',");
+//                api.append("'").append(method.getProduces()).append("'");
                 api.append(");");
                 sqls.add(api.toString());
             });

@@ -1,5 +1,6 @@
 package com.bamboo.tool.factory;
 
+import b.C.S;
 import cn.hutool.core.collection.CollectionUtil;
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.db.service.BambooService;
@@ -14,6 +15,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.java.PsiAnnotationImpl;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.javadoc.PsiDocToken;
 import com.intellij.psi.util.PsiUtil;
@@ -37,89 +39,104 @@ public class FrameworkExecute {
 
         List<AnnotationInfoSetting> annotationInfoSettings = BambooService.selectAllAnnotationInfoSetting(null);
         Map<String, AnnotationInfoSetting> infoSettingClassMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.CLASS.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
-        Map<String, AnnotationInfoSetting> infoSettingMethodMap = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope().getCode())).collect(Collectors.toMap(AnnotationInfoSetting::getAnnotationPath, e -> e));
+        List<String> scanMethods = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope().getCode())).map(e -> e.getAnnotationName()).collect(Collectors.toList());
         List<BambooClass> bambooClasses = new ArrayList<>();
         List<PsiClassCache> caches = PsiUtils.getALLPsiClass(project, annotationInfoSettings);
         caches.forEach(cache -> {
-            PsiClass psiClass = cache.getPsiClass();
-            AnnotationInfoSetting info = cache.getInfo();
-            Module module = ModuleUtil.findModuleForPsiElement(psiClass);
-            if (module != null) {
-                BambooClass bambooClass = new BambooClass();
-                bambooClass.setClassName(psiClass.getName());
-                bambooClass.setClassPath(Objects.requireNonNull(PsiUtil.getVirtualFile(psiClass)).getPath());
-                bambooClass.setModuleName(module.getName());
-                bambooClass.setSetting(info);
-                String classDescription = FrameworkExecute.getClassDescription(psiClass);
+            AnnotationInfoSetting info = cache.getSetting();
+            Map<String, AnnotationMethodScope> methodScopes = info.getMethodScopes().stream().collect(Collectors.toMap(AnnotationMethodScope::getMethodScope, methodScope -> methodScope));
+            cache.getAnnotations().stream().forEach(e -> {
+                PsiClass psiClass = (PsiClass) e.getParent().getParent();
+                Module module = ModuleUtil.findModuleForPsiElement(psiClass);
+                if (module != null) {
+                    BambooClass bambooClass = new BambooClass();
+                    bambooClass.setClassName(psiClass.getName());
+                    bambooClass.setClassPath(Objects.requireNonNull(PsiUtil.getVirtualFile(psiClass)).getPath());
+                    bambooClass.setModuleName(module.getName());
+                    bambooClass.setSetting(info);
+                    String classDescription = FrameworkExecute.getClassDescription(psiClass);
+                    if (StringUtil.isNotBlank(classDescription)) {
+                        BambooDesc bambooDesc = new BambooDesc();
+                        bambooDesc.setDescribe(classDescription);
+                        bambooDesc.setFramewordCode("javadoc");
+                        bambooClass.getDescs().add(bambooDesc);
+                    }
+                    // 构建注解信息
+                    buildClassAnnotationInfo(psiClass, bambooClass);
+                    bambooClass.buildMethods(psiClass.getMethods(),methodScopes,scanMethods);
 
-                if (StringUtil.isNotBlank(classDescription)) {
-                    BambooDesc bambooDesc = new BambooDesc();
-                    bambooDesc.setDescribe(classDescription);
-                    bambooDesc.setFramewordCode("javadoc");
-                    bambooClass.getDescs().add(bambooDesc);
-                }
-                PsiAnnotation[] annotations = psiClass.getAnnotations();
-                if (annotations.length > 0) {
-                    buildAnnotations(bambooClass, null, infoSettingClassMap, annotations, info);
-                }
-                PsiMethod[] methods = psiClass.getMethods();
-                if (methods.length > 0) {
-                    Map<String, AnnotationMethodScope> methodScopes = info.getMethodScopes().stream().collect(Collectors.toMap(AnnotationMethodScope::getMethodScope, methodScope -> methodScope));
-                    Arrays.stream(methods).forEach(method -> {
-                        if (CollectionUtil.isNotEmpty(info.getMethodScopes())) {
-                            boolean satisfyScope = methodLevel(methodScopes, method);
-                            if (satisfyScope) {
-                                BambooMethod bambooMethod = new BambooMethod();
-                                bambooMethod.setMethodName(method.getName());
-                                bambooMethod.setAccessLevel(PsiUtil.getAccessLevel(method.getModifierList()));
 
-                                AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
-                                if (annotationMethodScope != null) {
-                                    PsiAnnotation[] methodAnnotations = method.getAnnotations();
-                                    if (methodAnnotations.length > 0) {
-                                        boolean annotations1 = buildAnnotations(null, bambooMethod, infoSettingMethodMap, methodAnnotations, info);
-                                        if (annotations1) {
-                                            bambooMethod.getReturnType().buildReturnType(Objects.requireNonNull(method.getReturnType()));
-                                            String methodDescription = FrameworkExecute.getMethodDescription(method);
-                                            if (StringUtil.isNotBlank(methodDescription)) {
-                                                BambooDesc bambooDesc = new BambooDesc();
-                                                bambooDesc.setDescribe(methodDescription);
-                                                bambooDesc.setFramewordCode("javadoc");
-                                                bambooMethod.getDescs().add(bambooDesc);
-                                            }
-                                            bambooMethod.buildMethodParams(method.getParameterList());
-                                            bambooClass.getMethods().add(bambooMethod);
-                                        }
+//                            boolean satisfyScope = methodLevel(methodScopes, method);
+//
+//
+//                                    AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
+//                                    if (annotationMethodScope != null) {
+//                                        PsiAnnotation[] methodAnnotations = method.getAnnotations();
+//                                        if (methodAnnotations.length > 0) {
+//                                            boolean annotations1 = buildAnnotations(null, bambooMethod, infoSettingMethodMap, methodAnnotations, info);
+//                                            if (annotations1) {
+//                                                bambooMethod.getReturnType().buildReturnType(Objects.requireNonNull(method.getReturnType()));
+//                                                String methodDescription = FrameworkExecute.getMethodDescription(method);
+//                                                if (StringUtil.isNotBlank(methodDescription)) {
+//                                                    BambooDesc bambooDesc = new BambooDesc();
+//                                                    bambooDesc.setDescribe(methodDescription);
+//                                                    bambooDesc.setFramewordCode("javadoc");
+//                                                    bambooMethod.getDescs().add(bambooDesc);
+//                                                }
+//                                                bambooMethod.buildMethodParams(method.getParameterList());
+//                                                bambooClass.getMethods().add(bambooMethod);
+//                                            }
+//
+//                                        }
+//                                    } else {
+//                                        if (info.getFramework().getName().equals("o_dian_yun")) {
+//                                            bambooMethod.getReturnType().buildReturnType(Objects.requireNonNull(method.getReturnType()));
+//                                            String methodDescription = FrameworkExecute.getMethodDescription(method);
+//                                            if (StringUtil.isNotBlank(methodDescription)) {
+//                                                BambooDesc bambooDesc = new BambooDesc();
+//                                                bambooDesc.setDescribe(methodDescription);
+//                                                bambooDesc.setFramewordCode("javadoc");
+//                                                bambooMethod.getDescs().add(bambooDesc);
+//                                            }
+//                                            bambooMethod.buildMethodParams(method.getParameterList());
+//                                            if (info.getSoaType().getCode().equals("soa_service")) {
+//                                                bambooMethod.getMethodUrl().add(method.getName());
+//                                            }
+//                                            if (info.getSoaType().getCode().equals("soa_client")) {
+//                                                bambooMethod.getMethodUrl().add(method.getName());
+//                                            }
+//                                        }
+//                                        bambooClass.getMethods().add(bambooMethod);
+//                                    }
 
-                                    }
-                                } else {
-                                    if (info.getFramework().getName().equals("o_dian_yun")) {
-                                        bambooMethod.getReturnType().buildReturnType(Objects.requireNonNull(method.getReturnType()));
-                                        String methodDescription = FrameworkExecute.getMethodDescription(method);
-                                        if (StringUtil.isNotBlank(methodDescription)) {
-                                            BambooDesc bambooDesc = new BambooDesc();
-                                            bambooDesc.setDescribe(methodDescription);
-                                            bambooDesc.setFramewordCode("javadoc");
-                                            bambooMethod.getDescs().add(bambooDesc);
-                                        }
-                                        bambooMethod.buildMethodParams(method.getParameterList());
-                                        if (info.getSoaType().getCode().equals("soa_service")) {
-                                            bambooMethod.getMethodUrl().add(method.getName());
-                                        }
-                                        if (info.getSoaType().getCode().equals("soa_client")) {
-                                            bambooMethod.getMethodUrl().add(method.getName());
-                                        }
-                                    }
-                                    bambooClass.getMethods().add(bambooMethod);
-                                }
-                            }
-                        }
-                    });
+
+
+                    bambooClasses.add(bambooClass);
                 }
-                bambooClasses.add(bambooClass);
-            }
+            });
         });
         return bambooClasses;
+    }
+
+    public static void buildClassAnnotationInfo(PsiClass psiClass, BambooClass bambooClass) {
+        Map<String, AnnotationInfo> stringAnnotationInfoMap = builAnnotationInfo(psiClass.getAnnotations());
+        bambooClass.setAnnotationInfoMap(stringAnnotationInfoMap);
+    }
+
+    public static void buildClassAnnotationInfo(PsiMethod psiMethod, BambooMethod method) {
+        Map<String, AnnotationInfo> stringAnnotationInfoMap = builAnnotationInfo(psiMethod.getAnnotations());
+        method.setAnnotationInfoMap(stringAnnotationInfoMap);
+    }
+
+    public static Map<String, AnnotationInfo> builAnnotationInfo(PsiAnnotation[] annotations) {
+        Map<String, AnnotationInfo> annotationInfoMap = Arrays.stream(annotations).map(annotation -> {
+            AnnotationInfo annotationInfo = new AnnotationInfo();
+            annotationInfo.setAnnotationName(annotation.getNameReferenceElement().getReferenceName());
+            Map<String, List<String>> stringListMap = buildAttributes(annotation.getParameterList().getAttributes());
+            annotationInfo.setAnnotationAttributs(stringListMap);
+            return annotationInfo;
+        }).collect(Collectors.toMap(AnnotationInfo::getAnnotationName, a -> a));
+        return annotationInfoMap;
     }
 
     /**
@@ -158,7 +175,7 @@ public class FrameworkExecute {
                 if (CollectionUtil.isNotEmpty(params)) {
                     PsiNameValuePair[] attributes = annotation.getParameterList().getAttributes();
                     if (attributes.length > 0) {
-                        buildAttributes(bambooClass, bambooMethod, info, annotationInfoSetting, params, attributes);
+                        Map<String, List<String>> stringListMap = buildAttributes(attributes);
                     } else {
                         if (StringUtil.isNotBlank(requestMethod)) {
                             bambooMethod.getMethodUrl().add("");
@@ -171,23 +188,30 @@ public class FrameworkExecute {
         return results.get();
     }
 
-    private static void buildAttributes(BambooClass bambooClass, BambooMethod bambooMethod, AnnotationInfoSetting info, AnnotationInfoSetting annotationInfoSetting, Map<String, AnnotationParam> params, PsiNameValuePair[] attributes) {
+    public static Map<String, List<String>> buildAttributes(PsiNameValuePair[] attributes) {
+        Map<String, List<String>> attributesMap = new HashMap<>();
         for (PsiNameValuePair attribute : attributes) {
             PsiAnnotationMemberValue value = attribute.getValue();
             String name = StringUtil.isEmpty(attribute.getName()) ? "null" : attribute.getName();
-            AnnotationParam annotationParam = params.get(name);
-            if (!Objects.isNull(annotationParam)) {
-                List<String> values = PsiAnnotationMemberUtil.getValue(value);
-                String type = annotationParam.getType();
-                if (bambooMethod != null) {
-                    buildAttributesMethod(bambooMethod, annotationInfoSetting, values, type);
-                }
-                if (bambooClass != null) {
-                    buildAttributesClass(bambooClass, info, annotationInfoSetting, values, type);
-                }
-
-            }
+            attributesMap.put(name, PsiAnnotationMemberUtil.getValue(value));
         }
+        return attributesMap;
+//        for (PsiNameValuePair attribute : attributes) {
+//            PsiAnnotationMemberValue value = attribute.getValue();
+//            String name = StringUtil.isEmpty(attribute.getName()) ? "null" : attribute.getName();
+//            AnnotationParam annotationParam = params.get(name);
+//            if (!Objects.isNull(annotationParam)) {
+//                List<String> values = PsiAnnotationMemberUtil.getValue(value);
+//                String type = annotationParam.getType();
+//                if (bambooMethod != null) {
+//                    buildAttributesMethod(bambooMethod, annotationInfoSetting, values, type);
+//                }
+//                if (bambooClass != null) {
+//                    buildAttributesClass(bambooClass, info, annotationInfoSetting, values, type);
+//                }
+//
+//            }
+//        }
     }
 
     private static void buildAttributesClass(BambooClass bambooClass, AnnotationInfoSetting info, AnnotationInfoSetting annotationInfoSetting, List<String> values, String type) {
@@ -237,14 +261,6 @@ public class FrameworkExecute {
             bambooMethod.setMethodUrl(values);
         } else if ("requestMethod".equals(type)) {
             bambooMethod.getRequestMethods().addAll(values);
-        } else if ("consumes".equals(type)) {
-            bambooMethod.setConsumes(values.toString());
-        } else if ("params".equals(type)) {
-            bambooMethod.setParams(values.toString());
-        } else if ("headers".equals(type)) {
-            bambooMethod.setHeaders(values.toString());
-        } else if ("produces".equals(type)) {
-            bambooMethod.setProduces(values.toString());
         } else if ("desc".equals(type)) {
             BambooDesc bambooDesc = new BambooDesc();
             String frameworkName = annotationInfoSetting.getFramework().getName();

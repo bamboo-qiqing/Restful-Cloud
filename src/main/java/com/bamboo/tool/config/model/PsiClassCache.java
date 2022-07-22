@@ -1,8 +1,12 @@
 package com.bamboo.tool.config.model;
 
 import com.bamboo.tool.entity.AnnotationInfoSetting;
+import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import lombok.Data;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Create by GuoQing
@@ -12,12 +16,12 @@ import lombok.Data;
 @Data
 public class PsiClassCache {
 
-    private PsiClass psiClass;
-    private AnnotationInfoSetting info;
+    private AnnotationInfoSetting setting;
+    private Collection<PsiAnnotation> annotations;
 
-    public PsiClassCache(AnnotationInfoSetting info, PsiClass psiClass) {
-        this.psiClass = psiClass;
-        this.info = info;
+    public PsiClassCache(AnnotationInfoSetting setting, Collection<PsiAnnotation> annotations) {
+        this.setting = setting;
+        this.annotations = annotations;
     }
 
 }
