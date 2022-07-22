@@ -76,7 +76,7 @@ public class BambooApiGotoContributor extends AbstractGotoSEContributor {
     public @Nullable
     @Nls
     String getAdvertisement() {
-        return "alt+q";
+        return "ctrl+alt+q";
     }
 
     static class Factory implements SearchEverywhereContributorFactory<Object> {
