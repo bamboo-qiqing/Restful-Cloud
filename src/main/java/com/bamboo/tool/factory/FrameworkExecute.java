@@ -37,6 +37,7 @@ public class FrameworkExecute {
 
         List<AnnotationInfoSetting> annotationInfoSettings = BambooApisComponent.getStoreService().getAllAnnotation();
         List<String> scanMethods = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope())).map(e -> e.getAnnotationName()).collect(Collectors.toList());
+        List<String> attributeClass = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.CLASS.getCode().equals(e.getScope())).map(e -> e.getAnnotationName()).collect(Collectors.toList());
         List<BambooClass> bambooClasses = new ArrayList<>();
         List<PsiClassCache> caches = PsiUtils.getALLPsiClass(project, annotationInfoSettings);
         caches.forEach(cache -> {
@@ -125,26 +126,10 @@ public class FrameworkExecute {
             Map<String, List<String>> stringListMap = buildAttributes(annotation.getParameterList().getAttributes());
             annotationInfo.setAnnotationAttributs(stringListMap);
             return annotationInfo;
-        }).collect(Collectors.toMap(AnnotationInfo::getAnnotationName, a -> a));
+        }).filter(e->CollectionUtil.isNotEmpty(e.getAnnotationAttributs())).collect(Collectors.toMap(AnnotationInfo::getAnnotationName, a -> a));
         return annotationInfoMap;
     }
 
-    /**
-     * 判断方法范围
-     */
-    private static boolean methodLevel(Map<String, AnnotationMethodScope> methodScopes, PsiMethod method) {
-
-        int accessLevel = PsiUtil.getAccessLevel(method.getModifierList());
-        AnnotationMethodScope privateScope = methodScopes.get(MethodScope.PRIVATE.getCode());
-        if (privateScope != null) {
-            return accessLevel == PsiUtil.ACCESS_LEVEL_PRIVATE;
-        }
-        AnnotationMethodScope publicScope = methodScopes.get(MethodScope.PUBLIC.getCode());
-        if (publicScope != null) {
-            return accessLevel == PsiUtil.ACCESS_LEVEL_PUBLIC;
-        }
-        return true;
-    }
 
     /**
      * 构建注释
