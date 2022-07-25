@@ -35,7 +35,7 @@ public class PsiUtils {
 
 
     public static List<PsiClassCache> getALLPsiClass(Project project, List<AnnotationInfoSetting> annotationInfoSettings) {
-        List<AnnotationInfoSetting> infos = annotationInfoSettings.stream().filter(e -> AnnotationScope.CLASS.equals(e.getScope())).filter(e -> e.getEffect().contains("scann")).collect(Collectors.toList());
+        List<AnnotationInfoSetting> infos = annotationInfoSettings.stream().filter(e -> AnnotationScope.CLASS.getCode().equals(e.getScope())).filter(e -> e.getEffect().contains("scann")).collect(Collectors.toList());
         List<PsiClassCache> caches=new ArrayList<>();
         infos.forEach(e->{
             Collection<PsiAnnotation> psiAnnotations = JavaAnnotationIndex.getInstance().get(e.getAnnotationName(), project, ProjectScope.getContentScope(project));

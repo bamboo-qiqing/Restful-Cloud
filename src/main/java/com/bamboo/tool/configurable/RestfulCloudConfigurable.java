@@ -38,13 +38,13 @@ public class RestfulCloudConfigurable implements Configurable {
     @Override
     public @Nullable
     JComponent createComponent() {
-        boolean isShowDesc = BambooService.selectIsShowDesc();
+//        boolean isShowDesc = BambooService.selectIsShowDesc();
         initDataUrlLable.setText(I18nUtil.getString("setting.init.dataAddress"));
         initDataUrlField.setText(BambooService.initDataUrl);
         initDataSettingPanel.setBorder(IdeBorderFactory.createTitledBorder(I18nUtil.getString("setting.init.dataConfiguration"), true));
         incPanel.setBorder(IdeBorderFactory.createTitledBorder(I18nUtil.getString("setting.interfaceDescConfig"), true));
         descriptionBox.setText(I18nUtil.getString("setting.isOpenInterfaceDesc"));
-        descriptionBox.setSelected(isShowDesc);
+//        descriptionBox.setSelected(isShowDesc);
         descFrameWorkPanel.setBorder(IdeBorderFactory.createTitledBorder(I18nUtil.getString("setting.interfaceDescFrameworkSettings"), true));
         descFrameWorkLable.setText(I18nUtil.getString("setting.descFrameWorkLable"));
         JBTable descFrameWorkTable = new JBTable();

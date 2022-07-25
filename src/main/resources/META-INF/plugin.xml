@@ -54,6 +54,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
+        <projectService serviceImplementation="com.bamboo.tool.config.BambooApisComponent" />
         <projectService serviceImplementation="com.bamboo.tool.configurable.BambooApiFilterConfiguration"
                         order="first"/>
         <projectService serviceImplementation="com.bamboo.tool.configurable.BambooSoaFilterConfiguration"

@@ -8,10 +8,6 @@ public enum AttributeEnums {
     POOL_URL("poolUrl", "项目url"),
     CLASS_URL("classUrl", "类url"),
     METHOD_URL("methodUrl", "方法url"),
-    consumes("consumes", "consumes"),
-    params("params", "params"),
-    headers("headers", "headers"),
-    produces("produces", "produces"),
     description("desc", "描述"),
     ;
 

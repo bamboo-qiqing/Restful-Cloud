@@ -61,6 +61,8 @@ public class BambooMethod {
         this.getReturnType().buildReturnType(method.getReturnType());
         //构建方法参数
         this.buildMethodParams(method.getParameterList());
+        //构建注释
+        this.setDescription(FrameworkExecute.getMethodDescription(method));
         return this;
     }
 

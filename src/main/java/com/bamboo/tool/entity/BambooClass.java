@@ -21,20 +21,14 @@ public class BambooClass {
     private String classPath = StringUtils.EMPTY;
     private String poolUrl;
     private List<String> classUrl = new ArrayList<>();
-    private String projectId;
     private List<BambooMethod> methods = new ArrayList<>();
     private AnnotationInfoSetting setting;
-    private String settingId;
+
     private List<BambooDesc> descs = new ArrayList<>();
-    private String consumes = StringUtils.EMPTY;
-    private String params = StringUtils.EMPTY;
-    private String headers = StringUtils.EMPTY;
-    private String produces = StringUtils.EMPTY;
     private Map<String, AnnotationInfo> annotationInfoMap;
     private Boolean isExist = false;
 
     public void buildMethods(PsiMethod[] methods, Map<String, AnnotationMethodScope> methodScopes, List<String> scanMethods) {
-
         if (methods.length > 0) {
             // 构建所有方法
             List<BambooMethod> methodList = Arrays.stream(methods).map(method -> new BambooMethod().buildMethod(method)).filter(a -> {

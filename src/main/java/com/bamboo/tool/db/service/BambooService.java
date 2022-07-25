@@ -1,6 +1,7 @@
 package com.bamboo.tool.db.service;
 
 
+import b.C.S;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
@@ -15,7 +16,6 @@ import com.bamboo.tool.db.SqlConstant;
 import com.bamboo.tool.db.SqliteConfig;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.entity.*;
-import com.bamboo.tool.enums.AnnotationScope;
 import com.bamboo.tool.enums.RequestMethod;
 import com.bamboo.tool.enums.SoaType;
 import com.bamboo.tool.util.StringUtil;
@@ -178,10 +178,10 @@ public class BambooService {
             bambooClass.setId(Id);
             if (!Objects.isNull(oldClass)) {
                 oldClass.setIsExist(true);
-                if (bambooClass.getSettingId() != null && !oldClass.getSettingId().equals(bambooClass.getSettingId())) {
-                    oldClass.setSettingId(bambooClass.getSettingId());
-
-                }
+//                if (bambooClass.getSettingId() != null && !oldClass.getSettingId().equals(bambooClass.getSettingId())) {
+//                    oldClass.setSettingId(bambooClass.getSettingId());
+//
+//                }
                 String description = oldClass.getDescription();
                 String descs = JSONObject.toJSONString(bambooClass.getDescs());
                 if (!description.equals(descs)) {
@@ -320,7 +320,7 @@ public class BambooService {
         ResultSet resultSet = state.executeQuery(str);
         List<Framework> frameworks = new ArrayList<>();
         while (resultSet.next()) {
-            int id = resultSet.getInt("id");
+            String id = resultSet.getString("id");
             String name = resultSet.getString("name");
             String describe = resultSet.getString("describe");
 
@@ -362,7 +362,7 @@ public class BambooService {
 
     @SneakyThrows
     public static List<AnnotationInfoSetting> selectAllAnnotationInfoSetting(String frameworkId) {
-        Map<Integer, Framework> framework = BambooService.selectAllFramework().stream().collect(Collectors.toMap(Framework::getId, e -> e));
+        Map<String, Framework> framework = BambooService.selectAllFramework().stream().collect(Collectors.toMap(Framework::getId, e -> e));
         Map<Integer, List<AnnotationMethodScope>> methodScopeMap = BambooService.selectAllAnnotationMethodScope().stream().collect(Collectors.groupingBy(AnnotationMethodScope::getAnnotationId, Collectors.toList()));
         Map<Integer, List<AnnotationParam>> paramMap = BambooService.selectAllAnnotationParam(null).stream().collect(Collectors.groupingBy(AnnotationParam::getAnnotationInfoId, Collectors.toList()));
 
@@ -393,9 +393,9 @@ public class BambooService {
     }
 
     @NotNull
-    private static AnnotationInfoSetting getAnnotationInfo(ResultSet resultSet, Map<Integer, Framework> frameworkMap, Map<Integer, List<AnnotationMethodScope>> methodScopeMap, Map<Integer, List<AnnotationParam>> paramMap) throws SQLException {
+    private static AnnotationInfoSetting getAnnotationInfo(ResultSet resultSet, Map<String, Framework> frameworkMap, Map<Integer, List<AnnotationMethodScope>> methodScopeMap, Map<Integer, List<AnnotationParam>> paramMap) throws SQLException {
         AnnotationInfoSetting annotationInfoSetting = new AnnotationInfoSetting();
-        int id = resultSet.getInt("id");
+        String id = resultSet.getString("id");
         String classPath = resultSet.getString("class_path");
         String classShortName = resultSet.getString("class_short_name");
         String scope = resultSet.getString("scope");
@@ -411,11 +411,10 @@ public class BambooService {
         annotationInfoSetting.setAnnotationPath(classPath);
         annotationInfoSetting.setAnnotationName(classShortName);
         if (scope != null) {
-            annotationInfoSetting.setScope(AnnotationScope.getAnnotationScope(scope));
+            annotationInfoSetting.setScope(scope);
         }
-        annotationInfoSetting.setSoaType(SoaType.getSoaType(soaType));
+        annotationInfoSetting.setSoaType(soaType);
         annotationInfoSetting.setEffect(effect);
-        annotationInfoSetting.setFramework(framework);
 
         if (annotationMethodScopes != null) {
             annotationInfoSetting.setMethodScopes(annotationMethodScopes);
@@ -445,7 +444,7 @@ public class BambooService {
     }
 
     @SneakyThrows
-    public static List<BambooApiMethod>   getAllApi(String projectId, String notProjectId, Project project, String queryCondition, Boolean isHistory,List<SoaType> soaTypes) {
+    public static List<BambooApiMethod> getAllApi(String projectId, String notProjectId, Project project, String queryCondition, Boolean isHistory, List<SoaType> soaTypes) {
         Connection conn = SqliteConfig.getConnection();
         Statement state = conn.createStatement();
         StringBuilder str = new StringBuilder();
@@ -493,15 +492,15 @@ public class BambooService {
             str.append(notProjectId);
             str.append("'");
         }
-        if(CollectionUtil.isNotEmpty(soaTypes)){
+        if (CollectionUtil.isNotEmpty(soaTypes)) {
             str.append(" and ais.soa_type in(");
-            for (int i = 0; i <soaTypes.size() ; i++) {
-                SoaType  soaType= soaTypes.get(i);
+            for (int i = 0; i < soaTypes.size(); i++) {
+                SoaType soaType = soaTypes.get(i);
                 str.append("'");
                 str.append(soaType.getCode());
-                if(i==(soaTypes.size()-1)){
+                if (i == (soaTypes.size() - 1)) {
                     str.append("'");
-                }else{
+                } else {
                     str.append("',");
                 }
             }
@@ -529,9 +528,9 @@ public class BambooService {
             String projectName = resultSet.getString("projectName");
             String projectPath = resultSet.getString("projectPath");
             String soaType = resultSet.getString("soaType");
-            if(StringUtil.isNotEmpty(soaType)){
-                 SoaType soaType1 = SoaType.getSoaType(soaType);
-                 api.setSoaType(soaType1);
+            if (StringUtil.isNotEmpty(soaType)) {
+                SoaType soaType1 = SoaType.getSoaType(soaType);
+                api.setSoaType(soaType1);
             }
             String frameworkName = resultSet.getString("frameworkName");
             String methodId = resultSet.getString("methodId");
@@ -726,7 +725,7 @@ public class BambooService {
             bambooClass.setClassName(className);
             bambooClass.setModuleName(modelName);
             bambooClass.setDescription(description);
-            bambooClass.setProjectId(projectId);
+//            bambooClass.setProjectId(projectId);
             map.put(id, bambooClass);
         }
         return map;
@@ -800,7 +799,7 @@ public class BambooService {
         ResultSet resultSet = state.executeQuery("select * from framework where name='" + name + "'");
         List<Framework> frameworks = new ArrayList<>();
         while (resultSet.next()) {
-            int id = resultSet.getInt("id");
+            String id = resultSet.getString("id");
             String name1 = resultSet.getString("name");
             String describeS = resultSet.getString("describe");
 
@@ -813,8 +812,9 @@ public class BambooService {
         resultSet.close();
         state.close();
         conn.close();
-        return CollectionUtil.isNotEmpty(frameworks)?frameworks.get(0):null;
+        return CollectionUtil.isNotEmpty(frameworks) ? frameworks.get(0) : null;
     }
+
     @SneakyThrows
     public static void removeFramework(Integer id) {
         Connection conn = SqliteConfig.getConnection();
@@ -822,7 +822,6 @@ public class BambooService {
         state.execute("delete  from framework  where id = '" + id + "';");
         state.close();
         conn.close();
-
     }
 
 }
