@@ -5,6 +5,7 @@ import com.bamboo.tool.config.BambooApisComponent;
 import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.entity.*;
 import com.bamboo.tool.enums.AnnotationScope;
+import com.bamboo.tool.enums.AttributeEnums;
 import com.bamboo.tool.enums.MethodScope;
 import com.bamboo.tool.util.PsiAnnotationMemberUtil;
 import com.bamboo.tool.util.PsiUtils;
@@ -36,8 +37,10 @@ public class FrameworkExecute {
     public static List<BambooClass> buildApiMethod(Project project) {
 
         List<AnnotationInfoSetting> annotationInfoSettings = BambooApisComponent.getStoreService().getAllAnnotation();
-        List<String> scanMethods = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope())).map(e -> e.getAnnotationName()).collect(Collectors.toList());
-        List<String> attributeClass = annotationInfoSettings.stream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.CLASS.getCode().equals(e.getScope())).map(e -> e.getAnnotationName()).collect(Collectors.toList());
+        List<String> scanMethods = annotationInfoSettings.parallelStream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope())).map(e -> e.getAnnotationName()).collect(Collectors.toList());
+        List<AnnotationInfoSetting> attributeClass = annotationInfoSettings.parallelStream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.CLASS.getCode().equals(e.getScope())).collect(Collectors.toList());
+        Map<String, AnnotationInfoSetting> attributeMethod = annotationInfoSettings.parallelStream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope())).collect(Collectors.toMap(e -> e.getAnnotationName(), e -> e));
+
         List<BambooClass> bambooClasses = new ArrayList<>();
         List<PsiClassCache> caches = PsiUtils.getALLPsiClass(project, annotationInfoSettings);
         caches.forEach(cache -> {
@@ -57,6 +60,43 @@ public class FrameworkExecute {
                     // 构建注解信息
                     buildClassAnnotationInfo(psiClass, bambooClass);
                     bambooClass.buildMethods(psiClass.getMethods(), methodScopes, scanMethods);
+                    attributeClass.parallelStream().forEach(setting -> {
+                        Map<String, AnnotationInfo> annotationInfoMap = bambooClass.getAnnotationInfoMap();
+                        AnnotationInfo annotationInfo = annotationInfoMap.get(setting.getAnnotationName());
+                        if (!Objects.isNull(annotationInfo)) {
+                            Map<String, List<String>> annotationAttributs = annotationInfo.getAnnotationAttributs();
+                            List<AnnotationParam> params = setting.getParams();
+                            params.parallelStream().forEach(param -> {
+                                List<String> strings = annotationAttributs.get(param.getName());
+                                if (AttributeEnums.POOL_URL.getCode().equals(param.getType()) && CollectionUtil.isNotEmpty(strings)) {
+                                    bambooClass.setPoolUrl(strings.get(0));
+                                }
+                                if (AttributeEnums.CLASS_URL.getCode().equals(param.getType()) && CollectionUtil.isNotEmpty(strings)) {
+                                    bambooClass.getClassUrl().addAll(strings);
+                                }
+                            });
+                        }
+                    });
+                    bambooClass.getMethods().parallelStream().forEach(method -> {
+                        Map<String, AnnotationInfo> annotationInfoMap = method.getAnnotationInfoMap();
+                        annotationInfoMap.values().forEach(s -> {
+                            AnnotationInfoSetting annotationInfoSetting = attributeMethod.get(s.getAnnotationName());
+                            if (!Objects.isNull(annotationInfoSetting)) {
+                                Map<String, List<String>> annotationAttributs = s.getAnnotationAttributs();
+                                List<AnnotationParam> params = annotationInfoSetting.getParams();
+                                params.forEach(param -> {
+                                    List<String> strings = annotationAttributs.get(param.getName());
+                                    if (CollectionUtil.isNotEmpty(strings)) {
+                                        if (AttributeEnums.METHOD_URL.getCode().equals(param.getType())) {
+                                             List<String> urls = new ArrayList<>();
+                                        }
+                                    }
+                                });
+                            }
+
+                        });
+                    });
+
 
 //                            boolean satisfyScope = methodLevel(methodScopes, method);
 //
@@ -126,7 +166,7 @@ public class FrameworkExecute {
             Map<String, List<String>> stringListMap = buildAttributes(annotation.getParameterList().getAttributes());
             annotationInfo.setAnnotationAttributs(stringListMap);
             return annotationInfo;
-        }).filter(e->CollectionUtil.isNotEmpty(e.getAnnotationAttributs())).collect(Collectors.toMap(AnnotationInfo::getAnnotationName, a -> a));
+        }).filter(e -> CollectionUtil.isNotEmpty(e.getAnnotationAttributs())).collect(Collectors.toMap(AnnotationInfo::getAnnotationName, a -> a));
         return annotationInfoMap;
     }
 

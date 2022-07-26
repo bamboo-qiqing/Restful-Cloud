@@ -31,7 +31,9 @@ public class BambooClass {
     public void buildMethods(PsiMethod[] methods, Map<String, AnnotationMethodScope> methodScopes, List<String> scanMethods) {
         if (methods.length > 0) {
             // 构建所有方法
-            List<BambooMethod> methodList = Arrays.stream(methods).map(method -> new BambooMethod().buildMethod(method)).filter(a -> {
+            List<BambooMethod> methodList = Arrays.stream(methods)
+                    .map(method -> new BambooMethod().buildMethod(method))
+                    .filter(a -> {
                 if (methodScopes.get(MethodScope.PUBLIC.getCode()) != null) {
                     return a.getAccessLevel() == PsiUtil.ACCESS_LEVEL_PUBLIC;
                 } else if (methodScopes.get(MethodScope.PRIVATE.getCode()) != null) {
