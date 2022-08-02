@@ -19,11 +19,10 @@ public class BambooClass {
     private String moduleName = StringUtils.EMPTY;
     private String description = StringUtils.EMPTY;
     private String classPath = StringUtils.EMPTY;
-    private String poolUrl;
+    private String poolUrl = StringUtils.EMPTY;
     private List<String> classUrl = new ArrayList<>();
     private List<BambooMethod> methods = new ArrayList<>();
     private AnnotationInfoSetting setting;
-
     private List<BambooDesc> descs = new ArrayList<>();
     private Map<String, AnnotationInfo> annotationInfoMap;
     private Boolean isExist = false;
@@ -31,9 +30,7 @@ public class BambooClass {
     public void buildMethods(PsiMethod[] methods, Map<String, AnnotationMethodScope> methodScopes, List<String> scanMethods) {
         if (methods.length > 0) {
             // 构建所有方法
-            List<BambooMethod> methodList = Arrays.stream(methods)
-                    .map(method -> new BambooMethod().buildMethod(method))
-                    .filter(a -> {
+            List<BambooMethod> methodList = Arrays.stream(methods).map(method -> new BambooMethod().buildMethod(method)).filter(a -> {
                 if (methodScopes.get(MethodScope.PUBLIC.getCode()) != null) {
                     return a.getAccessLevel() == PsiUtil.ACCESS_LEVEL_PUBLIC;
                 } else if (methodScopes.get(MethodScope.PRIVATE.getCode()) != null) {

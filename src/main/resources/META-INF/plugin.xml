@@ -1,7 +1,9 @@
 <idea-plugin>
     <id>com.bamboo</id>
     <name>Restful Cloud</name>
-    <vendor email="760560079@qq.com" url="https://bamboo-qiqing.github.io/projects/restfulCloud/home.html">Restful Cloud </vendor>
+    <vendor email="760560079@qq.com" url="https://bamboo-qiqing.github.io/projects/restfulCloud/home.html">Restful
+        Cloud
+    </vendor>
 
     <description><![CDATA[
         Restful Cloud is a restful api toolkit plug-in (http client).
@@ -54,8 +56,10 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <applicationService serviceImplementation="com.bamboo.tool.config.BambooToolComponent" order="first"/>
-        <projectService serviceImplementation="com.bamboo.tool.config.BambooApisComponent" />
+        <projectService serviceImplementation="com.bamboo.tool.config.BambooApisComponent"/>
         <projectService serviceImplementation="com.bamboo.tool.configurable.BambooApiFilterConfiguration"
+                        order="first"/>
+        <projectService serviceImplementation="com.bamboo.tool.configurable.ProjectFileterConfiguration"
                         order="first"/>
         <projectService serviceImplementation="com.bamboo.tool.configurable.BambooSoaFilterConfiguration"
                         order="first"/>
@@ -63,7 +67,7 @@
         <toolWindow id="Restful Cloud" anchor="right" factoryClass="com.bamboo.tool.config.BambooToolWindowFactory"
                     secondary="false" icon="PluginIcons.LOGO"
                     order="last"
-                    doNotActivateOnStart="true" />
+                    doNotActivateOnStart="true"/>
         <!--兼容性处理code-->
         <notificationGroup id="toolWindowNotificationGroup" displayType="TOOL_WINDOW"/>
 
@@ -84,7 +88,7 @@
                 class="com.bamboo.tool.view.component.actions.RestfulCloudSearchAction" icon="AllIcons.Actions.Search">
             <keyboard-shortcut first-keystroke="ctrl alt q" keymap="$default"/>
         </action>
-
+        
     </actions>
 
 

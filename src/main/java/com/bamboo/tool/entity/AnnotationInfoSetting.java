@@ -1,10 +1,13 @@
 package com.bamboo.tool.entity;
 
+import b.C.S;
 import com.bamboo.tool.enums.DefaultFrameWorkEnum;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Create by GuoQing
@@ -22,7 +25,7 @@ public class AnnotationInfoSetting {
     private String effect;
     private List<AnnotationParam> params = new ArrayList<>();
     List<AnnotationMethodScope> methodScopes = new ArrayList<>();
-
+    Map<String, List<String>> otherParams = new HashMap<>();
 //    public Object[] getStrings() {
 //        Object[] data = {annotationPath,
 //                scope.getDesc(),

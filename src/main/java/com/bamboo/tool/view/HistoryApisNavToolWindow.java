@@ -112,9 +112,9 @@ public class HistoryApisNavToolWindow extends SimpleToolWindowPanel implements D
         if (!(component instanceof MethodNode)) {
             return;
         }
-        MethodNode methodNode = (MethodNode) component;
-        final BambooApiMethod source = methodNode.getSource();
-        source.navigate(true);
+//        MethodNode methodNode = (MethodNode) component;
+//        final BambooApiMethod source = methodNode.getSource();
+//        source.navigate(true);
     }
 
     private void rendingTree(Project project) {
@@ -146,9 +146,9 @@ public class HistoryApisNavToolWindow extends SimpleToolWindowPanel implements D
             }
             append(node.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
             setIcon(node.getIcon(true));
-            if (target instanceof MethodNode) {
-                setToolTipText(((MethodNode) target).getToolTipText());
-            }
+//            if (target instanceof MethodNode) {
+//                setToolTipText(((MethodNode) target).getToolTipText());
+//            }
             SpeedSearchUtil.applySpeedSearchHighlighting(this, this, false, true);
         }
     }

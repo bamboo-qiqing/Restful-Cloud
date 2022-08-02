@@ -1,5 +1,7 @@
 package com.bamboo.tool.config;
 
+import com.bamboo.tool.config.model.ProjectInfo;
+import com.bamboo.tool.config.model.RestfulCloudConfig;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.util.I18nUtil;
 import com.bamboo.tool.view.CurrentApisNavTool;
@@ -15,6 +17,8 @@ import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManagerEvent;
 import com.intellij.ui.content.ContentManagerListener;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * Create by GuoQing
@@ -35,18 +39,17 @@ public class BambooToolWindowFactory implements ToolWindowFactory, DumbAware {
         toolWindow.getContentManager().addContent(currentApisNavToolApis);
 
 
-
         HistoryApisNavToolWindow historyApisNavToolWindow = new HistoryApisNavToolWindow(project);
         historyApisNavToolWindow.getComponent().add(historyApisNavToolWindow.getContent());
 
         Content historyApis = contentFactory.createContent(historyApisNavToolWindow, I18nUtil.getString("panel.history"), true);
         toolWindow.getContentManager().addContent(historyApis);
-        toolWindow.addContentManagerListener(new ContentManagerListener(){
+        toolWindow.addContentManagerListener(new ContentManagerListener() {
             @Override
             public void selectionChanged(@NotNull ContentManagerEvent event) {
                 final Content content = event.getContent().getManager().getContent(1);
-                if(content.getComponent() instanceof  HistoryApisNavToolWindow){
-                    HistoryApisNavToolWindow component = (HistoryApisNavToolWindow)content.getComponent();
+                if (content.getComponent() instanceof HistoryApisNavToolWindow) {
+                    HistoryApisNavToolWindow component = (HistoryApisNavToolWindow) content.getComponent();
                     component.renderData(project);
                 }
                 ContentManagerListener.super.selectionChanged(event);

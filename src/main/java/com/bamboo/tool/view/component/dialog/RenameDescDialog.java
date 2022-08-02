@@ -56,15 +56,15 @@ public class RenameDescDialog extends JDialog {
         if (StringUtil.isNotBlank(text)) {
             if (lastPathComponent instanceof MethodNode) {
                 MethodNode methodNode = (MethodNode) lastPathComponent;
-                BambooApiMethod source = methodNode.getSource();
-                String methodId = source.getMethodId();
-                BambooService.saveMethodRemark(text,methodId);
+//                BambooApiMethod source = methodNode.getSource();
+//                String methodId = source.getMethodId();
+//                BambooService.saveMethodRemark(text,methodId);
             }
             if (lastPathComponent instanceof ClassNode) {
                 ClassNode classNode = (ClassNode) lastPathComponent;
-                NoteData source = classNode.getSource();
-                String classId = source.getClassId();
-                BambooService.saveClassRemark(text,classId);
+//                NoteData source = classNode.getSource();
+//                String classId = source.getClassId();
+//                BambooService.saveClassRemark(text,classId);
             }
         }
         dispose();

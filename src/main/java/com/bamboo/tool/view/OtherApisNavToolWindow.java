@@ -165,9 +165,9 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
             }
             append(node.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
             setIcon(node.getIcon(true));
-            if (target instanceof MethodNode) {
-                setToolTipText(((MethodNode) target).getToolTipText());
-            }
+//            if (target instanceof MethodNode) {
+//                setToolTipText(((MethodNode) target).getToolTipText());
+//            }
             SpeedSearchUtil.applySpeedSearchHighlighting(this, this, false, true);
         }
     }
@@ -180,8 +180,8 @@ public class OtherApisNavToolWindow extends SimpleToolWindowPanel implements Dis
         if (!(component instanceof MethodNode)) {
             return;
         }
-        MethodNode methodNode = (MethodNode) component;
-        BambooApiMethod source = methodNode.getSource();
-        source.navigate(true);
+//        MethodNode methodNode = (MethodNode) component;
+//        BambooApiMethod source = methodNode.getSource();
+//        source.navigate(true);
     }
 }

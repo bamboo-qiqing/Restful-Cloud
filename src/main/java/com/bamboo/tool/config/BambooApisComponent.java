@@ -35,6 +35,16 @@ public class BambooApisComponent implements PersistentStateComponent<BambooApisC
         XmlSerializerUtil.copyBean(state, Objects.requireNonNull(getState()));
     }
 
+    @Override
+    public void noStateLoaded() {
+        PersistentStateComponent.super.noStateLoaded();
+    }
+
+    @Override
+    public void initializeComponent() {
+        PersistentStateComponent.super.initializeComponent();
+    }
+
     public static BambooApisComponent getInstance(Project project) {
         return project.getService(BambooApisComponent.class);
     }

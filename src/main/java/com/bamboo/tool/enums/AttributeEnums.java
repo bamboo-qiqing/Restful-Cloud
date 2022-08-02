@@ -8,6 +8,7 @@ public enum AttributeEnums {
     POOL_URL("poolUrl", "项目url"),
     CLASS_URL("classUrl", "类url"),
     METHOD_URL("methodUrl", "方法url"),
+    REQUEST_METHOD("requestMethod", "请求类型"),
     description("desc", "描述"),
     ;
 

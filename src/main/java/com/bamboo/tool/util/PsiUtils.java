@@ -155,7 +155,7 @@ public class PsiUtils {
     }
 
 
-    public static void openFile(@NotNull VirtualFile file, @NotNull Project project, String methodName, String methodId) {
+    public static void openFile(@NotNull VirtualFile file, @NotNull Project project, String methodName, String methodReturn, List<MethodParam> methodParams) {
         if (file == null) {
             return;
         }
@@ -163,14 +163,16 @@ public class PsiUtils {
         if (project == null) {
             return;
         }
-        Map<String, List<MethodParam>> api = BambooService.getApi(methodId);
+
         NonProjectFileWritingAccessProvider.allowWriting(Collections.singletonList(file));
         PsiFile psiFile = PsiUtil.getPsiFile(project, file);
         if (psiFile instanceof PsiJavaFile) {
             PsiClass childClass = ((PsiJavaFileImpl) psiFile).findChildByClass(PsiClass.class);
             if (childClass != null) {
                 PsiElement psiElement = Arrays.stream(childClass.getMethods()).filter(e -> e.getName().equals(methodName)).filter(e -> {
-                    List<MethodParam> methodParams = api.get(e.getReturnType().getPresentableText());
+                    if(!e.getReturnType().getPresentableText().equals(methodReturn)){
+                        return false;
+                    }
                     List<String> paramTypePaths = methodParams.parallelStream().map(type -> type.getParamType()).collect(Collectors.toList());
                     if (methodParams != null) {
                         PsiParameterList parameters = e.getParameterList();

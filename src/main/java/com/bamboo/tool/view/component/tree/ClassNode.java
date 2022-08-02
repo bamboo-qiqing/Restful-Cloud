@@ -16,8 +16,8 @@ import java.util.Optional;
 public class ClassNode extends BaseNode<NoteData> {
 
 
-    public ClassNode(NoteData noteData) {
-        super(noteData);
+    public ClassNode(NoteData bambooClass) {
+        super(bambooClass);
     }
 
 
@@ -49,6 +49,5 @@ public class ClassNode extends BaseNode<NoteData> {
         } else {
             return source.getName();
         }
-
     }
 }

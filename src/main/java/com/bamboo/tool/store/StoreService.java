@@ -1,6 +1,11 @@
 package com.bamboo.tool.store;
 
+import com.bamboo.tool.config.model.ProjectInfo;
+import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.entity.AnnotationInfoSetting;
+import com.bamboo.tool.entity.BambooClass;
+import com.bamboo.tool.enums.RequestMethod;
+import com.intellij.openapi.project.Project;
 
 import java.util.List;
 
@@ -16,4 +21,18 @@ public interface StoreService {
      * @return
      */
     List<AnnotationInfoSetting> getAllAnnotation();
+
+    /**
+     * 搜索api
+     *
+     * @param searchChar
+     * @param requestMethods
+     * @param projectInfos
+     * @return
+     */
+    List<BambooApiMethod> searchApi(String searchChar, List<RequestMethod> requestMethods, List<ProjectInfo> projectInfos, Project project);
+
+    void saveData(List<BambooClass> bambooClasses, Project project);
+
+    List<BambooClass> getOtherProjectBambooClass(Project project);
 }

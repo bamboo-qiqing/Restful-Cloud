@@ -1,5 +1,6 @@
 package com.bamboo.tool.contributor;
 
+import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.enums.RequestMethod;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider;
@@ -8,12 +9,15 @@ import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import lombok.Data;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Create by GuoQing
@@ -21,6 +25,8 @@ import java.util.List;
  * Description
  */
 public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
+
+    private Set<ProjectInfo> projectInfos;
 
     protected RequestMappingModel(@NotNull Project project, @NotNull List<ChooseByNameContributor> contributors) {
         super(project, contributors);
@@ -35,10 +41,7 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
 
     @Override
     protected boolean acceptItem(NavigationItem item) {
-        BambooApiMethod api = (BambooApiMethod) item;
-        final Collection<RequestMethod> filterItems = this.getFilterItems();
-        long count = filterItems.parallelStream().filter(e -> api.getRequestMethods().contains(e.getCode())).count();
-        return count > 0;
+        return true;
     }
 
     @Override
@@ -103,4 +106,11 @@ public class RequestMappingModel extends FilteringGotoByModel<RequestMethod> {
         return new RequestMappingItemProvider(this);
     }
 
+    public Set<ProjectInfo> getProjectInfos() {
+        return projectInfos;
+    }
+
+    public void setProjectInfos(List<ProjectInfo> projectInfos) {
+        this.projectInfos = new HashSet<>(projectInfos);
+    }
 }

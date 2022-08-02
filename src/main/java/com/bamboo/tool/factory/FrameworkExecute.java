@@ -6,7 +6,7 @@ import com.bamboo.tool.config.model.PsiClassCache;
 import com.bamboo.tool.entity.*;
 import com.bamboo.tool.enums.AnnotationScope;
 import com.bamboo.tool.enums.AttributeEnums;
-import com.bamboo.tool.enums.MethodScope;
+import com.bamboo.tool.enums.RequestMethod;
 import com.bamboo.tool.util.PsiAnnotationMemberUtil;
 import com.bamboo.tool.util.PsiUtils;
 import com.bamboo.tool.util.RequestMethodUtil;
@@ -29,13 +29,10 @@ import java.util.stream.Collectors;
  * Description
  */
 public class FrameworkExecute {
-
-
     /**
      * 构建当前项目 api集合
      */
     public static List<BambooClass> buildApiMethod(Project project) {
-
         List<AnnotationInfoSetting> annotationInfoSettings = BambooApisComponent.getStoreService().getAllAnnotation();
         List<String> scanMethods = annotationInfoSettings.parallelStream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.METHOD.getCode().equals(e.getScope())).map(e -> e.getAnnotationName()).collect(Collectors.toList());
         List<AnnotationInfoSetting> attributeClass = annotationInfoSettings.parallelStream().filter(e -> e.getEffect().contains("attribute")).filter(e -> AnnotationScope.CLASS.getCode().equals(e.getScope())).collect(Collectors.toList());
@@ -63,23 +60,40 @@ public class FrameworkExecute {
                     attributeClass.parallelStream().forEach(setting -> {
                         Map<String, AnnotationInfo> annotationInfoMap = bambooClass.getAnnotationInfoMap();
                         AnnotationInfo annotationInfo = annotationInfoMap.get(setting.getAnnotationName());
-                        if (!Objects.isNull(annotationInfo)) {
+                        if (!Objects.isNull(annotationInfo) && CollectionUtil.isNotEmpty(annotationInfo.getAnnotationAttributs())) {
                             Map<String, List<String>> annotationAttributs = annotationInfo.getAnnotationAttributs();
                             List<AnnotationParam> params = setting.getParams();
                             params.parallelStream().forEach(param -> {
                                 List<String> strings = annotationAttributs.get(param.getName());
                                 if (AttributeEnums.POOL_URL.getCode().equals(param.getType()) && CollectionUtil.isNotEmpty(strings)) {
-                                    bambooClass.setPoolUrl(strings.get(0));
+                                    if (StringUtil.isNotEmpty(strings.get(0))) {
+                                        boolean startWith = StringUtil.startWith(strings.get(0), "/");
+                                        if (!startWith) {
+                                            bambooClass.setPoolUrl("/" + strings.get(0));
+                                        } else {
+                                            bambooClass.setPoolUrl(strings.get(0));
+                                        }
+                                    }
                                 }
+
                                 if (AttributeEnums.CLASS_URL.getCode().equals(param.getType()) && CollectionUtil.isNotEmpty(strings)) {
-                                    bambooClass.getClassUrl().addAll(strings);
+                                    List<String> classUrls = strings.stream().map(classUrl -> {
+                                        if (StringUtil.isNotEmpty(classUrl)) {
+                                            boolean classStartWith = StringUtil.startWith(classUrl, "/");
+                                            if (!classStartWith) {
+                                                classUrl = "/" + classUrl;
+                                            }
+                                        }
+                                        return classUrl;
+                                    }).collect(Collectors.toList());
+                                    bambooClass.getClassUrl().addAll(classUrls);
                                 }
                             });
                         }
                     });
                     bambooClass.getMethods().parallelStream().forEach(method -> {
                         Map<String, AnnotationInfo> annotationInfoMap = method.getAnnotationInfoMap();
-                        annotationInfoMap.values().forEach(s -> {
+                        annotationInfoMap.values().stream().filter(annotationInfo -> annotationInfo.getAnnotationName() != null).forEach(s -> {
                             AnnotationInfoSetting annotationInfoSetting = attributeMethod.get(s.getAnnotationName());
                             if (!Objects.isNull(annotationInfoSetting)) {
                                 Map<String, List<String>> annotationAttributs = s.getAnnotationAttributs();
@@ -88,63 +102,45 @@ public class FrameworkExecute {
                                     List<String> strings = annotationAttributs.get(param.getName());
                                     if (CollectionUtil.isNotEmpty(strings)) {
                                         if (AttributeEnums.METHOD_URL.getCode().equals(param.getType())) {
-                                             List<String> urls = new ArrayList<>();
+                                            List<String> urls = new ArrayList<>();
+                                            strings.stream().forEach(methodUrl -> {
+                                                boolean methodStartWith = StringUtil.startWith(methodUrl, "/");
+                                                if (!methodStartWith) {
+                                                    methodUrl = "/" + methodUrl;
+                                                }
+                                                if (CollectionUtil.isNotEmpty(bambooClass.getClassUrl())) {
+                                                    for (String classUrl : bambooClass.getClassUrl()) {
+                                                        urls.add(bambooClass.getPoolUrl() + classUrl + methodUrl);
+                                                    }
+                                                }
+                                            });
+                                            method.getMethodUrl().addAll(urls);
+                                        } else if (AttributeEnums.REQUEST_METHOD.getCode().equals(param.getType())) {
+                                            method.getRequestMethods().addAll(strings);
                                         }
                                     }
                                 });
+                                Map<String, List<String>> otherParams = annotationInfoSetting.getOtherParams();
+                                otherParams.forEach((key, value) -> {
+                                    List<String> requestMethods = otherParams.get(AttributeEnums.REQUEST_METHOD.getCode());
+                                    if (CollectionUtil.isNotEmpty(requestMethods)) {
+                                        method.getRequestMethods().addAll(requestMethods);
+                                    }
+                                    List<String> methodUrls = otherParams.get(AttributeEnums.METHOD_URL.getCode());
+                                    if (CollectionUtil.isNotEmpty(methodUrls)) {
+                                        method.getMethodUrl().addAll(methodUrls);
+                                    }
+                                });
                             }
-
                         });
+                        if (CollectionUtil.isEmpty(method.getRequestMethods())) {
+                            method.getRequestMethods().add(RequestMethod.ALL.getCode());
+                        }
                     });
-
-
-//                            boolean satisfyScope = methodLevel(methodScopes, method);
-//
-//
-//                                    AnnotationMethodScope annotationMethodScope = methodScopes.get(MethodScope.ANNOTATION.getCode());
-//                                    if (annotationMethodScope != null) {
-//                                        PsiAnnotation[] methodAnnotations = method.getAnnotations();
-//                                        if (methodAnnotations.length > 0) {
-//                                            boolean annotations1 = buildAnnotations(null, bambooMethod, infoSettingMethodMap, methodAnnotations, info);
-//                                            if (annotations1) {
-//                                                bambooMethod.getReturnType().buildReturnType(Objects.requireNonNull(method.getReturnType()));
-//                                                String methodDescription = FrameworkExecute.getMethodDescription(method);
-//                                                if (StringUtil.isNotBlank(methodDescription)) {
-//                                                    BambooDesc bambooDesc = new BambooDesc();
-//                                                    bambooDesc.setDescribe(methodDescription);
-//                                                    bambooDesc.setFramewordCode("javadoc");
-//                                                    bambooMethod.getDescs().add(bambooDesc);
-//                                                }
-//                                                bambooMethod.buildMethodParams(method.getParameterList());
-//                                                bambooClass.getMethods().add(bambooMethod);
-//                                            }
-//
-//                                        }
-//                                    } else {
-//                                        if (info.getFramework().getName().equals("o_dian_yun")) {
-//                                            bambooMethod.getReturnType().buildReturnType(Objects.requireNonNull(method.getReturnType()));
-//                                            String methodDescription = FrameworkExecute.getMethodDescription(method);
-//                                            if (StringUtil.isNotBlank(methodDescription)) {
-//                                                BambooDesc bambooDesc = new BambooDesc();
-//                                                bambooDesc.setDescribe(methodDescription);
-//                                                bambooDesc.setFramewordCode("javadoc");
-//                                                bambooMethod.getDescs().add(bambooDesc);
-//                                            }
-//                                            bambooMethod.buildMethodParams(method.getParameterList());
-//                                            if (info.getSoaType().getCode().equals("soa_service")) {
-//                                                bambooMethod.getMethodUrl().add(method.getName());
-//                                            }
-//                                            if (info.getSoaType().getCode().equals("soa_client")) {
-//                                                bambooMethod.getMethodUrl().add(method.getName());
-//                                            }
-//                                        }
-//                                        bambooClass.getMethods().add(bambooMethod);
-//                                    }
-
-
                     bambooClasses.add(bambooClass);
                 }
             });
+
         });
         return bambooClasses;
     }
@@ -154,7 +150,7 @@ public class FrameworkExecute {
         bambooClass.setAnnotationInfoMap(stringAnnotationInfoMap);
     }
 
-    public static void buildClassAnnotationInfo(PsiMethod psiMethod, BambooMethod method) {
+    public static void buildMethodAnnotationInfo(PsiMethod psiMethod, BambooMethod method) {
         Map<String, AnnotationInfo> stringAnnotationInfoMap = builAnnotationInfo(psiMethod.getAnnotations());
         method.setAnnotationInfoMap(stringAnnotationInfoMap);
     }
@@ -166,7 +162,7 @@ public class FrameworkExecute {
             Map<String, List<String>> stringListMap = buildAttributes(annotation.getParameterList().getAttributes());
             annotationInfo.setAnnotationAttributs(stringListMap);
             return annotationInfo;
-        }).filter(e -> CollectionUtil.isNotEmpty(e.getAnnotationAttributs())).collect(Collectors.toMap(AnnotationInfo::getAnnotationName, a -> a));
+        }).collect(Collectors.toMap(AnnotationInfo::getAnnotationName, a -> a));
         return annotationInfoMap;
     }
 
@@ -175,7 +171,6 @@ public class FrameworkExecute {
      * 构建注释
      */
     private static boolean buildAnnotations(BambooClass bambooClass, BambooMethod bambooMethod, Map<String, AnnotationInfoSetting> infoSettingMap, PsiAnnotation[] annotations, AnnotationInfoSetting info) {
-
         AtomicBoolean results = new AtomicBoolean(false);
         Arrays.stream(annotations).forEach(annotation -> {
 

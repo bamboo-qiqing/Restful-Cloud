@@ -3,6 +3,7 @@ package com.bamboo.tool.db.entity;
 import com.bamboo.tool.contributor.RequestMappingItemPresentation;
 import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.entity.DescFramework;
+import com.bamboo.tool.entity.MethodParam;
 import com.bamboo.tool.enums.SoaType;
 import com.bamboo.tool.util.PsiUtils;
 import com.intellij.navigation.ItemPresentation;
@@ -15,6 +16,7 @@ import com.intellij.pom.Navigatable;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +30,7 @@ import java.util.Map;
 public class BambooApiMethod implements NavigationItem {
     private Navigatable navigationElement;
     private String url;
-    private String requestMethods;
+    private List<String> requestMethods;
     private String methodName;
     private String methodReturn;
     private String className;
@@ -41,6 +43,7 @@ public class BambooApiMethod implements NavigationItem {
     private SoaType soaType;
     private String frameworkName;
     private String projectPath;
+    private List<MethodParam> methodParams ;
     private Integer queryCount;
     private String methodId;
     private Project project;
@@ -54,7 +57,8 @@ public class BambooApiMethod implements NavigationItem {
 
     @Override
     public @Nullable
-    ItemPresentation getPresentation() { return new RequestMappingItemPresentation(this);
+    ItemPresentation getPresentation() {
+        return new RequestMappingItemPresentation(this);
     }
 
     @Override
@@ -63,8 +67,7 @@ public class BambooApiMethod implements NavigationItem {
 
         ApplicationManager.getApplication().runReadAction(() -> {
             if (file != null && file.isValid()) {
-                BambooService.saveMethodCount(methodId, queryCount);
-                PsiUtils.openFile(file, project, methodName, methodId);
+                PsiUtils.openFile(file, project, methodName, methodReturn,methodParams);
             }
             if (navigationElement != null) {
                 navigationElement.navigate(requestFocus);

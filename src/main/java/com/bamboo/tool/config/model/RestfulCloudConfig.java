@@ -14,14 +14,17 @@ import java.util.List;
 @Data
 public class RestfulCloudConfig {
 
-    private ProjectInfo projectInfo;
     /**
      * 是否显示注释，默认显示
      */
     private Boolean isShowDesc;
-
     /**
      * 注解集合
      */
     private List<AnnotationInfoSetting> annotations;
+    /**
+     * 项目集合
+     */
+    private List<ProjectInfo> projectInfos;
+
 }

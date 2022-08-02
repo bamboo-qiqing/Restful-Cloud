@@ -2,20 +2,21 @@ package com.bamboo.tool.view;
 
 import com.bamboo.tool.config.BambooApisComponent;
 import com.bamboo.tool.config.BambooApisComponentConfig;
+import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.ProjectInfo;
+import com.bamboo.tool.config.model.RestfulCloudConfig;
 import com.bamboo.tool.configurable.BambooApiFilterConfiguration;
 import com.bamboo.tool.configurable.BambooSoaFilterConfiguration;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.db.service.BambooService;
+import com.bamboo.tool.entity.AnnotationInfoSetting;
 import com.bamboo.tool.entity.BambooClass;
 import com.bamboo.tool.enums.RequestMethod;
 import com.bamboo.tool.enums.SoaType;
 import com.bamboo.tool.factory.FrameworkExecute;
+import com.bamboo.tool.store.StoreService;
 import com.bamboo.tool.util.PsiUtils;
-import com.bamboo.tool.view.component.actions.RefreshApiAction;
-import com.bamboo.tool.view.component.actions.RenameDescAction;
-import com.bamboo.tool.view.component.actions.SearchApiAction;
-import com.bamboo.tool.view.component.actions.SearchEverywhereFiltersAction;
+import com.bamboo.tool.view.component.actions.*;
 import com.bamboo.tool.view.component.notificationGroup.ToolWindowNotificationGroup;
 import com.bamboo.tool.view.component.tree.*;
 import com.intellij.icons.AllIcons;
@@ -32,17 +33,21 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.*;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
+import com.power.doc.model.ApiConfig;
 import icons.PluginIcons;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -51,6 +56,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposable {
 
@@ -72,7 +78,6 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
         allApiList = new ArrayList<>();
         setLayout(new BorderLayout());
         apiTree = new ApiTree();
-
         Disposer.register(myProject, this);
 
         initActionBar();
@@ -87,34 +92,24 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
             }
         });
 
-        PopupHandler popupHandler = new PopupHandler() {
+        apiTree.addMouseListener(new MouseAdapter() {
             @Override
-            public void invokePopup(Component comp, int x, int y) {
-
-                if (comp instanceof ApiTree) {
-
-                    DefaultActionGroup group = new DefaultActionGroup();
-                    ApiTree source = (ApiTree) comp;
-                    Object lastPathComponent = source.getSelectionPath().getLastPathComponent();
-                    if (lastPathComponent instanceof MethodNode) {
-                        group.add(new RenameDescAction(source));
-                    }
-                    if (lastPathComponent instanceof ClassNode) {
-                        group.add(new RenameDescAction(source));
-                    }
-                    if (lastPathComponent instanceof ModuleNode) {
-//                        group.add(new RenameDescAction(source));
-                    }
-                    if (lastPathComponent instanceof ProjectNode) {
-//                        group.add(new RenameDescAction(source));
-                    }
-                    ActionPopupMenu contextMenu = ((ActionManagerImpl) ActionManager.getInstance()).createActionPopupMenu(ActionPlaces.POPUP, new DefaultActionGroup(group), new MenuItemPresentationFactory(true));
-                    contextMenu.getComponent().show(comp, x, y);
+            public void mouseClicked(MouseEvent event) {
+                if (!apiTree.isEnabled()) {
+                    return;
                 }
-
+//                if (SwingUtilities.isLeftMouseButton(event)) {
+//                    if (event.getClickCount() == 2 && getDoubleClickListener() != null) {
+//                        getDoubleClickListener().accept(node);
+//                    }
+//                } else if (SwingUtilities.isRightMouseButton(event)) {
+//                    showPopupMenu(event.getX(), event.getY(), getPopupMenu(event, node));
+//                }
+                if (SwingUtilities.isRightMouseButton(event)) {
+                    showPopupMenu(event.getX(), event.getY(), getPopupMenu(event));
+                }
             }
-        };
-        apiTree.addMouseListener(popupHandler);
+        });
         apiTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent event) {
@@ -135,12 +130,51 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
         renderData();
     }
 
+    public JPopupMenu getPopupMenu(@NotNull MouseEvent event) {
+        List<JMenuItem> items = new ArrayList<>();
+        JBPopupMenu menu = new JBPopupMenu();
+
+        JMenu jMenu = new JMenu("导出");
+        jMenu.setIcon(AllIcons.ToolbarDecorator.Export);
+        JMenuItem exportHtml = new JMenuItem("导出为Html");
+        exportHtml.addActionListener(actionEvent -> {
+            ApiConfig apiConfig = new ApiConfig();
+        });
+        jMenu.add(exportHtml);
+        menu.add(jMenu);
+        return menu;
+    }
+
     @Override
     public void dispose() {
 
     }
 
+    /**
+     * 显示右键菜单
+     */
+    protected void showPopupMenu(int x, int y, @Nullable JPopupMenu menu) {
+        if (menu == null) {
+            return;
+        }
+        TreePath path = apiTree.getPathForLocation(x, y);
+        apiTree.setSelectionPath(path);
+        Rectangle rectangle = apiTree.getUI().getPathBounds(apiTree, path);
+        if (rectangle != null && rectangle.contains(x, y)) {
+            menu.show(apiTree, x, rectangle.y + rectangle.height);
+        }
+    }
+
     private void renderData() {
+        RestfulCloudConfig state = BambooToolComponent.getInstance().getState();
+        List<ProjectInfo> projectInfos = state.getProjectInfos();
+        long count = projectInfos.stream().filter(e -> e.getProjectName().equals(myProject.getName())).filter(e -> e.getProjectPath().equals(myProject.getBasePath())).count();
+        if (count < 1) {
+            ProjectInfo projectInfo = new ProjectInfo();
+            projectInfo.setProjectPath(myProject.getBasePath());
+            projectInfo.setProjectName(myProject.getName());
+            projectInfos.add(projectInfo);
+        }
         DumbService.getInstance(myProject).smartInvokeLater(() -> rendingTree());
     }
 
@@ -160,7 +194,7 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
             append(node.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
             setIcon(node.getIcon(true));
             if (target instanceof MethodNode) {
-                setToolTipText(((MethodNode) target).getToolTipText());
+//                setToolTipText(((MethodNode) target).getToolTipText());
             }
 
             SpeedSearchUtil.applySpeedSearchHighlighting(this, this, false, true);
@@ -191,16 +225,43 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
                 ApplicationManager.getApplication().runReadAction(() -> {
+                    StoreService storeService = BambooApisComponent.getStoreService();
                     allApiList = FrameworkExecute.buildApiMethod(myProject);
+
+                    List<BambooClass> otherProjectBambooClass = storeService.getOtherProjectBambooClass(myProject);
+                    allApiList.addAll(otherProjectBambooClass);
+
                     indicator.setText("Rendering");
-                    BambooApisComponentConfig state = BambooApisComponent.getInstance(myProject).getState();
-
-                    state.setBambooClasses(allApiList);
-                    ProjectInfo currentProject = BambooService.queryProject(myProject.getBasePath(), myProject.getName());
-                    BambooService.saveClass(allApiList, currentProject);
-                    List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, myProject, null, false, soaTypeFiler.getSelectedElements());
-
-                    RootNode rootNode = PsiUtils.convertToRoot(allApi, requestTypeFiler.getSelectedElements());
+                    storeService.saveData(allApiList, myProject);
+                    List<BambooApiMethod> apis = new ArrayList<>();
+                    allApiList.parallelStream().forEach(bambooClass -> {
+                        bambooClass.getMethods().parallelStream().forEach(method -> {
+                            List<BambooApiMethod> list = method.getMethodUrl().stream().map(e -> {
+                                BambooApiMethod bambooApiMethod = new BambooApiMethod();
+                                bambooApiMethod.setUrl(e);
+                                bambooApiMethod.setProject(myProject);
+                                bambooApiMethod.setMethodName(method.getMethodName());
+                                bambooApiMethod.setClassPath(bambooClass.getClassPath());
+                                bambooApiMethod.setProjectName(myProject.getName());
+                                bambooApiMethod.setRequestMethods(method.getRequestMethods());
+                                bambooApiMethod.setMethodReturn(method.getReturnType().getReturnType());
+                                bambooApiMethod.setModelName(bambooClass.getModuleName());
+                                bambooApiMethod.setProjectPath(myProject.getBasePath());
+                                bambooApiMethod.setClassName(bambooClass.getClassName());
+                                bambooApiMethod.setMethodParams(method.getMethodParams());
+                                AnnotationInfoSetting setting = bambooClass.getSetting();
+                                String soaTypeStr = setting.getSoaType();
+                                SoaType soaType = SoaType.getSoaType(soaTypeStr);
+                                bambooApiMethod.setSoaType(soaType);
+                                return bambooApiMethod;
+                            }).collect(Collectors.toList());
+                            apis.addAll(list);
+                        });
+                    });
+//                    ProjectInfo currentProject = BambooService.queryProject(myProject.getBasePath(), myProject.getName());
+//                    BambooService.saveClass(allApiList, currentProject);
+//                    List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, myProject, null, false, soaTypeFiler.getSelectedElements());
+                    RootNode rootNode = PsiUtils.convertToRoot(apis, requestTypeFiler.getSelectedElements());
                     apiTree.setModel(new DefaultTreeModel(rootNode));
                     ToolWindowNotificationGroup.NOTIFICATION_GROUP.createNotification("Reload apis complete", MessageType.INFO).notify(myProject);
                 });

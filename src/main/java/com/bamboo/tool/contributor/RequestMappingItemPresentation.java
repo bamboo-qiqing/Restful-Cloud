@@ -32,7 +32,7 @@ public class RequestMappingItemPresentation implements ItemPresentation {
     public
     @Nullable
     String getLocationString() {
-        return item.getProjectName() + "." + item.getClassName() + item.getRequestMethods();
+        return item.getClassName() + item.getRequestMethods();
     }
 
     @Override
@@ -40,4 +40,5 @@ public class RequestMappingItemPresentation implements ItemPresentation {
     Icon getIcon(boolean b) {
         return item.getSoaType().getIcon();
     }
+
 }

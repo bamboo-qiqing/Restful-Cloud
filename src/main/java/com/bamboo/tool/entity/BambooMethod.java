@@ -44,7 +44,7 @@ public class BambooMethod {
         if (parametersCount > 0) {
             for (int i = 0; i < parametersCount; i++) {
                 PsiParameter parameter = psiParameterList.getParameter(i);
-                final MethodParam methodParam = new MethodParam();
+                MethodParam methodParam = new MethodParam();
                 assert parameter != null;
                 methodParam.buildMethodParam(parameter, i);
                 methodParams.add(methodParam);
@@ -56,7 +56,7 @@ public class BambooMethod {
         this.setMethodName(method.getName());
         this.setAccessLevel(PsiUtil.getAccessLevel(method.getModifierList()));
         //构建方法注解信息
-        FrameworkExecute.buildClassAnnotationInfo(method, this);
+        FrameworkExecute.buildMethodAnnotationInfo(method, this);
         // 构建返回类型
         this.getReturnType().buildReturnType(method.getReturnType());
         //构建方法参数

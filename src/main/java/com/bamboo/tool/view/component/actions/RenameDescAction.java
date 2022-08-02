@@ -1,8 +1,6 @@
 package com.bamboo.tool.view.component.actions;
 
 
-import com.bamboo.tool.db.entity.BambooApiMethod;
-import com.bamboo.tool.db.service.BambooService;
 import com.bamboo.tool.view.component.dialog.RenameDescDialog;
 import com.bamboo.tool.view.component.tree.ApiTree;
 import com.bamboo.tool.view.component.tree.ClassNode;

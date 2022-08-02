@@ -26,7 +26,6 @@ import com.intellij.util.Processor;
 import com.intellij.util.SynchronizedCollectConsumer;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.indexing.FindSymbolParameters;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

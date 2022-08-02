@@ -16,6 +16,7 @@
 
 package com.bamboo.tool.view.component.tree;
 
+import com.bamboo.tool.entity.BambooMethod;
 import com.bamboo.tool.entity.DescFramework;
 import com.bamboo.tool.db.entity.BambooApiMethod;
 import com.bamboo.tool.util.StringUtil;
@@ -29,8 +30,8 @@ import java.util.Optional;
 
 public class MethodNode extends BaseNode<BambooApiMethod> {
 
-    public MethodNode(BambooApiMethod apiModel) {
-        super(apiModel);
+    public MethodNode(BambooApiMethod method) {
+        super(method);
     }
 
 
@@ -64,7 +65,6 @@ public class MethodNode extends BaseNode<BambooApiMethod> {
         } else {
             return source.getUrl() + source.getRequestMethods();
         }
-
     }
 
     public String getToolTipText() {

@@ -538,7 +538,7 @@ public class BambooService {
             String classId = resultSet.getString("classId");
             Integer queryCount = resultSet.getInt("queryCount");
             api.setUrl(url);
-            api.setRequestMethods(requestMethods);
+//            api.setRequestMethods(requestMethods);
             api.setMethodName(methodName);
             api.setMethodReturn(methodReturn);
             api.setModelName(modelName);
