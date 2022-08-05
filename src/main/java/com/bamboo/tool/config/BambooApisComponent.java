@@ -1,5 +1,6 @@
 package com.bamboo.tool.config;
 
+import com.bamboo.tool.store.Impl.SqliteStoreServiceImpl;
 import com.bamboo.tool.store.LocalStoreServiceImpl;
 import com.bamboo.tool.store.StoreService;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -49,7 +50,7 @@ public class BambooApisComponent implements PersistentStateComponent<BambooApisC
         return project.getService(BambooApisComponent.class);
     }
     public static StoreService getStoreService() {
-        StoreService storeService=new LocalStoreServiceImpl();
+        StoreService storeService=new SqliteStoreServiceImpl();
         return storeService;
     }
 }

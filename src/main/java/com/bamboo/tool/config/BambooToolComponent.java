@@ -4,8 +4,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.bamboo.tool.config.model.RestfulCloudConfig;
 import com.bamboo.tool.entity.AnnotationInfoSetting;
 import com.bamboo.tool.entity.AnnotationParam;
+import com.bamboo.tool.entity.Framework;
 import com.bamboo.tool.enums.DefaultAnnotationEnum;
 import com.bamboo.tool.enums.DefaultAnnotationParamEnum;
+import com.bamboo.tool.enums.DefaultFrameWorkEnum;
 import com.bamboo.tool.enums.DefaultOtherParams;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -59,7 +61,11 @@ public class BambooToolComponent implements PersistentStateComponent<RestfulClou
             annotationInfoSetting.setEffect(annotationEnum.getEffect());
             annotationInfoSetting.setScope(annotationEnum.getScope());
             annotationInfoSetting.setSoaType(annotationEnum.getSoaType());
-            annotationInfoSetting.setFramework(annotationEnum.getFrameWork());
+            Framework framework = new Framework();
+            DefaultFrameWorkEnum frameWork = annotationEnum.getFrameWork();
+            framework.setName(frameWork.getCode());
+            framework.setDescribe(frameWork.getName());
+            annotationInfoSetting.setFramework(framework);
             List<DefaultAnnotationParamEnum> defaultAnnotationParamEnums = listMap.get(annotationEnum);
             if (CollectionUtil.isNotEmpty(defaultAnnotationParamEnums)) {
                 List<AnnotationParam> params = defaultAnnotationParamEnums.stream().map(list -> {

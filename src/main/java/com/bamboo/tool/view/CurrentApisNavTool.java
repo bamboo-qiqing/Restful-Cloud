@@ -228,8 +228,6 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
                     StoreService storeService = BambooApisComponent.getStoreService();
                     allApiList = FrameworkExecute.buildApiMethod(myProject);
 
-                    List<BambooClass> otherProjectBambooClass = storeService.getOtherProjectBambooClass(myProject);
-                    allApiList.addAll(otherProjectBambooClass);
 
                     indicator.setText("Rendering");
                     storeService.saveData(allApiList, myProject);
@@ -244,7 +242,7 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
                                 bambooApiMethod.setClassPath(bambooClass.getClassPath());
                                 bambooApiMethod.setProjectName(myProject.getName());
                                 bambooApiMethod.setRequestMethods(method.getRequestMethods());
-                                bambooApiMethod.setMethodReturn(method.getReturnType().getReturnType());
+                                bambooApiMethod.setMethodReturn(method.getReturnType().getReturnTypePath());
                                 bambooApiMethod.setModelName(bambooClass.getModuleName());
                                 bambooApiMethod.setProjectPath(myProject.getBasePath());
                                 bambooApiMethod.setClassName(bambooClass.getClassName());
@@ -258,9 +256,6 @@ public class CurrentApisNavTool extends SimpleToolWindowPanel implements Disposa
                             apis.addAll(list);
                         });
                     });
-//                    ProjectInfo currentProject = BambooService.queryProject(myProject.getBasePath(), myProject.getName());
-//                    BambooService.saveClass(allApiList, currentProject);
-//                    List<BambooApiMethod> allApi = BambooService.getAllApi(currentProject.getId().toString(), null, myProject, null, false, soaTypeFiler.getSelectedElements());
                     RootNode rootNode = PsiUtils.convertToRoot(apis, requestTypeFiler.getSelectedElements());
                     apiTree.setModel(new DefaultTreeModel(rootNode));
                     ToolWindowNotificationGroup.NOTIFICATION_GROUP.createNotification("Reload apis complete", MessageType.INFO).notify(myProject);

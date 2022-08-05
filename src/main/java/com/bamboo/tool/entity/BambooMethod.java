@@ -1,5 +1,6 @@
 package com.bamboo.tool.entity;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bamboo.tool.factory.FrameworkExecute;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
@@ -12,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Create by GuoQing
@@ -25,19 +27,17 @@ public class BambooMethod {
     private String description = StringUtils.EMPTY;
     private String remark = StringUtils.EMPTY;
     private String methodName = StringUtils.EMPTY;
-    private String projectId;
-    private String classId;
-    private int accessLevel;
+    private  String projectId;
+    private  String classId;
+    private  int accessLevel;
 
     private List<String> methodUrl = new ArrayList<>();
     private List<String> requestMethods = new ArrayList<>();
     private MethodReturnType returnType = new MethodReturnType();
-    private String returnTypeStr;
-    private String methodParamsStr;
     private List<MethodParam> methodParams = new ArrayList<>();
     private List<BambooDesc> descs = new ArrayList<>();
-    private Boolean isExist = false;
     private Map<String, AnnotationInfo> annotationInfoMap;
+    private JavaDocComment javaDocComment;
 
     public void buildMethodParams(PsiParameterList psiParameterList) {
         int parametersCount = psiParameterList.getParametersCount();
@@ -63,19 +63,27 @@ public class BambooMethod {
         this.buildMethodParams(method.getParameterList());
         //构建注释
         this.setDescription(FrameworkExecute.getMethodDescription(method));
+        // 构建java注释对象
+        this.setJavaDocComment(JavaDocComment.buildJavaDocComment(method.getDocComment()));
+
         return this;
     }
 
 
-    public String toInsertSql(String projectId) {
-        return "insert into bamboo_method (id, project_id, method_name, class_id,description,method_params,return_type) VALUES(" + "'" + id + "'," + "'" + projectId + "'," + "'" + methodName + "'," + "'" + classId + "'," + "'" + description + "'," + "'" + methodParamsStr + "'," + "'" + returnTypeStr + "'" + ");";
-    }
-
-    public String toUpdateSql() {
-        return "UPDATE bamboo_method SET description   = '" + description + "' WHERE id = '" + id + "';";
-    }
-
-    public String toDeleteSql() {
-        return "delete from bamboo_method where id='" + id + "';";
+    public String toInsertSql(String projectId, String classId) {
+        return new StringBuilder()
+                .append("insert into bamboo_method (id, project_id, method_name, class_id,description,method_params,return_type,method_url,annotation_attributes,request_methods,java_doc_comment) VALUES(")
+                .append("'").append(UUID.randomUUID()).append("',")
+                .append("'").append(projectId).append("',")
+                .append("'").append(methodName).append("',")
+                .append("'").append(classId).append("',")
+                .append("'").append(description).append("',")
+                .append("'").append(JSONObject.toJSON(methodParams)).append("',")
+                .append("'").append(JSONObject.toJSON(returnType)).append("',")
+                .append("'").append(JSONObject.toJSON(methodUrl)).append("',")
+                .append("'").append(JSONObject.toJSON(annotationInfoMap)).append("',")
+                .append("'").append(JSONObject.toJSON(requestMethods)).append("',")
+                .append("'").append(javaDocComment == null ? "" : JSONObject.toJSON(javaDocComment)) + "'"
+                + ");";
     }
 }

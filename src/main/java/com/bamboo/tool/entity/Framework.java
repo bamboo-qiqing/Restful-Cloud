@@ -16,7 +16,6 @@ public class Framework {
     private String id;
     private String name;
     private String describe;
-    private List<AnnotationInfoSetting> annotationInfoSettings=new ArrayList<>();
 
     public Object[] getStrings() {
         Object[] data = {name, describe, id};

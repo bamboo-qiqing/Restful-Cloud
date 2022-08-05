@@ -35,4 +35,9 @@ public interface StoreService {
     void saveData(List<BambooClass> bambooClasses, Project project);
 
     List<BambooClass> getOtherProjectBambooClass(Project project);
+
+    /**
+     * 获取所有的项目信息
+     */
+    List<ProjectInfo> getAllProjectInfos();
 }

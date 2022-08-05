@@ -1,5 +1,6 @@
 package com.bamboo.tool.contributor;
 
+import com.bamboo.tool.config.BambooApisComponent;
 import com.bamboo.tool.config.BambooToolComponent;
 import com.bamboo.tool.config.model.ProjectInfo;
 import com.bamboo.tool.configurable.BambooApiFilterConfiguration;
@@ -47,7 +48,7 @@ public class BambooApiGotoContributor extends AbstractGotoSEContributor {
     protected BambooApiGotoContributor(@NotNull AnActionEvent event) {
         super(event);
         myProject = event.getProject();
-        List<ProjectInfo> projectInfos = BambooToolComponent.getInstance().getState().getProjectInfos();
+        List<ProjectInfo> projectInfos = BambooApisComponent.getStoreService().getAllProjectInfos();
         BambooApiFilterConfiguration instance = BambooApiFilterConfiguration.getInstance(myProject);
         ProjectFileterConfiguration projectInstance = ProjectFileterConfiguration.getInstance(myProject);
 

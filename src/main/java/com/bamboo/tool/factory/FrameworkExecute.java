@@ -42,7 +42,6 @@ public class FrameworkExecute {
         List<PsiClassCache> caches = PsiUtils.getALLPsiClass(project, annotationInfoSettings);
         caches.forEach(cache -> {
             AnnotationInfoSetting info = cache.getSetting();
-            Map<String, AnnotationMethodScope> methodScopes = info.getMethodScopes().stream().collect(Collectors.toMap(AnnotationMethodScope::getMethodScope, methodScope -> methodScope));
             cache.getAnnotations().stream().forEach(e -> {
                 PsiClass psiClass = (PsiClass) e.getParent().getParent();
                 Module module = ModuleUtil.findModuleForPsiElement(psiClass);
@@ -54,9 +53,10 @@ public class FrameworkExecute {
                     bambooClass.setSetting(info);
                     String classDescription = FrameworkExecute.getClassDescription(psiClass);
                     bambooClass.setDescription(classDescription);
+                    bambooClass.setJavaDocComment(JavaDocComment.buildJavaDocComment(psiClass.getDocComment()));
                     // 构建注解信息
                     buildClassAnnotationInfo(psiClass, bambooClass);
-                    bambooClass.buildMethods(psiClass.getMethods(), methodScopes, scanMethods);
+                    bambooClass.buildMethods(psiClass.getMethods(), scanMethods);
                     attributeClass.parallelStream().forEach(setting -> {
                         Map<String, AnnotationInfo> annotationInfoMap = bambooClass.getAnnotationInfoMap();
                         AnnotationInfo annotationInfo = annotationInfoMap.get(setting.getAnnotationName());

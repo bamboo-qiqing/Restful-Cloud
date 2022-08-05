@@ -30,9 +30,7 @@ public class BambooToolWindowFactory implements ToolWindowFactory, DumbAware {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-//        BambooService.initTable(project);
-
-
+        BambooService.initTable(project);
         CurrentApisNavTool currentApisNavTool = new CurrentApisNavTool(project);
         currentApisNavTool.getComponent().add(currentApisNavTool.getContent());
         Content currentApisNavToolApis = contentFactory.createContent(currentApisNavTool, I18nUtil.getString("panel.current"), true);

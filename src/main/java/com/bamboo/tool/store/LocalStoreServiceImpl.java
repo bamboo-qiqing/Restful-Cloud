@@ -92,4 +92,9 @@ public class LocalStoreServiceImpl implements StoreService {
         });
         return bambooClasses;
     }
+
+    @Override
+    public List<ProjectInfo> getAllProjectInfos() {
+        return BambooToolComponent.getInstance().getState().getProjectInfos();
+    }
 }

@@ -133,112 +133,6 @@ public class BambooService {
         return project;
     }
 
-    @SneakyThrows
-    public static void saveClass(List<BambooClass> allClasses, ProjectInfo projectInfo) {
-        if (CollectionUtil.isEmpty(allClasses)) {
-            return;
-        }
-        BambooService.deleteClasssByProjectId(projectInfo.getId().toString());
-        Connection conn = SqliteConfig.getConnection();
-        Statement state = conn.createStatement();
-        List<String> sqls = BambooService.addBatchSql(projectInfo, allClasses);
-        sqls.forEach(e -> {
-            try {
-                state.addBatch(e);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        });
-        state.executeBatch();
-        state.close();
-        conn.close();
-    }
-
-    @SneakyThrows
-    public static void deleteClasssByProjectId(String projectId) {
-        Connection conn = SqliteConfig.getConnection();
-        Statement state = conn.createStatement();
-        if (!Objects.isNull(projectId)) {
-            state.addBatch(StringUtil.format("delete from bamboo_api WHERE project_id = '{}';", projectId));
-            state.executeBatch();
-        }
-        state.close();
-        conn.close();
-    }
-
-    @SneakyThrows
-    private static List<String> addBatchSql(ProjectInfo projectInfo, List<BambooClass> allClasses) {
-        String projectId = projectInfo.getId().toString();
-        Map<String, BambooClass> classMap = BambooService.queryClassByProjectId(projectId);
-        Map<String, BambooMethod> methodMap = BambooService.queryMethodByProjectId(projectId);
-        List<String> sqls = new ArrayList<>();
-        allClasses.forEach(bambooClass -> {
-            String Id = Base64.encode(bambooClass.getClassPath(), CharsetUtil.CHARSET_UTF_8);
-            BambooClass oldClass = classMap.get(Id);
-            bambooClass.setId(Id);
-            if (!Objects.isNull(oldClass)) {
-                oldClass.setIsExist(true);
-//                if (bambooClass.getSettingId() != null && !oldClass.getSettingId().equals(bambooClass.getSettingId())) {
-//                    oldClass.setSettingId(bambooClass.getSettingId());
-//
-//                }
-                String description = oldClass.getDescription();
-                String descs = JSONObject.toJSONString(bambooClass.getDescs());
-                if (!description.equals(descs)) {
-                    oldClass.setDescription(descs);
-                }
-                if (oldClass.getIsExist()) {
-                    sqls.add(oldClass.toUpdateSql());
-                }
-            } else if (Objects.isNull(oldClass)) {
-                sqls.add(bambooClass.toInsertSql(projectInfo.getId()));
-            }
-
-            List<BambooMethod> methods = bambooClass.getMethods();
-            if (CollectionUtil.isNotEmpty(methods)) {
-
-                methods.forEach(method -> {
-                    String returnType = JSONObject.toJSONString(method.getReturnType());
-                    List<MethodParam> methodParams = method.getMethodParams().stream().sorted(Comparator.comparing(MethodParam::getParamIndex)).collect(Collectors.toList());
-                    List<String> paramTypePaths = methodParams.stream().map(e -> e.getParamTypePath()).collect(Collectors.toList());
-                    String methodParamsStr = JSONObject.toJSONString(methodParams);
-                    String descs = JSONObject.toJSONString(method.getDescs());
-                    String methodId = Base64.encode(bambooClass.getId() + method.getReturnType().getReturnTypePath() + paramTypePaths + method.getMethodName() + bambooClass.getClassUrl(), CharsetUtil.CHARSET_UTF_8);
-
-                    BambooMethod bambooMethod = methodMap.get(methodId);
-                    method.setId(methodId);
-                    method.setClassId(bambooClass.getId());
-                    method.setProjectId(projectId);
-                    method.setReturnTypeStr(returnType);
-                    method.setMethodParamsStr(methodParamsStr);
-                    if (Objects.isNull(bambooMethod)) {
-                        method.setDescription(descs);
-                        String methodInsertSql = method.toInsertSql(projectId);
-                        sqls.add(methodInsertSql);
-                    } else {
-                        if (!descs.equals(bambooMethod.getDescription())) {
-                            bambooMethod.setDescription(descs);
-                            sqls.add(bambooMethod.toUpdateSql());
-                        }
-                        bambooMethod.setIsExist(true);
-                    }
-
-                    List<String> classUrls = bambooClass.getClassUrl();
-                    if (CollectionUtil.isNotEmpty(classUrls)) {
-                        classUrls.parallelStream().forEach(e -> buildApiSql(sqls, bambooClass, method, e, projectInfo));
-                    } else {
-                        buildApiSql(sqls, bambooClass, method, "", projectInfo);
-                    }
-                });
-            }
-        });
-        classMap.values().stream().filter(e -> !e.getIsExist()).forEach(e -> {
-            sqls.add(e.toDeleteSql());
-            sqls.add(e.toDeleteMethodSql());
-        });
-        methodMap.values().stream().filter(e -> !e.getIsExist()).forEach(e -> sqls.add(e.toDeleteSql()));
-        return sqls;
-    }
 
     private static void buildApiSql(List<String> sqls, BambooClass bambooClass, BambooMethod method, String e, ProjectInfo projectInfo) {
         List<String> methodUrls = method.getMethodUrl();
@@ -395,7 +289,7 @@ public class BambooService {
     @NotNull
     private static AnnotationInfoSetting getAnnotationInfo(ResultSet resultSet, Map<String, Framework> frameworkMap, Map<Integer, List<AnnotationMethodScope>> methodScopeMap, Map<Integer, List<AnnotationParam>> paramMap) throws SQLException {
         AnnotationInfoSetting annotationInfoSetting = new AnnotationInfoSetting();
-        String id = resultSet.getString("id");
+        Integer id = resultSet.getInt("id");
         String classPath = resultSet.getString("class_path");
         String classShortName = resultSet.getString("class_short_name");
         String scope = resultSet.getString("scope");
@@ -416,9 +310,7 @@ public class BambooService {
         annotationInfoSetting.setSoaType(soaType);
         annotationInfoSetting.setEffect(effect);
 
-        if (annotationMethodScopes != null) {
-            annotationInfoSetting.setMethodScopes(annotationMethodScopes);
-        }
+
 
         if (params != null) {
             annotationInfoSetting.setParams(params);

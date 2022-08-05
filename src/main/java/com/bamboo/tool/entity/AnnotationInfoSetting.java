@@ -16,15 +16,14 @@ import java.util.Map;
  */
 @Data
 public class AnnotationInfoSetting {
-    private String id;
+    private Integer id;
     private String annotationName;
     private String annotationPath;
-    private DefaultFrameWorkEnum framework;
+    private Framework framework;
     private String scope;
     private String soaType;
     private String effect;
     private List<AnnotationParam> params = new ArrayList<>();
-    List<AnnotationMethodScope> methodScopes = new ArrayList<>();
     Map<String, List<String>> otherParams = new HashMap<>();
 //    public Object[] getStrings() {
 //        Object[] data = {annotationPath,
